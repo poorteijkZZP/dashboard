@@ -5,7 +5,8 @@
  */
 (function () {
   var CFG = window.APP_CONFIG || {};
-  var LIVE = !!(CFG.supabaseUrl && CFG.supabaseKey && window.supabase);
+  var DEMO_URL = /[?&]demo\b/.test(location.search);
+  var LIVE = !DEMO_URL && !!(CFG.supabaseUrl && CFG.supabaseKey && window.supabase);
   var JAAR = CFG.jaar || 2026;
 
   // modelveld -> kolom in tabel "klanten"

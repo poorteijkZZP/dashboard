@@ -19,6 +19,10 @@ Online klantdashboard waarin alle collega's van PoortEijk ZZP tegelijk werken: a
 | `supabase/schema.sql` | Tabellen en rechten voor Supabase |
 | `netlify.toml` | Beveiligingsinstellingen voor de website |
 
+## Demo bekijken
+
+Ook als het dashboard live staat, kun je de demo met verzonnen klanten nog openen door `?demo` achter het adres te zetten, bijvoorbeeld `https://poorteijkzzp.netlify.app/?demo`.
+
 ## Rollen
 
 - **Beheer**: alles, inclusief klanten toevoegen, stamgegevens wijzigen, overdragen, beëindigen, selecties en export.

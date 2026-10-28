@@ -4,7 +4,7 @@
 // De "anon / publishable" sleutel mag hier staan: de database is afgeschermd met rechten per rol.
 // Zet hier NOOIT de "service_role" of "secret" sleutel.
 window.APP_CONFIG = {
-  supabaseUrl: '',
-  supabaseKey: '',
+  supabaseUrl: 'https://hgnwdnmodxwdqhydiwxi.supabase.co',
+  supabaseKey: 'sb_publishable_MdP_9Lzsb0H_n1gQYWd0Kg_pVSHZIjT',
   jaar: 2026
 };
