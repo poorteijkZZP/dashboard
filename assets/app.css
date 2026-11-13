@@ -19,18 +19,28 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .kpi{text-align:left;background:#fff;border:1px solid #E4E2DF;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:inherit;min-height:92px}
 .kpi:hover{border-color:#FFBF80}
 .kpi.on{border-color:#FF8000;box-shadow:inset 0 0 0 1px #FF8000;background:#FFFBF7}
-.grid{display:grid;grid-template-columns:250px 130px 96px 300px 160px 96px 220px;min-width:1252px}
+.grid{display:grid;grid-template-columns:250px 112px 130px 96px 310px 170px 100px 220px;min-width:1388px}
+.tablebox{overflow:auto;max-height:calc(100vh - 130px)}
 .hbtn{border:0;background:none;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;min-height:28px;text-align:left}
 .hbtn:hover{color:#A94F00}
 .hcell{font-size:11px;font-weight:700;color:#5E5E5E;text-transform:uppercase;letter-spacing:.05em;padding:12px 14px;border-bottom:1px solid #E4E2DF;background:#FBFAF8}
 .cell{padding:8px 14px;border-bottom:1px solid #F0EEEB;display:flex;align-items:center;gap:8px;font-size:14px;min-height:50px;box-sizing:border-box}
+.grid > .hcell{position:sticky;top:0;z-index:2}
+.grid > .hcell:first-child{left:0;z-index:3}
+.row > .cell:first-child{position:sticky;left:0;z-index:1;background:#fff;box-shadow:1px 0 0 #F0EEEB}
+button.dot,button.pill{border:0;padding:0;cursor:pointer;font-family:inherit}
+button.pill{padding:3px 7px}
+button.dot:hover:not(:disabled),button.pill:hover:not(:disabled){outline:2px solid #FFBF80;outline-offset:1px}
+button.dot:disabled,button.pill:disabled{cursor:default}
+.chipbtn{border:0;cursor:pointer;font-family:inherit}
+.chipbtn.on{background:#2B2B2B;color:#fff}
 .row{display:contents}
 .row:hover .cell{background:#FFF8F1}
 .row.sel .cell{background:#FFF2E5}
 .name{border:0;background:none;padding:0;cursor:pointer;font-weight:700;font-size:14px;color:#2B2B2B;display:inline-flex;align-items:center;gap:8px;min-height:40px;text-align:left}
 .name:hover{color:#A94F00;text-decoration:underline}
 .av{width:26px;height:26px;border-radius:50%;background:#FFD9B3;color:#6B3200;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
-.dot{width:13px;height:13px;border-radius:3px;background:#E9E6E1;display:inline-block;flex:none}
+.dot{width:15px;height:15px;border-radius:3px;background:#E9E6E1;display:inline-block;flex:none}
 .dot.done{background:#FF8000}
 .dot.late{background:#fff;box-shadow:inset 0 0 0 2px #A94F00}
 .dot.due{background:#2B2B2B}

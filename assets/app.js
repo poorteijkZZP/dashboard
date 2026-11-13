@@ -87,7 +87,7 @@ function bijLabel(c) {
 }
 
 var FILTERS = [
-  { id:'alles', label:'Alle lopende klanten', kpi:'Klanten', sub:'actief en opgezegd', f:lopend },
+  { id:'alles', label:'Alle lopende klanten', kpi:'Klanten', sub:'actieve klanten', f:lopend },
   { id:'btw', label:'BTW Q3 nog open', kpi:'BTW Q3 open', sub:'deadline 31 oktober', f:btw3Open },
   { id:'achter', label:'Achterstand', kpi:'Achterstand', sub:'administratie of BTW', f:isAchter },
   { id:'jw', label:'Jaarwerk 2025 nog open', kpi:'Jaarwerk 2025 open', sub:'jaarrekening', f:jwOpen },
@@ -133,7 +133,7 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       phase: STORE.live ? 'loading' : 'app', me:null, auth:{ email:'', pw:'', pw2:'' }, authMode:'login', authMsg:'', authOk:false, conn:'connecting', logs:{}, demoAsk:false, saveErr:'',
-      role:'Jeroen', page:'klanten', scope:'alle', bankF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
+      role:'Jeroen', page:'klanten', scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
       bsub:'nieuw', form:emptyForm(), editId:null, err:'',
       mq:'', mutSel:null, mutMode:'menu', mut:{ admin:'Jeroen' }, mutMsg:'',
       stop:{ datum:'2026-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
@@ -249,7 +249,8 @@ class Component extends DCLogic {
   renderVals() {
     var self = this, s = this.state, role = STORE.live ? (s.me ? s.me.naam : '') : s.role, beheer = STORE.live ? !!(s.me && s.me.rol === 'beheer') : role === 'Jeroen', all = s.clients;
 
-    var inScope = function (c) { return (s.scope === 'alle' || c.admin === role) && (s.bankF === 'alle' || c.bank === s.bankF); };
+    var inBase = function (c) { return (s.scope === 'alle' || c.admin === role) && (s.bankF === 'alle' || c.bank === s.bankF); };
+    var inScope = function (c) { return inBase(c) && (s.adminF === 'alle' || c.admin === s.adminF); };
     var cur = FILTERS.filter(function (f) { return f.id === s.filter; })[0];
     if (!beheer && (cur.id === 'opgezegd' || cur.id === 'gestopt')) cur = FILTERS[0];
     var q = s.q.trim().toLowerCase();
@@ -258,6 +259,7 @@ class Component extends DCLogic {
     var openBtw = function (c) { var n = 0; for (var qi = 0; qi < 3; qi++) if (!btwNa(c, qi) && !c.btw[qi]) n++; return n; };
     var SK = {
       naam: function (c) { return c.naam.toLowerCase(); },
+      freq: function (c) { return c.freq === 'kwartaal' ? 0 : 1; },
       admin: function (c) { return c.admin || 'zzz'; },
       bank: function (c) { return BANKORD[c.bank] != null ? BANKORD[c.bank] : 9; },
       adm: function (c) { return progress(c); },
@@ -274,9 +276,11 @@ class Component extends DCLogic {
     });
     var vis = FILTERS.filter(function (f) { return beheer || (f.id !== 'opgezegd' && f.id !== 'gestopt'); });
     var kpis = vis.map(function (f) {
-      return { label:f.kpi, sub:f.sub, value: all.filter(function (c) { return inScope(c) && f.f(c); }).length, cls: cur.id === f.id ? 'kpi on' : 'kpi', pick:function () { self.setState({ filter:f.id }); } };
+      var nOp = f.id === 'alles' ? all.filter(function (c) { return inScope(c) && c.status === 'Opgezegd'; }).length : 0;
+      return { label:f.kpi, sub: nOp ? 'waarvan ' + nOp + ' opgezegd' : f.sub, value: all.filter(function (c) { return inScope(c) && f.f(c); }).length, cls: cur.id === f.id ? 'kpi on' : 'kpi', pick:function () { self.setState({ filter:f.id }); } };
     });
-    var breakdown = s.scope === 'alle' ? ADMINS.map(function (a) { return { admin:a, n: list.filter(function (c) { return c.admin === a; }).length }; }).filter(function (b) { return b.n > 0; }) : [];
+    var baseList = all.filter(function (c) { return inBase(c) && cur.f(c) && (!q || c.naam.toLowerCase().indexOf(q) >= 0); });
+    var breakdown = s.scope === 'alle' ? ADMINS.map(function (a) { var on = s.adminF === a; return { admin:a, n: baseList.filter(function (c) { return c.admin === a; }).length, cls: on ? 'chip chipbtn on' : 'chip chipbtn', t: on ? 'Klik om weer iedereen te tonen' : 'Alleen klanten van ' + a, pick: function () { self.setState({ adminF: on ? 'alle' : a }); } }; }).filter(function (b) { return b.n > 0 || s.adminF === b.admin; }) : [];
 
     var pillCls = function (on, na, late, due) { return na ? 'pill na' : on ? 'pill done' : late ? 'pill late' : due ? 'pill due' : 'pill'; };
     var kenmList = function (c) {
@@ -297,11 +301,16 @@ class Component extends DCLogic {
         isKw: c.freq === 'kwartaal',
         dots: c.months.map(function (d, i) {
           var na = mNa(c, i), late = mLate(c, i), due = mDue(c, i);
-          return { cls: na ? 'dot na' : d ? 'dot done' : late ? 'dot late' : due ? 'dot due' : 'dot', t: MONTHS[i] + ': ' + (na ? 'n.v.t.' : d ? 'gedaan' : 'open') };
+          return { cls: na ? 'dot na' : d ? 'dot done' : late ? 'dot late' : due ? 'dot due' : 'dot', na: na, t: MONTHS[i] + ': ' + (na ? 'n.v.t.' : d ? 'gedaan, klik om terug te zetten' : 'open, klik om af te vinken'), toggle: function () { if (!na) self.toggle(c, 'm', i, MONTHS[i]); } };
         }),
         bij: bijLabel(c),
-        btw: [0,1,2,3].map(function (qi) { return { l:'Q' + (qi + 1), cls: pillCls(c.btw[qi], btwNa(c, qi), bLate(c, qi), lopend(c) && qi === 2) }; }),
+        btw: [0,1,2,3].map(function (qi) { var bna = btwNa(c, qi); return { l:'Q' + (qi + 1), na: bna, cls: pillCls(c.btw[qi], bna, bLate(c, qi), lopend(c) && qi === 2), t: 'BTW Q' + (qi + 1) + ': ' + (bna ? 'n.v.t.' : c.btw[qi] ? 'gedaan, klik om terug te zetten' : 'open, klik om af te vinken'), toggle: function () { if (!bna) self.toggle(c, 'btw', qi, 'BTW Q' + (qi + 1)); } }; }),
         jw: pillCls(!!c.jw25, c.j25na || c.jw25 === null, false, lopend(c)), ib: pillCls(!!c.ib25, c.j25na || c.ib25 === null, false, lopend(c)),
+        jwNa: c.j25na || c.jw25 === null, ibNa: c.j25na || c.ib25 === null,
+        jwT: 'Jaarwerk 2025: ' + (c.jw25 === null ? 'n.v.t.' : c.jw25 ? 'gedaan' : 'open, klik om af te vinken'), ibT: 'IB 2025: ' + (c.ib25 === null ? 'n.v.t.' : c.ib25 ? 'gedaan' : 'open, klik om af te vinken'),
+        jwToggle: function () { if (!(c.j25na || c.jw25 === null)) self.toggle(c, 'jw25', 0, 'Jaarwerk 2025'); }, ibToggle: function () { if (!(c.j25na || c.ib25 === null)) self.toggle(c, 'ib25', 0, 'IB 2025'); },
+        hasAdmin: !!c.admin,
+        freqLabel: c.freq === 'kwartaal' ? 'Per kwartaal' : 'Per maand', freqCls: c.freq === 'kwartaal' ? 'mini o' : 'mini',
         kenm: kenmList(c),
         open: function () { self.openClient(c.id); }
       };
@@ -463,6 +472,7 @@ class Component extends DCLogic {
       roleInitial: initial(role),
       roles: ADMINS.map(function (a) { return { l: a === 'Jeroen' ? 'Jeroen · beheer' : a, cls: role === a ? 'seg on' : 'seg', pick:function () { self.setState(a === 'Jeroen' ? { role:a } : { role:a, page:'klanten' }); } }; }),
       bankF: s.bankF, onBankF: function (ev) { self.setState({ bankF:ev.target.value }); },
+      adminF: s.adminF, onAdminF: function (ev) { self.setState({ adminF:ev.target.value, scope:'alle' }); },
       sortBy: sortBy, arrow: arrow,
       navKlantCls: s.page === 'klanten' ? 'nav on' : 'nav', navBeheerCls: s.page === 'beheer' ? 'nav on' : 'nav',
       goKlanten: function () { self.setState({ page:'klanten' }); }, goBeheer: function () { self.setState({ page:'beheer' }); },
@@ -470,13 +480,13 @@ class Component extends DCLogic {
 
       scopeAllCls: s.scope === 'alle' ? 'seg on' : 'seg', scopeMijnCls: s.scope === 'mijn' ? 'seg on' : 'seg',
       scopeAllN: all.filter(function (c) { return lopend(c) && (s.bankF === 'alle' || c.bank === s.bankF); }).length, scopeMijnN: all.filter(function (c) { return lopend(c) && c.admin === role && (s.bankF === 'alle' || c.bank === s.bankF); }).length,
-      scopeAll: function () { self.setState({ scope:'alle' }); }, scopeMijn: function () { self.setState({ scope:'mijn' }); },
+      scopeAll: function () { self.setState({ scope:'alle' }); }, scopeMijn: function () { self.setState({ scope:'mijn', adminF:'alle' }); },
       q:s.q, onQ:function (ev) { self.setState({ q:ev.target.value }); },
       kpis:kpis, breakdown:breakdown,
       viewTitle: (s.scope === 'mijn' ? 'Mijn klanten: ' : 'Alle klanten: ') + cur.label.charAt(0).toLowerCase() + cur.label.slice(1),
       viewCount: list.length + (list.length === 1 ? ' klant' : ' klanten'),
       rows:rows, noRows: rows.length === 0,
-      showEmpty: !selC, showDetail: !!selC, d:d,
+      showEmpty: !selC, showDetail: !!selC, hasSel: !!selC, d:d,
       tOver: s.tab === 'over', tGeg: s.tab === 'geg', tHist: s.tab === 'hist',
       tabOverCls: s.tab === 'over' ? 'ptab on' : 'ptab', tabGegCls: s.tab === 'geg' ? 'ptab on' : 'ptab', tabHistCls: s.tab === 'hist' ? 'ptab on' : 'ptab',
       tabOver:function () { self.setState({ tab:'over' }); }, tabGeg:function () { self.setState({ tab:'geg' }); }, tabHist:function () { self.setState({ tab:'hist' }); },

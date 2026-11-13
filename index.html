@@ -99,6 +99,15 @@
         <button type="button" class="{{scopeAllCls}}" onClick="{{scopeAll}}">Alle klanten<span class="n">{{scopeAllN}}</span></button>
         <button type="button" class="{{scopeMijnCls}}" onClick="{{scopeMijn}}">Mijn klanten<span class="n">{{scopeMijnN}}</span></button>
       </div>
+      <label style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: #5E5E5E">Collega
+        <select aria-label="Filter op collega" value="{{adminF}}" onChange="{{onAdminF}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: #2B2B2B">
+          <option value="alle">Iedereen</option>
+          <option value="Jeroen">Jeroen</option>
+          <option value="Gea">Gea</option>
+          <option value="Marco">Marco</option>
+          <option value="Yassir">Yassir</option>
+        </select>
+      </label>
       <label style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: #5E5E5E">Bank
         <select aria-label="Filter op bank" value="{{bankF}}" onChange="{{onBankF}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: #2B2B2B">
           <option value="alle">Alle banken</option>
@@ -132,13 +141,15 @@
           <span style="font-size: 15px; font-weight: 800">{{viewTitle}}</span>
           <span style="font-size: 13px; color: #5E5E5E">{{viewCount}}</span>
           <div style="flex: 1 1 auto"></div>
+          <span style="font-size: 12px; font-weight: 600; color: #5E5E5E">Per collega</span>
           <sc-for list="{{breakdown}}" as="b" hint-placeholder-count="4">
-            <span class="chip">{{b.admin}} <b>{{b.n}}</b></span>
+            <button type="button" class="{{b.cls}}" title="{{b.t}}" onClick="{{b.pick}}">{{b.admin}} <b>{{b.n}}</b></button>
           </sc-for>
         </div>
-        <div style="overflow-x: auto">
+        <div class="tablebox">
           <div class="grid">
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.naam}}">Klant {{arrow.naam}}</button></div>
+            <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.freq}}">Verwerking {{arrow.freq}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.admin}}">Administrateur {{arrow.admin}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.bank}}">Bank {{arrow.bank}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.adm}}">Administratie 2026 {{arrow.adm}}</button></div>
@@ -147,36 +158,34 @@
             <div class="hcell">Kenmerken</div>
             <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
               <div class="{{r.cls}}">
-                <div class="cell" style="flex-wrap: wrap; gap: 2px 8px">
-                  <button type="button" class="name" onClick="{{r.open}}">
+                <div class="cell" style="gap: 8px">
+                  <button type="button" class="name" style="flex: 1 1 auto; min-width: 0" onClick="{{r.open}}">
                     {{r.naam}}
                     <sc-if value="{{r.hasBijz}}" hint-placeholder-val="{{ false }}">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A94F00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Heeft bijzonderheden"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
                     </sc-if>
                   </button>
                   <sc-if value="{{r.hasStatus}}" hint-placeholder-val="{{ false }}">
-                    <span class="mini" style="background: #2B2B2B; color: #fff">{{r.status}}</span>
+                    <span class="mini" style="background: #2B2B2B; color: #fff; flex: none">{{r.status}}</span>
                   </sc-if>
                 </div>
-                <div class="cell"><span class="av">{{r.init}}</span>{{r.admin}}</div>
+                <div class="cell"><span class="{{r.freqCls}}">{{r.freqLabel}}</span></div>
+                <div class="cell"><sc-if value="{{r.hasAdmin}}" hint-placeholder-val="{{ true }}"><span class="av">{{r.init}}</span>{{r.admin}}</sc-if></div>
                 <div class="cell" style="font-weight: 600">{{r.bank}}</div>
                 <div class="cell" style="gap: 3px">
                   <sc-for list="{{r.dots}}" as="dt" hint-placeholder-count="12">
-                    <span class="{{dt.cls}}" title="{{dt.t}}"></span>
+                    <button type="button" class="{{dt.cls}}" title="{{dt.t}}" aria-label="{{dt.t}}" disabled="{{dt.na}}" onClick="{{dt.toggle}}"></button>
                   </sc-for>
                   <span style="font-size: 12px; font-weight: 600; color: #5E5E5E; margin-left: 8px">{{r.bij}}</span>
-                  <sc-if value="{{r.isKw}}" hint-placeholder-val="{{ false }}">
-                    <span class="mini">per kw.</span>
-                  </sc-if>
                 </div>
                 <div class="cell" style="gap: 4px">
                   <sc-for list="{{r.btw}}" as="p" hint-placeholder-count="4">
-                    <span class="{{p.cls}}">{{p.l}}</span>
+                    <button type="button" class="{{p.cls}}" title="{{p.t}}" disabled="{{p.na}}" onClick="{{p.toggle}}">{{p.l}}</button>
                   </sc-for>
                 </div>
                 <div class="cell" style="gap: 4px">
-                  <span class="{{r.jw}}">JW</span>
-                  <span class="{{r.ib}}">IB</span>
+                  <button type="button" class="{{r.jw}}" title="{{r.jwT}}" disabled="{{r.jwNa}}" onClick="{{r.jwToggle}}">JW</button>
+                  <button type="button" class="{{r.ib}}" title="{{r.ibT}}" disabled="{{r.ibNa}}" onClick="{{r.ibToggle}}">IB</button>
                 </div>
                 <div class="cell" style="gap: 4px; flex-wrap: wrap">
                   <sc-for list="{{r.kenm}}" as="km" hint-placeholder-count="2">
@@ -196,10 +205,11 @@
           <span style="display: inline-flex; align-items: center; gap: 6px"><span class="dot due"></span>Deadline loopt</span>
           <span style="display: inline-flex; align-items: center; gap: 6px"><span class="dot"></span>Nog niet aan de beurt</span>
           <span style="display: inline-flex; align-items: center; gap: 6px"><span class="dot na"></span>Niet van toepassing</span>
-          <span>Per kw. = klant levert per kwartaal aan, alleen jan, apr, jul en okt staan open</span>
+          <span>Klik op een vakje om af te vinken. Kwartaalklanten: alleen jan, apr, jul en okt staan open.</span>
         </div>
       </section>
 
+      <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
       <aside class="card" style="flex: 1 1 430px; min-width: 0; max-width: 100%; overflow: hidden">
 
         <sc-if value="{{showEmpty}}" hint-placeholder-val="{{ true }}">
@@ -357,6 +367,7 @@
           </sc-if>
         </sc-if>
       </aside>
+      </sc-if>
     </div>
   </sc-if>
 
