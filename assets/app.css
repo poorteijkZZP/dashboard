@@ -120,7 +120,7 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .hcell.sep,.cell.sep{border-left:1px solid #EEEBE7}
 .hsub{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:10px;font-weight:600;color:#7A7A7A;text-transform:none;letter-spacing:0;white-space:nowrap}
 .hsub .bmtag{font-size:9px}
-.mlet i{flex:none;font-style:normal;text-align:center;font-size:10px;font-weight:700;color:#8E8E8E}
+.mlet i{flex:none;font-style:normal;text-align:center;font-size:10px;letter-spacing:-0.03em;font-weight:700;color:#8E8E8E}
 .mlet i:nth-child(3n):not(:last-child),.mlet.dots .dot:nth-child(3n):not(:last-child){margin-right:7px}
 .mlet{display:inline-flex;gap:3px;align-items:center;flex:none}
 .mlet i{width:15px}
