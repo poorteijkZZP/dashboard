@@ -64,4 +64,4 @@ Wordt los aangeleverd als `import_klanten_2026.sql` (niet in deze repository). D
 - Geen BSN's, inloggegevens of bankgegevens in dit dashboard.
 - Ieder een eigen account, tweestapsverificatie aan op GitHub, Netlify en Supabase.
 - Wekelijks een export naar Excel als reservekopie (Klanten > Excel, met filter Alle lopende klanten).
-
+- 
