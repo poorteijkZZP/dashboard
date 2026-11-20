@@ -271,10 +271,13 @@
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.freq}}">Verwerking {{arrow.freq}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.admin}}">Administrateur {{arrow.admin}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.bank}}">Bank {{arrow.bank}}</button></div>
-            <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.adm}}">Administratie {{jaarLabel}} {{arrow.adm}}</button></div>
-            <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.btw}}">BTW-aangiften {{arrow.btw}}</button></div>
-            <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.y25}}">{{vjLabel}} {{arrow.y25}}</button></div>
-            <div class="hcell">Kenmerken</div>
+            <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.adm}}">Administratie {{jaarLabel}} {{arrow.adm}}</button>
+              <div class="hsub"><span class="mlet"><i>J</i><i>F</i><i>M</i><i>A</i><i>M</i><i>J</i><i>J</i><i>A</i><i>S</i><i>O</i><i>N</i><i>D</i></span><span class="hbij">bij t/m</span></div></div>
+            <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.btw}}">BTW-aangiften {{arrow.btw}}</button>
+              <div class="hsub">per kwartaal · <b class="bmtag">m</b> per maand</div></div>
+            <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.y25}}">Jaar {{vjLabel}} {{arrow.y25}}</button>
+              <div class="hsub">jaarwerk · IB</div></div>
+            <div class="hcell sep"><span class="hbtn" style="display: inline-flex; align-items: center; cursor: default">Kenmerken</span></div>
             <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
               <div class="{{r.cls}}">
                 <div class="cell" style="gap: 8px">
@@ -291,13 +294,15 @@
                 <div class="cell"><span class="{{r.freqCls}}">{{r.freqLabel}}</span></div>
                 <div class="cell"><sc-if value="{{r.hasAdmin}}" hint-placeholder-val="{{ true }}"><span class="av">{{r.init}}</span>{{r.admin}}</sc-if></div>
                 <div class="cell" style="font-weight: 600">{{r.bank}}</div>
-                <div class="cell" style="gap: 3px">
-                  <sc-for list="{{r.dots}}" as="dt" hint-placeholder-count="12">
-                    <button type="button" class="{{dt.cls}}" title="{{dt.t}}" aria-label="{{dt.t}}" disabled="{{dt.na}}" onClick="{{dt.toggle}}"></button>
-                  </sc-for>
-                  <span style="font-size: 12px; font-weight: 600; color: #5E5E5E; margin-left: 8px">{{r.bij}}</span>
+                <div class="cell sep" style="gap: 8px">
+                  <span class="mlet dots">
+                    <sc-for list="{{r.dots}}" as="dt" hint-placeholder-count="12">
+                      <button type="button" class="{{dt.cls}}" title="{{dt.t}}" aria-label="{{dt.t}}" disabled="{{dt.na}}" onClick="{{dt.toggle}}"></button>
+                    </sc-for>
+                  </span>
+                  <span class="bij">{{r.bij}}</span>
                 </div>
-                <div class="cell" style="gap: 4px">
+                <div class="cell sep" style="gap: 4px">
                   <sc-if value="{{r.btwM}}" hint-placeholder-val="{{ false }}">
                     <span class="bmtag" title="BTW-aangifte per maand. Een klik vinkt de eerstvolgende open maand af.">m</span>
                   </sc-if>
@@ -305,11 +310,11 @@
                     <button type="button" class="{{p.cls}}" title="{{p.t}}" disabled="{{p.na}}" onClick="{{p.toggle}}">{{p.l}}<sc-if value="{{p.hasFr}}" hint-placeholder-val="{{ false }}"><small class="pfr">{{p.fr}}</small></sc-if></button>
                   </sc-for>
                 </div>
-                <div class="cell" style="gap: 4px">
+                <div class="cell sep" style="gap: 4px">
                   <button type="button" class="{{r.jw}}" title="{{r.jwT}}" disabled="{{r.jwNa}}" onClick="{{r.jwToggle}}">JW</button>
                   <button type="button" class="{{r.ib}}" title="{{r.ibT}}" disabled="{{r.ibNa}}" onClick="{{r.ibToggle}}">IB</button>
                 </div>
-                <div class="cell" style="gap: 4px; flex-wrap: wrap">
+                <div class="cell sep" style="gap: 4px; flex-wrap: wrap">
                   <sc-for list="{{r.kenm}}" as="km" hint-placeholder-count="2">
                     <span class="{{km.cls}}">{{km.l}}</span>
                   </sc-for>

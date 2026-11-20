@@ -19,11 +19,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .kpi{text-align:left;background:#fff;border:1px solid #E4E2DF;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:inherit;min-height:92px}
 .kpi:hover{border-color:#FFBF80}
 .kpi.on{border-color:#FF8000;box-shadow:inset 0 0 0 1px #FF8000;background:#FFFBF7}
-.grid{display:grid;grid-template-columns:250px 112px 130px 96px 310px 186px 100px 220px;min-width:1404px}
+.grid{display:grid;grid-template-columns:250px 112px 130px 96px 336px 206px 118px 230px;min-width:1478px}
 .tablebox{overflow:auto;max-height:calc(100vh - 130px)}
 .hbtn{border:0;background:none;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;min-height:28px;text-align:left}
 .hbtn:hover{color:#A94F00}
-.hcell{font-size:11px;font-weight:700;color:#5E5E5E;text-transform:uppercase;letter-spacing:.05em;padding:12px 14px;border-bottom:1px solid #E4E2DF;background:#FBFAF8}
+.hcell{font-size:11px;font-weight:800;color:#3A3A3A;text-transform:uppercase;letter-spacing:.05em;padding:12px 14px;border-bottom:1px solid #E4E2DF;background:#FBFAF8}
 .cell{padding:8px 14px;border-bottom:1px solid #F0EEEB;display:flex;align-items:center;gap:8px;font-size:14px;min-height:50px;box-sizing:border-box}
 .grid > .hcell{position:sticky;top:0;z-index:2}
 .grid > .hcell:first-child{left:0;z-index:3}
@@ -116,3 +116,13 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .bmtag{font-size:10px;font-weight:800;color:#8A3F00;background:#FFF2E5;border-radius:4px;padding:1px 4px;margin-right:1px}
 .pill .pfr{font-size:9px;font-weight:800;margin-left:2px;opacity:.85}
 .tog.slim{min-height:40px;font-size:12px}
+/* Duidelijkere kolommen */
+.hcell.sep,.cell.sep{border-left:1px solid #EEEBE7}
+.hsub{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:10px;font-weight:600;color:#7A7A7A;text-transform:none;letter-spacing:0;white-space:nowrap}
+.hsub .bmtag{font-size:9px}
+.mlet i{flex:none;font-style:normal;text-align:center;font-size:10px;font-weight:700;color:#8E8E8E}
+.mlet i:nth-child(3n):not(:last-child),.mlet.dots .dot:nth-child(3n):not(:last-child){margin-right:7px}
+.mlet{display:inline-flex;gap:3px;align-items:center;flex:none}
+.mlet i{width:15px}
+.hbij{margin-left:auto;font-size:10px;color:#8E8E8E}
+.bij{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700;color:#3A3A3A;background:#F1EFEC;border-radius:6px;padding:3px 8px;min-width:46px;text-align:center}
