@@ -1,20 +1,35 @@
 var MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
-var DUE = 9;
 var ADMINS = ['Jeroen','Gea','Marco','Yassir'];
-var BTWDL = ['uiterlijk 30 apr','uiterlijk 31 jul','uiterlijk 31 okt','uiterlijk 31 jan'];
 var KENM = [['pers','Personenauto'],['best','Bestelauto'],['km','KM-registratie'],['uzgb','Verklaring UZGB'],['motor','Motor'],['fiets','Fiets']];
 var KSHORT = { pers:'Personenauto', best:'Bestelauto', km:'KM', uzgb:'UZGB', motor:'Motor', fiets:'Fiets' };
 var FACT = { 'ZZP basis':250, 'ZZP plus':250, 'BV holding':150, 'BV werkmaatschappij':250 };
 var JAAR = (window.APP_CONFIG && window.APP_CONFIG.jaar) || 2026;
 var DEMO_KEY = 'poorteijk-dashboard-demo-v1';
+var DEMO_INST = 'poorteijk-dashboard-demo-v1-inst';
+var VANDAAG = new Date();
+var PEIL_HANDMATIG = null;
+function vj() { return JAAR - 1; }
+function peil() {
+  if (PEIL_HANDMATIG !== null && PEIL_HANDMATIG !== undefined && PEIL_HANDMATIG !== '' && !isNaN(parseInt(PEIL_HANDMATIG, 10))) return parseInt(PEIL_HANDMATIG, 10);
+  var n = (VANDAAG.getFullYear() - JAAR) * 12 + VANDAAG.getMonth() - 1;
+  return Math.max(0, Math.min(12, n));
+}
+function peilLabel() { var p = peil(); return p ? 't/m ' + MONTHS[p - 1] : 'nog geen maand'; }
+function btwDeadline(q) { return new Date(JAAR + (q === 3 ? 1 : 0), (q * 3 + 3) % 12, q === 0 ? 30 : 31, 23, 59); }
+function kwartaalVoorbij(q) { return VANDAAG >= new Date(JAAR, q * 3 + 3, 1); }
+function btwDlLabel(q) { var d = btwDeadline(q); return 'uiterlijk ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + (q === 3 ? ' ' + d.getFullYear() : ''); }
+function dagenTot(d) { return Math.ceil((d - VANDAAG) / 86400000); }
+function wk(c, key) { return !!(c.wacht && c.wacht[key]); }
+function vandaagIso() { var d = VANDAAG; return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function slug(t) { return String(t).replace(/[^A-Za-z0-9\u00C0-\u017F ]+/g, ' ').replace(/\s+/g, ' ').trim(); }
 function vanLabel(c) { return c.vanY ? c.vanY + (c.vanQ != null && c.vanQ !== '' && !isNaN(c.vanQ) ? ' Q' + (parseInt(c.vanQ, 10) + 1) : '') : 'onbekend'; }
 var COLS = [['naam','Naam onderneming'],['voornaam','Voornaam'],['achternaam','Achternaam'],['email','E-mailadres'],['btwnr','Btw-nummer'],['btwid','Btw-ID'],['admin','Administrateur'],['rechtsvorm','Rechtsvorm'],['bank','Bank'],['software','Boekhoudpakket']];
 
-function nowLabel() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return '14 okt 2026 ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+function nowLabel() { var d = new Date(); var p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
 function nlDate(s) { if (!s) return ''; var a = s.split('-'); return parseInt(a[2], 10) + ' ' + MONTHS[parseInt(a[1], 10) - 1] + ' ' + a[0]; }
 function initial(n) { return (n || '?').charAt(0).toUpperCase(); }
 function emptyForm() {
-  return { naam:'', admin:'Jeroen', pakket:'ZZP basis', facturen:'250', vanY:'2026', vanQ:'3', freq:'maand', bank:'BK', software:'AFAS SB', up:true, rechtsvorm:'Eenmanszaak', regime:'Normaal', pand:'', btwMaand:false, pers:false, best:false, km:false, uzgb:false, motor:false, fiets:false, review:false, voornaam:'', achternaam:'', email:'', btwnr:'', btwid:'', bijz:'' };
+  return { naam:'', admin:'Jeroen', pakket:'ZZP basis', facturen:'250', vanY:String(new Date().getFullYear()), vanQ:String(Math.floor(new Date().getMonth() / 3)), freq:'maand', bank:'BK', software:'AFAS SB', up:true, rechtsvorm:'Eenmanszaak', regime:'Normaal', pand:'', btwMaand:false, pers:false, best:false, km:false, uzgb:false, motor:false, fiets:false, review:false, voornaam:'', achternaam:'', email:'', btwnr:'', btwid:'', bijz:'' };
 }
 function C(o) {
   var c = Object.assign({ status:'Actief', freq:'maand', software:'AFAS SB', up:true, rechtsvorm:'Eenmanszaak', regime:'Normaal', pand:'', btwMaand:false, pers:false, best:false, km:false, uzgb:false, motor:false, fiets:false, bijz:'', notities:'', m:9, btw:[1,1,0,0], cq2:1, cq3:0, c25:1, jw25:1, ib25:0, j25na:false, pakket:'ZZP plus', facturen:'', review:false, btwnr:'', btwid:'', vanY:2022, vanQ:0, einde:null, log:[] }, o);
@@ -60,23 +75,27 @@ var SEED = [
 
 
 function demoLoad() { try { var x = localStorage.getItem(DEMO_KEY); if (x) return JSON.parse(x); } catch (e) {} return SEED; }
-function sIdx(c) { return !c.vanY || c.vanQ == null || c.vanQ === '' || isNaN(c.vanQ) || c.vanY < 2026 ? 0 : (c.vanY === 2026 ? c.vanQ * 3 : 12); }
+function sIdx(c) { return !c.vanY || c.vanQ == null || c.vanQ === '' || isNaN(c.vanQ) || parseInt(c.vanY, 10) < JAAR ? 0 : (parseInt(c.vanY, 10) === JAAR ? parseInt(c.vanQ, 10) * 3 : 12); }
 function mNa(c, i) { return (!!c.mna && c.mna[i]) || i < sIdx(c) || (!!c.einde && i > c.einde.adm) || (c.freq === 'kwartaal' && i % 3 !== 0); }
 function btwNa(c, q) { return (!!c.bna && c.bna[q]) || c.regime !== 'Normaal' || (q * 3 + 2) < sIdx(c) || (!!c.einde && q > c.einde.btw); }
 function lopend(c) { return c.status !== 'Gestopt'; }
 function mLate(c, i) {
-  if (!lopend(c) || mNa(c, i) || c.months[i]) return false;
-  return c.freq === 'kwartaal' ? i < 6 : i < DUE;
+  if (!lopend(c) || mNa(c, i) || c.months[i] || wk(c, 'm' + (i + 1))) return false;
+  return c.freq === 'kwartaal' ? i + 3 <= peil() : i < peil();
 }
-function mDue(c, i) { return lopend(c) && c.freq === 'kwartaal' && i === 6 && !mNa(c, i) && !c.months[i]; }
-function bLate(c, q) { return lopend(c) && !btwNa(c, q) && !c.btw[q] && q < 2; }
+function mDue(c, i) { return lopend(c) && c.freq === 'kwartaal' && !mNa(c, i) && !c.months[i] && !wk(c, 'm' + (i + 1)) && !mLate(c, i) && kwartaalVoorbij(Math.floor(i / 3)); }
+function bLate(c, q) { return lopend(c) && !btwNa(c, q) && !c.btw[q] && !wk(c, 'btw' + (q + 1)) && VANDAAG > btwDeadline(q); }
+function bDue(c, q) { return lopend(c) && !btwNa(c, q) && !c.btw[q] && !wk(c, 'btw' + (q + 1)) && kwartaalVoorbij(q) && !bLate(c, q); }
+function heeftWacht(c) { if (!lopend(c) || !c.wacht) return false; for (var k in c.wacht) if (c.wacht[k]) return true; return false; }
+function wachtLabels(c) { var out = []; for (var i = 0; i < 12; i++) if (wk(c, 'm' + (i + 1)) && !c.months[i]) out.push(MONTHS[i]); for (var q = 0; q < 4; q++) if (wk(c, 'btw' + (q + 1)) && !c.btw[q]) out.push('BTW Q' + (q + 1)); return out; }
+function lateLabels(c) { var out = []; for (var i = 0; i < 12; i++) if (mLate(c, i)) out.push(c.freq === 'kwartaal' ? 'Q' + (Math.floor(i / 3) + 1) : MONTHS[i]); return out; }
+function btwOpenNu(c) { for (var q = 0; q < 4; q++) if (bLate(c, q) || bDue(c, q)) return true; return false; }
 function isAchter(c) {
   if (!lopend(c)) return false;
   for (var i = 0; i < 12; i++) if (mLate(c, i)) return true;
   for (var q = 0; q < 4; q++) if (bLate(c, q)) return true;
   return false;
 }
-function btw3Open(c) { return lopend(c) && !btwNa(c, 2) && !c.btw[2]; }
 function jwOpen(c) { return lopend(c) && !c.j25na && c.jw25 !== null && !c.jw25; }
 function ibOpen(c) { return lopend(c) && !c.j25na && c.ib25 !== null && !c.ib25; }
 function bijLabel(c) {
@@ -86,24 +105,27 @@ function bijLabel(c) {
   return c.freq === 'kwartaal' ? 't/m Q' + (Math.floor(last / 3) + 1) : 't/m ' + MONTHS[last];
 }
 
-var FILTERS = [
+function getFilters() { return [
   { id:'alles', label:'Alle lopende klanten', kpi:'Klanten', sub:'actieve klanten', f:lopend },
-  { id:'btw', label:'BTW Q3 nog open', kpi:'BTW Q3 open', sub:'deadline 31 oktober', f:btw3Open },
-  { id:'achter', label:'Achterstand', kpi:'Achterstand', sub:'administratie of BTW', f:isAchter },
-  { id:'jw', label:'Jaarwerk 2025 nog open', kpi:'Jaarwerk 2025 open', sub:'jaarrekening', f:jwOpen },
-  { id:'ib', label:'IB-aangifte 2025 nog open', kpi:'IB 2025 open', sub:'aangifte IB', f:ibOpen },
+  { id:'btw', label:'BTW-aangifte open', kpi:'BTW open', sub:'kwartaal voorbij, nog niet gedaan', f:btwOpenNu },
+  { id:'achter', label:'Achterstand', kpi:'Achterstand', sub:'administratie ' + peilLabel() + ' of BTW', f:isAchter },
+  { id:'wacht', label:'Wacht op klant', kpi:'Wacht op klant', sub:'stukken nog niet binnen', f:heeftWacht },
+  { id:'jw', label:'Jaarwerk ' + vj() + ' nog open', kpi:'Jaarwerk ' + vj() + ' open', sub:'jaarrekening', f:jwOpen },
+  { id:'ib', label:'IB-aangifte ' + vj() + ' nog open', kpi:'IB ' + vj() + ' open', sub:'aangifte IB', f:ibOpen },
   { id:'opgezegd', label:'Opgezegd, werk loopt nog', kpi:'Opgezegd', sub:'loopt af', f:function (c) { return c.status === 'Opgezegd'; } },
   { id:'gestopt', label:'Gestopt (archief)', kpi:'Gestopt', sub:'archief', f:function (c) { return c.status === 'Gestopt'; } }
-];
+]; }
 
-function emptySf() { return { status:'lopend', admin:'alle', bank:'alle', freq:'alle', btw3:'alle', achter:'alle', jw:'alle', ib:'alle', kenm:'alle', regime:'alle', rechtsvorm:'alle', review:'alle' }; }
+function emptySf() { return { status:'lopend', admin:'alle', bank:'alle', freq:'alle', btw3:'alle', achter:'alle', jw:'alle', ib:'alle', kenm:'alle', regime:'alle', rechtsvorm:'alle', review:'alle', wacht:'alle' }; }
 function sfMatch(c, f) {
   if (f.status === 'lopend' ? !lopend(c) : c.status !== f.status) return false;
   if (f.admin !== 'alle' && c.admin !== f.admin) return false;
   if (f.bank === 'geenBK' ? c.bank === 'BK' : (f.bank !== 'alle' && c.bank !== f.bank)) return false;
   if (f.freq !== 'alle' && c.freq !== f.freq) return false;
-  if (f.btw3 === 'open' && !btw3Open(c)) return false;
-  if (f.btw3 === 'klaar' && !c.btw[2]) return false;
+  if (f.btw3 === 'open' && !btwOpenNu(c)) return false;
+  if (f.btw3 === 'klaar' && btwOpenNu(c)) return false;
+  if (f.wacht === 'ja' && !heeftWacht(c)) return false;
+  if (f.wacht === 'nee' && heeftWacht(c)) return false;
   if (f.achter === 'ja' && !isAchter(c)) return false;
   if (f.achter === 'nee' && isAchter(c)) return false;
   if (f.jw === 'open' && !jwOpen(c)) return false;
@@ -122,10 +144,28 @@ function sfMatch(c, f) {
 }
 var PRESETS = [
   { l:'Actief zonder Google review', f:{ status:'Actief', review:'nee' }, cols:['naam','voornaam','email'] },
-  { l:'Geen BK en BTW Q3 open', f:{ bank:'geenBK', btw3:'open' }, cols:['naam','voornaam','email','admin'] },
-  { l:'IB 2025 open, actief', f:{ status:'Actief', ib:'open' }, cols:['naam','voornaam','email','admin'] },
+  { l:'Wacht op klant (herinnering)', f:{ wacht:'ja' }, cols:['naam','voornaam','email','admin'], tpl:'aanlevering' },
+  { l:'Geen BK en BTW open', f:{ bank:'geenBK', btw3:'open' }, cols:['naam','voornaam','email','admin'] },
+  { l:'IB vorig jaar open, actief', f:{ status:'Actief', ib:'open' }, cols:['naam','voornaam','email','admin'], tpl:'ib' },
   { l:'Bestelauto zonder UZGB', f:{ kenm:'bestZonder' }, cols:['naam','voornaam','email'] }
 ];
+var MAILT = {
+  aanlevering: { s:'Graag je stukken over {periode} aanleveren', b:'Hoi,\n\nWe willen je administratie over {periode} graag verwerken, maar we missen nog stukken van je. Wil je je facturen, bonnen en eventuele bankafschriften uiterlijk {uiterlijk} aanleveren? Dan kunnen we alles op tijd verwerken en je btw-aangifte verzorgen.\n\nHeb je vragen? Laat het gerust weten.\n\nGroet,\n{naam}\nPoortEijk ZZP' },
+  ib: { s:'Je aangifte inkomstenbelasting {vj}', b:'Hoi,\n\nWe gaan aan de slag met je aangifte inkomstenbelasting over {vj}. Wil je ons uiterlijk {uiterlijk} laten weten of er iets is veranderd in je privésituatie, zoals een verhuizing, een nieuwe hypotheek of een wijziging in je gezin? Dan kunnen we je aangifte goed en op tijd indienen.\n\nHeb je vragen? Laat het gerust weten.\n\nGroet,\n{naam}\nPoortEijk ZZP' },
+  review: { s:'Wil je ons een Google-review geven?', b:'Hoi,\n\nFijn dat we je administratie mogen verzorgen. Ben je tevreden over onze dienstverlening? Dan zouden we het erg waarderen als je een korte Google-review achterlaat. Dat helpt andere ondernemers om ons te vinden.\n\n[link naar jullie Google-reviewpagina]\n\nAlvast bedankt!\n\nGroet,\n{naam}\nPoortEijk ZZP' },
+  vrij: { s:'', b:'' }
+};
+function standaardPeriode() { var d = new Date(VANDAAG.getFullYear(), VANDAAG.getMonth() - 1, 1); return ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'][d.getMonth()] + ' ' + d.getFullYear(); }
+function standaardUiterlijk() { var d = new Date(VANDAAG.getTime() + 14 * 86400000); return d.getDate() + ' ' + ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'][d.getMonth()]; }
+function vulMail(t, periode, uiterlijk, naam) {
+  var m = MAILT[t] || MAILT.vrij;
+  var f = function (x) { return x.replace(/\{periode\}/g, periode).replace(/\{uiterlijk\}/g, uiterlijk).replace(/\{naam\}/g, naam || 'Team PoortEijk ZZP').replace(/\{vj\}/g, String(vj())); };
+  return { s: f(m.s), b: f(m.b) };
+}
+function mailtoLink(adressen, onderwerp, tekst) {
+  return 'mailto:?bcc=' + adressen.join(',') + (onderwerp ? '&subject=' + encodeURIComponent(onderwerp) : '') + (tekst ? '&body=' + encodeURIComponent(tekst) : '');
+}
+function stTekst(done, na, w, late) { return na ? 'n.v.t.' : done ? 'Gedaan' : w ? 'Wacht op klant' : late ? 'Achterstand' : 'Open'; }
 function colSet(list) { var o = {}; COLS.forEach(function (c) { o[c[0]] = list.indexOf(c[0]) >= 0; }); return o; }
 
 class Component extends DCLogic {
@@ -133,17 +173,18 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       phase: STORE.live ? 'loading' : 'app', me:null, auth:{ email:'', pw:'', pw2:'' }, authMode:'login', authMsg:'', authOk:false, conn:'connecting', logs:{}, demoAsk:false, saveErr:'',
-      role:'Jeroen', page:'klanten', scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
+      role:'Jeroen', page:'werk', jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
       bsub:'nieuw', form:emptyForm(), editId:null, err:'',
       mq:'', mutSel:null, mutMode:'menu', mut:{ admin:'Jeroen' }, mutMsg:'',
-      stop:{ datum:'2026-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
-      sf:emptySf(), cols:colSet(['naam','voornaam','email','admin']), saveName:'', saved:[{ l:'Herinnering IB 2025', f:Object.assign(emptySf(), { status:'Actief', ib:'open' }) }], copied:false
+      stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
+      sf:emptySf(), cols:colSet(['naam','voornaam','email','admin']), saveName:'', saved:[{ l:'Herinnering IB', f:Object.assign(emptySf(), { status:'Actief', ib:'open' }) }], copied:false
     };
   }
 
   componentDidMount() {
     var self = this;
     if (!STORE.live) {
+      try { var inst = JSON.parse(localStorage.getItem(DEMO_INST) || '{}'); if (inst.jaar) { JAAR = inst.jaar; } if (inst.peil !== undefined) PEIL_HANDMATIG = inst.peil; this.setState({ jaar:JAAR, jaren:[JAAR] }); } catch (x) {}
       window.addEventListener('storage', function (e) {
         if (e.key !== DEMO_KEY) return;
         var cl = demoLoad();
@@ -157,13 +198,23 @@ class Component extends DCLogic {
       else if (ev.type === 'newPassword') self.setState({ phase:'auth', authMode:'newpw', authMsg:'' });
       else if (ev.type === 'noProfile') self.setState({ phase:'auth', authMode:'login', authOk:false, authMsg:'Je bent ingelogd als ' + ev.email + ', maar je account is nog niet gekoppeld aan een naam en rol. Vraag de beheerder dit te doen.' });
       else if (ev.type === 'signedIn') self.startLive(ev.me);
+      else if (ev.type === 'mfa') self.setState({ phase:'auth', authMode:'mfa', mfa:{ factorId:ev.factorId }, code:'', authMsg:'' });
+      else if (ev.type === 'enroll') {
+        self.setState({ phase:'auth', authMode:'enroll', mfa:null, code:'', authMsg:'QR-code wordt gemaakt...', authOk:true });
+        STORE.enroll().then(function (m) { self.setState({ mfa:m, authMsg:'' }); }).catch(function (e) { self.setState({ authMsg:'Koppelen lukt niet: ' + e.message, authOk:false }); });
+      }
+      else if (ev.type === 'error') self.setState({ phase:'auth', authMode:'login', authMsg:ev.msg, authOk:false });
     });
   }
 
   startLive(me) {
     var self = this;
-    this.setState({ me:me, role:me.naam, phase:'loading' });
-    this.reload().then(function () {
+    this.setState({ me:me, role:me.naam, phase:'loading', werkWie:null });
+    STORE.loadSettings().then(function (st) {
+      if (st.huidig_jaar) JAAR = parseInt(st.huidig_jaar, 10);
+      self.setState({ jaar:JAAR });
+      return STORE.loadYears().then(function (ys) { if (ys.indexOf(JAAR) < 0) ys.push(JAAR); self.setState({ jaren:ys.sort() }); });
+    }).catch(function () {}).then(function () { return self.reload(); }).then(function () {
       self.setState({ phase:'app' });
       if (!self.__subscribed) { self.__subscribed = true; STORE.subscribe(function () { self.reload(); }, function (st) { self.setState({ conn:st }); }); }
     });
@@ -171,7 +222,7 @@ class Component extends DCLogic {
 
   reload() {
     var self = this;
-    return STORE.loadAll().then(function (cl) {
+    return STORE.loadSettings().then(function (st) { PEIL_HANDMATIG = st.peil === undefined ? null : st.peil; }).catch(function () {}).then(function () { return STORE.loadAll(self.state.jaar); }).then(function (cl) {
       self.setState({ clients: cl, saveErr:'' });
       if (self.state.sel) self.loadLog(self.state.sel);
     }).catch(function (e) { self.setState({ saveErr:'Gegevens laden mislukt: ' + e.message, phase:'app' }); });
@@ -201,7 +252,7 @@ class Component extends DCLogic {
     var self = this, role = this.state.role, old = null, neu = null;
     var clients = this.state.clients.map(function (c) {
       if (c.id !== id) return c;
-      var n = Object.assign({}, c, { months:c.months.slice(), btw:c.btw.slice(), mna:c.mna ? c.mna.slice() : null, bna:c.bna ? c.bna.slice() : null });
+      var n = Object.assign({}, c, { months:c.months.slice(), btw:c.btw.slice(), mna:c.mna ? c.mna.slice() : null, bna:c.bna ? c.bna.slice() : null, wacht:Object.assign({}, c.wacht || {}) });
       fn(n);
       n.log = [{ wie:role, wat:text, wanneer:nowLabel() }].concat(c.log || []);
       old = c; neu = n;
@@ -210,16 +261,65 @@ class Component extends DCLogic {
     this.setState({ clients:clients });
     if (STORE.live && old) {
       var l = Object.assign({}, this.state.logs); l[id] = [{ wie:role, wat:text, wanneer:'zojuist' }].concat(l[id] || []); this.setState({ logs:l });
-      STORE.persist(old, neu, text).catch(function (e) { self.setState({ saveErr:'Opslaan mislukt: ' + e.message + '. De gegevens worden opnieuw geladen.' }); self.reload(); });
+      STORE.persist(old, neu, text, this.state.jaar).catch(function (e) { self.setState({ saveErr:'Opslaan mislukt: ' + e.message + '. De gegevens worden opnieuw geladen.' }); self.reload(); });
     }
   }
 
   toggle(c, key, idx, label) {
+    var wkey = key === 'm' ? 'm' + (idx + 1) : key === 'btw' ? 'btw' + (idx + 1) : null;
+    if (this.state.klikMode === 'wacht' && wkey) {
+      var nw = !wk(c, wkey);
+      this.upd(c.id, function (n) {
+        if (nw) { n.wacht[wkey] = true; if (key === 'm') n.months[idx] = false; else n.btw[idx] = false; }
+        else delete n.wacht[wkey];
+      }, label + (nw ? ' op wacht op klant gezet' : ': wacht op klant opgeheven'));
+      return;
+    }
     var cur = key === 'm' ? c.months[idx] : key === 'btw' ? c.btw[idx] : !!c[key];
     var nv = !cur;
     this.upd(c.id, function (n) {
       if (key === 'm') n.months[idx] = nv; else if (key === 'btw') n.btw[idx] = nv; else n[key] = nv ? 1 : 0;
+      if (wkey && nv) delete n.wacht[wkey];
     }, label + (nv ? ' afgevinkt' : ' teruggezet naar open'));
+  }
+
+  startJaar() {
+    var self = this, next = this.state.jaar + 1;
+    if (STORE.live) {
+      this.setState({ jaarMsg:'Bezig met aanmaken...' });
+      STORE.startYear(this.state.clients, next).then(function (n) {
+        JAAR = next;
+        self.setState({ jaar:next, jaren:self.state.jaren.concat([next]).filter(function (v, i, a) { return a.indexOf(v) === i; }).sort(), jaarAsk:false, jaarMsg:'Jaar ' + next + ' gestart voor ' + n + ' klanten. ' + (next - 1) + ' blijft in te zien via de jaarkeuze bovenin.' });
+        return self.reload();
+      }).catch(function (e) { self.setState({ jaarMsg:'Starten mislukt: ' + e.message, jaarAsk:false }); });
+      return;
+    }
+    var cl = this.state.clients.map(function (c) {
+      if (c.status === 'Gestopt') return c;
+      var row = STORE.nieuwJaarRij(c, next), n = Object.assign({}, c);
+      n.months = []; n.mna = []; for (var i = 1; i <= 12; i++) { n.months.push(!!row['m' + i]); n.mna.push(row['m' + i] === null); }
+      n.btw = []; n.bna = []; for (var q = 1; q <= 4; q++) { n.btw.push(!!row['btw' + q]); n.bna.push(row['btw' + q] === null); }
+      n.cq2 = row.controle_q2; n.cq3 = row.controle_q3; n.c25 = row.controle_vj; n.jw25 = row.jaarwerk_vj; n.ib25 = row.ib_vj; n.wacht = {}; n.j25na = false;
+      return n;
+    });
+    JAAR = next;
+    try { var inst = JSON.parse(localStorage.getItem(DEMO_INST) || '{}'); inst.jaar = next; localStorage.setItem(DEMO_INST, JSON.stringify(inst)); } catch (x) {}
+    this.setState({ clients:cl, jaar:next, jaren:[next], jaarAsk:false, jaarMsg:'Demo: jaar ' + next + ' gestart. In de demo wordt het vorige jaar niet bewaard.' });
+  }
+
+  zetPeil(v) {
+    PEIL_HANDMATIG = v === 'auto' ? null : parseInt(v, 10);
+    if (STORE.live) STORE.setSetting('peil', PEIL_HANDMATIG).catch(function () {});
+    else { try { var inst = JSON.parse(localStorage.getItem(DEMO_INST) || '{}'); inst.peil = PEIL_HANDMATIG; localStorage.setItem(DEMO_INST, JSON.stringify(inst)); } catch (x) {} }
+    this.forceUpdate();
+  }
+
+  kiesJaar(j) {
+    j = parseInt(j, 10);
+    if (j === this.state.jaar) return;
+    JAAR = j;
+    this.setState({ jaar:j, sel:null });
+    if (STORE.live) this.reload();
   }
 
   saveForm() {
@@ -233,12 +333,12 @@ class Component extends DCLogic {
       return;
     }
     var nid = this.state.clients.reduce(function (m, c) { return Math.max(m, c.id); }, 0) + 1;
-    var nc = C(Object.assign({}, f, { id:nid, m:0, btw:[0,0,0,0], cq2:0, cq3:0, c25:0, jw25:0, ib25:0, j25na:parseInt(f.vanY, 10) >= 2026,
-      log:[{ wie:role, wat:'Klant aangemaakt (klant vanaf ' + f.vanY + ' Q' + (parseInt(f.vanQ, 10) + 1) + '). Voortgangsregel 2026 automatisch toegevoegd.', wanneer:nowLabel() }] }));
+    var nc = C(Object.assign({}, f, { id:nid, m:0, btw:[0,0,0,0], cq2:0, cq3:0, c25:0, jw25:0, ib25:0, j25na:parseInt(f.vanY, 10) >= JAAR,
+      log:[{ wie:role, wat:'Klant aangemaakt (klant vanaf ' + f.vanY + ' Q' + (parseInt(f.vanQ, 10) + 1) + '). Voortgangsregel ' + JAAR + ' automatisch toegevoegd.', wanneer:nowLabel() }] }));
     if (STORE.live) {
       var self = this;
       this.setState({ err:'Bezig met opslaan...' });
-      STORE.create(nc, 'Klant aangemaakt (klant vanaf ' + vanLabel(nc) + ')').then(function (newId) {
+      STORE.create(nc, 'Klant aangemaakt (klant vanaf ' + vanLabel(nc) + ')', this.state.jaar).then(function (newId) {
         return self.reload().then(function () { self.setState({ page:'klanten', sel:newId, tab:'over', filter:'alles', scope:'alle', q:'', err:'', form:emptyForm() }); self.loadLog(newId); });
       }).catch(function (e) { self.setState({ err:'Opslaan mislukt: ' + e.message }); });
       return;
@@ -247,6 +347,7 @@ class Component extends DCLogic {
   }
 
   renderVals() {
+    var FILTERS = getFilters();
     var self = this, s = this.state, role = STORE.live ? (s.me ? s.me.naam : '') : s.role, beheer = STORE.live ? !!(s.me && s.me.rol === 'beheer') : role === 'Jeroen', all = s.clients;
 
     var inBase = function (c) { return (s.scope === 'alle' || c.admin === role) && (s.bankF === 'alle' || c.bank === s.bankF); };
@@ -256,7 +357,7 @@ class Component extends DCLogic {
     var q = s.q.trim().toLowerCase();
     var BANKORD = { 'BK':0, 'camt.053':1, 'MT940':2, 'geen':3, 'overig':4 };
     var progress = function (c) { var n = 0; for (var i = 0; i < 12; i++) { if (mNa(c, i)) continue; if (!c.months[i]) break; n = i + 1; } return n; };
-    var openBtw = function (c) { var n = 0; for (var qi = 0; qi < 3; qi++) if (!btwNa(c, qi) && !c.btw[qi]) n++; return n; };
+    var openBtw = function (c) { var n = 0; for (var qi = 0; qi < 4; qi++) if (bLate(c, qi) || bDue(c, qi)) n++; return n; };
     var SK = {
       naam: function (c) { return c.naam.toLowerCase(); },
       freq: function (c) { return c.freq === 'kwartaal' ? 0 : 1; },
@@ -274,6 +375,7 @@ class Component extends DCLogic {
       sortBy[k] = function () { self.setState({ sort:{ k:k, d: s.sort.k === k ? -s.sort.d : 1 } }); };
       arrow[k] = s.sort.k === k ? (s.sort.d === 1 ? '↑' : '↓') : '';
     });
+    var viewTitleTxt = (s.scope === 'mijn' ? 'Mijn klanten: ' : (s.adminF !== 'alle' ? s.adminF + ': ' : 'Alle klanten: ')) + cur.label.charAt(0).toLowerCase() + cur.label.slice(1) + (s.bankF !== 'alle' ? ' (bank ' + s.bankF + ')' : '');
     var vis = FILTERS.filter(function (f) { return beheer || (f.id !== 'opgezegd' && f.id !== 'gestopt'); });
     var kpis = vis.map(function (f) {
       var nOp = f.id === 'alles' ? all.filter(function (c) { return inScope(c) && c.status === 'Opgezegd'; }).length : 0;
@@ -282,7 +384,7 @@ class Component extends DCLogic {
     var baseList = all.filter(function (c) { return inBase(c) && cur.f(c) && (!q || c.naam.toLowerCase().indexOf(q) >= 0); });
     var breakdown = s.scope === 'alle' ? ADMINS.map(function (a) { var on = s.adminF === a; return { admin:a, n: baseList.filter(function (c) { return c.admin === a; }).length, cls: on ? 'chip chipbtn on' : 'chip chipbtn', t: on ? 'Klik om weer iedereen te tonen' : 'Alleen klanten van ' + a, pick: function () { self.setState({ adminF: on ? 'alle' : a }); } }; }).filter(function (b) { return b.n > 0 || s.adminF === b.admin; }) : [];
 
-    var pillCls = function (on, na, late, due) { return na ? 'pill na' : on ? 'pill done' : late ? 'pill late' : due ? 'pill due' : 'pill'; };
+    var pillCls = function (on, na, late, due, w) { return na ? 'pill na' : on ? 'pill done' : w ? 'pill wacht' : late ? 'pill late' : due ? 'pill due' : 'pill'; };
     var kenmList = function (c) {
       var out = [];
       if (c.btwMaand) out.push({ l:'BTW per maand', cls:'mini o' });
@@ -300,15 +402,15 @@ class Component extends DCLogic {
         cls: s.sel === c.id ? 'row sel' : 'row',
         isKw: c.freq === 'kwartaal',
         dots: c.months.map(function (d, i) {
-          var na = mNa(c, i), late = mLate(c, i), due = mDue(c, i);
-          return { cls: na ? 'dot na' : d ? 'dot done' : late ? 'dot late' : due ? 'dot due' : 'dot', na: na, t: MONTHS[i] + ': ' + (na ? 'n.v.t.' : d ? 'gedaan, klik om terug te zetten' : 'open, klik om af te vinken'), toggle: function () { if (!na) self.toggle(c, 'm', i, MONTHS[i]); } };
+          var na = mNa(c, i), late = mLate(c, i), due = mDue(c, i), w = wk(c, 'm' + (i + 1));
+          return { cls: na ? 'dot na' : d ? 'dot done' : w ? 'dot wacht' : late ? 'dot late' : due ? 'dot due' : 'dot', na: na, t: MONTHS[i] + ': ' + (na ? 'n.v.t.' : d ? 'gedaan' : w ? 'wacht op klant' : late ? 'achterstand' : 'open') + (na ? '' : s.klikMode === 'wacht' ? ' (klik: wacht op klant aan/uit)' : ' (klik: gedaan aan/uit)'), toggle: function () { if (!na) self.toggle(c, 'm', i, MONTHS[i]); } };
         }),
         bij: bijLabel(c),
-        btw: [0,1,2,3].map(function (qi) { var bna = btwNa(c, qi); return { l:'Q' + (qi + 1), na: bna, cls: pillCls(c.btw[qi], bna, bLate(c, qi), lopend(c) && qi === 2), t: 'BTW Q' + (qi + 1) + ': ' + (bna ? 'n.v.t.' : c.btw[qi] ? 'gedaan, klik om terug te zetten' : 'open, klik om af te vinken'), toggle: function () { if (!bna) self.toggle(c, 'btw', qi, 'BTW Q' + (qi + 1)); } }; }),
+        btw: [0,1,2,3].map(function (qi) { var bna = btwNa(c, qi), bw = wk(c, 'btw' + (qi + 1)); return { l:'Q' + (qi + 1), na: bna, cls: pillCls(c.btw[qi], bna, bLate(c, qi), bDue(c, qi), bw), t: 'BTW Q' + (qi + 1) + ': ' + (bna ? 'n.v.t.' : c.btw[qi] ? 'gedaan' : bw ? 'wacht op klant' : bLate(c, qi) ? 'deadline verstreken' : bDue(c, qi) ? 'nu doen, ' + btwDlLabel(qi) : 'open'), toggle: function () { if (!bna) self.toggle(c, 'btw', qi, 'BTW Q' + (qi + 1)); } }; }),
         jw: pillCls(!!c.jw25, c.j25na || c.jw25 === null, false, lopend(c)), ib: pillCls(!!c.ib25, c.j25na || c.ib25 === null, false, lopend(c)),
         jwNa: c.j25na || c.jw25 === null, ibNa: c.j25na || c.ib25 === null,
-        jwT: 'Jaarwerk 2025: ' + (c.jw25 === null ? 'n.v.t.' : c.jw25 ? 'gedaan' : 'open, klik om af te vinken'), ibT: 'IB 2025: ' + (c.ib25 === null ? 'n.v.t.' : c.ib25 ? 'gedaan' : 'open, klik om af te vinken'),
-        jwToggle: function () { if (!(c.j25na || c.jw25 === null)) self.toggle(c, 'jw25', 0, 'Jaarwerk 2025'); }, ibToggle: function () { if (!(c.j25na || c.ib25 === null)) self.toggle(c, 'ib25', 0, 'IB 2025'); },
+        jwT: 'Jaarwerk ' + vj() + ': ' + (c.jw25 === null ? 'n.v.t.' : c.jw25 ? 'gedaan' : 'open, klik om af te vinken'), ibT: 'IB ' + vj() + ': ' + (c.ib25 === null ? 'n.v.t.' : c.ib25 ? 'gedaan' : 'open, klik om af te vinken'),
+        jwToggle: function () { if (!(c.j25na || c.jw25 === null)) self.toggle(c, 'jw25', 0, 'Jaarwerk ' + vj()); }, ibToggle: function () { if (!(c.j25na || c.ib25 === null)) self.toggle(c, 'ib25', 0, 'IB ' + vj()); },
         hasAdmin: !!c.admin,
         freqLabel: c.freq === 'kwartaal' ? 'Per kwartaal' : 'Per maand', freqCls: c.freq === 'kwartaal' ? 'mini o' : 'mini',
         kenm: kenmList(c),
@@ -320,8 +422,8 @@ class Component extends DCLogic {
     var d = { kenm:[], quarters:[], year:[], gegevens:[], log:[] };
     if (selC) {
       var c = selC;
-      var tog = function (on, na, late, due) { return na ? 'tog na' : on ? 'tog on' : late ? 'tog late' : due ? 'tog due' : 'tog'; };
-      var sub = function (on, na, late, due) { return na ? 'n.v.t.' : on ? 'gedaan' : late ? 'achter' : due ? 'nu doen' : 'open'; };
+      var tog = function (on, na, late, due, w) { return na ? 'tog na' : on ? 'tog on' : w ? 'tog wacht' : late ? 'tog late' : due ? 'tog due' : 'tog'; };
+      var sub = function (on, na, late, due, w) { return na ? 'n.v.t.' : on ? 'gedaan' : w ? 'wacht klant' : late ? 'achter' : due ? 'nu doen' : 'open'; };
       var kenm = [{ l:'BTW-aangifte', on:c.btwMaand, off:!c.btwMaand, v: c.btwMaand ? 'Per maand' : 'Per kwartaal', cls: c.btwMaand ? 'kt hi' : 'kt' }];
       KENM.forEach(function (k) { var on = !!c[k[0]]; kenm.push({ l:k[1], on:on, off:!on, v: on ? 'Ja' : 'Nee', cls: on ? 'kt on' : 'kt' }); });
       if (c.kmuzgb) kenm.push({ l:'KM of UZGB', on:true, off:false, v:'Nog splitsen', cls:'kt hi' });
@@ -331,22 +433,22 @@ class Component extends DCLogic {
 
       var quarters = [0,1,2,3].map(function (qi) {
         var items = [0,1,2].map(function (k) {
-          var i = qi * 3 + k, on = c.months[i], na = mNa(c, i), late = mLate(c, i), due = mDue(c, i);
-          return { l:MONTHS[i], on:on, na:na, cls:tog(on, na, late, due), sub:sub(on, na, late, due), toggle:function () { if (!na) self.toggle(c, 'm', i, MONTHS[i]); } };
+          var i = qi * 3 + k, on = c.months[i], na = mNa(c, i), late = mLate(c, i), due = mDue(c, i), w = wk(c, 'm' + (i + 1));
+          return { l:MONTHS[i], on:on, na:na, cls:tog(on, na, late, due, w), sub:sub(on, na, late, due, w), toggle:function () { if (!na) self.toggle(c, 'm', i, MONTHS[i]); } };
         });
-        var bna = btwNa(c, qi), bon = c.btw[qi], blate = bLate(c, qi), bdue = lopend(c) && qi === 2;
+        var bna = btwNa(c, qi), bon = c.btw[qi], blate = bLate(c, qi), bdue = bDue(c, qi), bw = wk(c, 'btw' + (qi + 1));
         var ctrlKey = qi === 1 ? 'cq2' : qi === 2 ? 'cq3' : null, ctrl = null;
         if (ctrlKey) { var con = !!c[ctrlKey], cna = c[ctrlKey] === null; ctrl = { l:'Controle t/m Q' + (qi + 1), on:con, cls:(cna ? 'tog na' : con ? 'tog on' : 'tog') + ' wide', sub: cna ? 'n.v.t.' : con ? 'gedaan' : 'open', toggle:function () { self.toggle(c, ctrlKey, 0, 'Controle t/m Q' + (qi + 1)); } }; }
-        return { label:'Q' + (qi + 1), dl: c.regime !== 'Normaal' ? 'geen BTW-aangifte' : 'BTW ' + BTWDL[qi], items:items,
-          btw:{ on:bon, na:bna, cls:tog(bon, bna, blate, bdue), sub:sub(bon, bna, blate, bdue), toggle:function () { if (!bna) self.toggle(c, 'btw', qi, 'BTW Q' + (qi + 1)); } },
+        return { label:'Q' + (qi + 1), dl: c.regime !== 'Normaal' ? 'geen BTW-aangifte' : 'BTW ' + btwDlLabel(qi), items:items,
+          btw:{ on:bon, na:bna, cls:tog(bon, bna, blate, bdue, bw), sub:sub(bon, bna, blate, bdue, bw), toggle:function () { if (!bna) self.toggle(c, 'btw', qi, 'BTW Q' + (qi + 1)); } },
           hasCtrl: !!ctrl, ctrl: ctrl || { l:'', on:false, cls:'tog', sub:'', toggle:function () {} } };
       });
-      var year = [['c25','Controle 2025'],['jw25','Jaarwerk 2025'],['ib25','IB 2025']].map(function (p) {
+      var year = [['c25','Controle ' + vj()],['jw25','Jaarwerk ' + vj()],['ib25','IB ' + vj()]].map(function (p) {
         var on = !!c[p[0]], na = c.j25na || c[p[0]] === null;
         return { l:p[1], on:on, na:na, cls:tog(on, na, false, false) + ' wide', sub:sub(on, na, false, false), toggle:function () { if (!na) self.toggle(c, p[0], 0, p[1]); } };
       });
       var e = c.einde;
-      var eindScope = e ? ('Wij doen nog: administratie ' + (e.adm < 0 ? 'niets meer' : 't/m ' + MONTHS[e.adm]) + ', BTW ' + (e.btw < 0 ? 'geen' : 't/m Q' + (e.btw + 1)) + ', jaarwerk 2026 ' + (e.jw26 ? 'ja' : 'nee') + ', IB 2026 ' + (e.ib26 ? 'ja' : 'nee') + '.') : '';
+      var eindScope = e ? ('Wij doen nog: administratie ' + (e.adm < 0 ? 'niets meer' : 't/m ' + MONTHS[e.adm]) + ', BTW ' + (e.btw < 0 ? 'geen' : 't/m Q' + (e.btw + 1)) + ', jaarwerk ' + JAAR + ' ' + (e.jw26 ? 'ja' : 'nee') + ', IB ' + JAAR + ' ' + (e.ib26 ? 'ja' : 'nee') + '.') : '';
       var draft = s.notes[c.id] !== undefined ? s.notes[c.id] : c.notities;
       var geg = [
         { k:'Contactpersoon', v:(c.voornaam + ' ' + c.achternaam).trim() || 'onbekend' },
@@ -380,6 +482,59 @@ class Component extends DCLogic {
       };
     }
 
+    // ---- Werkvoorraad
+    var wie = s.werkWie || (ADMINS.indexOf(role) >= 0 ? role : 'alle');
+    var mijn = all.filter(function (c) { return lopend(c) && (wie === 'alle' || c.admin === wie); }).sort(function (a, b) { return a.naam.localeCompare(b.naam); });
+    var openKl = function (c) { return function () { self.setState({ page:'klanten', sel:c.id, tab:'over' }); self.loadLog(c.id); }; };
+    var wBtw = [];
+    mijn.forEach(function (c) { [0,1,2,3].forEach(function (q) {
+      var w = wk(c, 'btw' + (q + 1)) && !c.btw[q] && !btwNa(c, q), late = bLate(c, q), due = bDue(c, q);
+      if (!(late || due || w)) return;
+      var dl = btwDeadline(q), dg = dagenTot(dl);
+      wBtw.push({ naam:c.naam, admin:c.admin, toonAdmin: wie === 'alle', open:openKl(c), hasPill:true, pillL:'Q' + (q + 1), pillCls: w ? 'pill wacht' : late ? 'pill late' : 'pill due', pillT:'Klik om af te vinken (volgens de klikstand)', toggle:function () { self.toggle(c, 'btw', q, 'BTW Q' + (q + 1)); },
+        info: w ? 'wacht op klant' : late ? 'deadline ' + (-dg) + (-dg === 1 ? ' dag' : ' dagen') + ' verstreken' : 'nog ' + dg + (dg === 1 ? ' dag' : ' dagen') + ', ' + btwDlLabel(q), sv: w ? 9e15 : dl.getTime(), email:c.email });
+    }); });
+    wBtw.sort(function (a, b) { return a.sv - b.sv || a.naam.localeCompare(b.naam); });
+    var wAchter = mijn.filter(function (c) { return lateLabels(c).length; }).map(function (c) { return { naam:c.naam, admin:c.admin, toonAdmin: wie === 'alle', open:openKl(c), hasPill:false, info:'open: ' + lateLabels(c).join(', '), email:c.email }; });
+    var wWacht = mijn.filter(heeftWacht).map(function (c) { return { naam:c.naam, admin:c.admin, toonAdmin: wie === 'alle', open:openKl(c), hasPill:false, info:'wacht op: ' + wachtLabels(c).join(', '), email:c.email }; });
+    var wJaar = mijn.filter(function (c) { return jwOpen(c) || ibOpen(c); }).map(function (c) { return { naam:c.naam, admin:c.admin, toonAdmin: wie === 'alle', open:openKl(c), hasPill:false, info:[jwOpen(c) ? 'jaarwerk' : '', ibOpen(c) ? 'IB-aangifte' : ''].filter(Boolean).join(' en ') + ' ' + vj() + ' open', email:c.email }; });
+    var mePlain = STORE.live ? (s.me ? s.me.naam : '') : role;
+    var herinnering = vulMail('aanlevering', standaardPeriode(), standaardUiterlijk(), mePlain);
+    var wachtMails = wWacht.map(function (x) { return x.email; }).filter(Boolean);
+    var sectie = function (id, titel, sub, items, leeg, actie) { return { id:id, titel:titel, sub:sub, n:items.length, items:items, hasItems:items.length > 0, leegTonen:items.length === 0, leeg:leeg, hasActie: !!actie && items.length > 0, actie: actie || {} }; };
+    var werkSecties = [
+      sectie('btw', 'BTW-aangiften', 'kwartaal voorbij en nog niet gedaan, op deadline gesorteerd', wBtw, 'Geen openstaande BTW-aangiften.'),
+      sectie('achter', 'Achterstand administratie', 'nog niet verwerkt ' + peilLabel(), wAchter, 'Geen achterstand.'),
+      sectie('wacht', 'Wacht op klant', 'stukken nog niet aangeleverd', wWacht, 'Bij niemand wachten we op stukken.', { l:'Herinnering mailen (BCC)', href: mailtoLink(wachtMails, herinnering.s, herinnering.b), t: wachtMails.length + ' e-mailadressen' }),
+      sectie('jaar', 'Jaarwerk en IB ' + vj(), 'nog open', wJaar, 'Alle jaarwerk en IB-aangiften zijn gedaan.')
+    ];
+    var teamM = [['n','Klanten'],['achter','Achterstand'],['btwLaat','BTW te laat'],['btwNu','BTW nu doen'],['wacht','Wacht op klant'],['jw','Jaarwerk ' + vj()],['ib','IB ' + vj()]];
+    var teamRaw = ADMINS.map(function (a) {
+      var kl = all.filter(function (c) { return lopend(c) && c.admin === a; });
+      var cnt = function (f) { return kl.filter(f).length; };
+      return { a:a, n:kl.length, achter:cnt(isAchter), btwLaat:cnt(function (c) { return [0,1,2,3].some(function (q) { return bLate(c, q); }); }), btwNu:cnt(function (c) { return [0,1,2,3].some(function (q) { return bDue(c, q); }); }), wacht:cnt(heeftWacht), jw:cnt(jwOpen), ib:cnt(ibOpen) };
+    });
+    var teamMax = {}; teamM.forEach(function (m) { teamMax[m[0]] = Math.max(1, Math.max.apply(null, teamRaw.map(function (r) { return r[m[0]]; }))); });
+    var team = teamRaw.map(function (r) { return { a:r.a, init:initial(r.a), pick:function () { self.setState({ werkWie:r.a }); }, cls: wie === r.a ? 'teamrow on' : 'teamrow', cells: teamM.map(function (m) { return { v:r[m[0]], bar:'width: ' + Math.round(r[m[0]] / teamMax[m[0]] * 100) + '%; background: ' + (m[0] === 'n' ? '#D9D9D9' : m[0] === 'wacht' ? '#7FA3D6' : m[0] === 'btwLaat' || m[0] === 'achter' ? '#C0392B' : '#FF8000') }; }) }; });
+    var exportWerk = function () {
+      var sh = werkSecties.map(function (sc) { return { name:sc.titel, rows:[['Klant','Administrateur','Wat']].concat(sc.items.map(function (x) { return [x.naam, x.admin, (x.pillL ? x.pillL + ': ' : '') + x.info]; })) }; });
+      if (beheer) sh.unshift({ name:'Team', rows:[['Collega'].concat(teamM.map(function (m) { return m[1]; }))].concat(teamRaw.map(function (r) { return [r.a].concat(teamM.map(function (m) { return r[m[0]]; })); })) });
+      downloadXlsx('Werkvoorraad ' + (wie === 'alle' ? 'iedereen' : wie) + ' ' + vandaagIso() + '.xlsx', sh);
+    };
+    var exportKlanten = function () {
+      var kop = ['Klant','Status','Verwerking','Administrateur','Bank'].concat(MONTHS).concat(['BTW Q1','BTW Q2','BTW Q3','BTW Q4','Controle t/m Q2','Controle t/m Q3','Controle ' + vj(),'Jaarwerk ' + vj(),'IB ' + vj(),'Achterstand','Wacht op klant','Kenmerken','Pakket','Facturen per jaar','Rechtsvorm','Boekhoudpakket','E-mailadres','Voornaam','Achternaam','Btw-nummer','Bijzonderheden','Teamnotities']);
+      var yn = function (v) { return v === null ? 'n.v.t.' : v ? 'Gedaan' : 'Open'; };
+      var rijen = list.map(function (c) {
+        return [c.naam, c.status, c.freq === 'kwartaal' ? 'Per kwartaal' : 'Per maand', c.admin, c.bank]
+          .concat(c.months.map(function (d, i) { return stTekst(d, mNa(c, i), wk(c, 'm' + (i + 1)), mLate(c, i)); }))
+          .concat([0,1,2,3].map(function (q) { return stTekst(c.btw[q], btwNa(c, q), wk(c, 'btw' + (q + 1)), bLate(c, q)); }))
+          .concat([yn(c.cq2), yn(c.cq3), yn(c.c25), yn(c.jw25), yn(c.ib25), isAchter(c) ? 'Ja' : 'Nee', heeftWacht(c) ? wachtLabels(c).join(', ') : '',
+            kenmList(c).map(function (k) { return k.l; }).join(', '), c.pakket, c.facturen === '' ? '' : Number(c.facturen), c.rechtsvorm, c.software, c.email, c.voornaam, c.achternaam, c.btwnr, c.bijz, c.notities]);
+      });
+      downloadXlsx('Klanten ' + slug(viewTitleTxt) + ' ' + JAAR + ' ' + vandaagIso() + '.xlsx', [{ name:'Klanten ' + JAAR, rows:[kop].concat(rijen) }]);
+    };
+    var mailVul = function (t) { var m = vulMail(t, s.mailPeriode, s.mailUiterlijk, mePlain); self.setState({ mailT:t, mailS:m.s, mailB:m.b, copiedTxt:false }); };
+
     var ef = emptyForm();
     var setF = function (k, chk) { return function (ev) { var v = chk ? ev.target.checked : ev.target.value; self.setState(function (st) { var f = Object.assign({}, st.form); f[k] = v; return { form:f }; }); }; };
     var on = {};
@@ -397,8 +552,8 @@ class Component extends DCLogic {
     var m = { naam:'', info:'' };
     if (mC) {
       var open25 = [];
-      if (!mC.j25na && !mC.jw25) open25.push('jaarwerk 2025');
-      if (!mC.j25na && !mC.ib25) open25.push('IB-aangifte 2025');
+      if (!mC.j25na && mC.jw25 === false) open25.push('jaarwerk ' + vj());
+      if (!mC.j25na && mC.ib25 === false) open25.push('IB-aangifte ' + vj());
       m = { naam:mC.naam, info:mC.admin + ' · ' + mC.rechtsvorm + ' · ' + mC.status + ' · klant sinds ' + vanLabel(mC) + (mC.einde ? ' · einde ' + mC.einde.datum : ''),
         kanStoppen: mC.status === 'Actief', isOpgezegd: mC.status === 'Opgezegd', kanTerug: mC.status !== 'Actief',
         hasOpen25: open25.length > 0, open25: open25.join(' en ') + ' staat nog open en blijft gewoon in de overzichten staan tot het is afgevinkt.' };
@@ -411,8 +566,6 @@ class Component extends DCLogic {
     if (!activeCols.length) activeCols = [COLS[0]];
     var prevCells = activeCols.map(function (cl) { return { v:cl[1], cls:'hcell' }; });
     selList.forEach(function (c) { activeCols.forEach(function (cl) { prevCells.push({ v:String(c[cl[0]] || ''), cls:'cell' }); }); });
-    var esc = function (v) { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-    var csv = [activeCols.map(function (cl) { return cl[1]; }).join(';')].concat(selList.map(function (c) { return activeCols.map(function (cl) { return esc(c[cl[0]]); }).join(';'); })).join('\r\n');
 
     var bCls = function (id) { return s.bsub === id ? 'sub on' : 'sub'; };
     var goSub = function (id) { return function () { self.setState({ bsub:id, mutMode:'menu', editId:null, err:'', mutMsg:'', form: id === 'nieuw' ? emptyForm() : s.form }); }; };
@@ -446,31 +599,57 @@ class Component extends DCLogic {
       demoReset: function () { if (!s.demoAsk) { self.setState({ demoAsk:true }); return; } try { localStorage.removeItem(DEMO_KEY); } catch (x) {} self.setState({ clients:SEED, demoAsk:false, sel:null, mutSel:null }); },
       auth: s.auth,
       onAuth: { email: function (ev) { self.setState({ auth:Object.assign({}, self.state.auth, { email:ev.target.value }) }); }, pw: function (ev) { self.setState({ auth:Object.assign({}, self.state.auth, { pw:ev.target.value }) }); }, pw2: function (ev) { self.setState({ auth:Object.assign({}, self.state.auth, { pw2:ev.target.value }) }); } },
-      authTitle: s.authMode === 'newpw' ? 'Kies je wachtwoord' : s.authMode === 'forgot' ? 'Wachtwoord vergeten' : 'Inloggen',
-      authSub: s.authMode === 'newpw' ? 'Minimaal 10 tekens. Je gebruikt dit wachtwoord voortaan om in te loggen.' : s.authMode === 'forgot' ? 'Je ontvangt een mail met een link om een nieuw wachtwoord te kiezen.' : 'Klantdashboard PoortEijk ZZP',
-      authAskEmail: s.authMode !== 'newpw', authAskPw: s.authMode !== 'forgot', authAskPw2: s.authMode === 'newpw',
+      authTitle: s.authMode === 'newpw' ? 'Kies je wachtwoord' : s.authMode === 'forgot' ? 'Wachtwoord vergeten' : s.authMode === 'mfa' ? 'Code invoeren' : s.authMode === 'enroll' ? 'Tweestapsverificatie instellen' : 'Inloggen',
+      authSub: s.authMode === 'newpw' ? 'Minimaal 10 tekens. Je gebruikt dit wachtwoord voortaan om in te loggen.' : s.authMode === 'forgot' ? 'Je ontvangt een mail met een link om een nieuw wachtwoord te kiezen.' : s.authMode === 'mfa' ? 'Open je authenticator-app en vul de code van 6 cijfers in.' : s.authMode === 'enroll' ? 'Eenmalig: koppel je telefoon. Scan de QR-code met Microsoft Authenticator of Google Authenticator en vul de code in die de app toont.' : 'Klantdashboard PoortEijk ZZP',
+      authAskEmail: s.authMode === 'login' || s.authMode === 'forgot', authAskPw: s.authMode === 'login' || s.authMode === 'newpw', authAskPw2: s.authMode === 'newpw',
+      authAskOnth: s.authMode === 'login', onth: s.onth, onOnth: function (ev) { self.setState({ onth:ev.target.checked }); },
+      authAskCode: s.authMode === 'mfa' || (s.authMode === 'enroll' && !!s.mfa), code: s.code, onCode: function (ev) { self.setState({ code:ev.target.value.replace(/\D/g, '').slice(0, 6) }); },
+      authShowQr: s.authMode === 'enroll' && !!s.mfa, mfaQr: s.mfa && s.mfa.qr ? s.mfa.qr : '', mfaSecret: s.mfa && s.mfa.secret ? s.mfa.secret : '',
       authPwLabel: s.authMode === 'newpw' ? 'Nieuw wachtwoord' : 'Wachtwoord', authPwAuto: s.authMode === 'newpw' ? 'new-password' : 'current-password',
-      authBtn: s.authMode === 'newpw' ? 'Wachtwoord opslaan' : s.authMode === 'forgot' ? 'Stuur mail' : 'Inloggen',
+      authBtn: s.authMode === 'newpw' ? 'Wachtwoord opslaan' : s.authMode === 'forgot' ? 'Stuur mail' : s.authMode === 'mfa' ? 'Bevestigen' : s.authMode === 'enroll' ? 'Koppelen en inloggen' : 'Inloggen',
       hasAuthMsg: !!s.authMsg, authMsg: s.authMsg, authMsgStyle: s.authOk ? 'background: #F1EFEC; color: #2B2B2B' : 'background: #FFF2E5; color: #8A3F00',
-      authCanForgot: s.authMode !== 'newpw', authForgotLabel: s.authMode === 'forgot' ? 'Terug naar inloggen' : 'Wachtwoord vergeten?',
-      authForgot: function () { self.setState({ authMode: s.authMode === 'forgot' ? 'login' : 'forgot', authMsg:'' }); },
+      authCanForgot: s.authMode !== 'newpw', authForgotLabel: s.authMode === 'forgot' ? 'Terug naar inloggen' : (s.authMode === 'mfa' || s.authMode === 'enroll') ? 'Uitloggen' : 'Wachtwoord vergeten?',
+      authForgot: function () { if (s.authMode === 'mfa' || s.authMode === 'enroll') { STORE.signOut(); return; } self.setState({ authMode: s.authMode === 'forgot' ? 'login' : 'forgot', authMsg:'' }); },
       authSubmit: function (ev) {
         ev.preventDefault();
         var a = self.state.auth;
         if (s.authMode === 'login') {
           self.setState({ authMsg:'Bezig...', authOk:true });
-          STORE.signIn(a.email.trim(), a.pw).then(function () { self.setState({ authMsg:'', auth:{ email:a.email, pw:'', pw2:'' } }); }).catch(function (e) { self.setState({ authMsg:e.message, authOk:false }); });
+          STORE.signIn(a.email.trim(), a.pw, s.onth).then(function () { self.setState({ authMsg:'', auth:{ email:a.email, pw:'', pw2:'' } }); }).catch(function (e) { self.setState({ authMsg:e.message, authOk:false }); });
+        } else if (s.authMode === 'mfa' || s.authMode === 'enroll') {
+          if (!s.mfa || !s.mfa.factorId) return;
+          if (s.code.length !== 6) { self.setState({ authMsg:'Vul de code van 6 cijfers in.', authOk:false }); return; }
+          self.setState({ authMsg:'Bezig...', authOk:true });
+          STORE.verify(s.mfa.factorId, s.code).then(function () { self.setState({ code:'', authMsg:'' }); }).catch(function (e) { self.setState({ authMsg:e.message, authOk:false, code:'' }); });
         } else if (s.authMode === 'forgot') {
           STORE.resetPw(a.email.trim()).then(function () { self.setState({ authMsg:'Als dit e-mailadres bekend is, staat er een mail met een link in je inbox.', authOk:true }); }).catch(function (e) { self.setState({ authMsg:e.message, authOk:false }); });
         } else {
           if (a.pw.length < 10) { self.setState({ authMsg:'Kies een wachtwoord van minimaal 10 tekens.', authOk:false }); return; }
           if (a.pw !== a.pw2) { self.setState({ authMsg:'De twee wachtwoorden zijn niet gelijk.', authOk:false }); return; }
-          STORE.setPw(a.pw).then(function (me) { self.setState({ auth:{ email:'', pw:'', pw2:'' }, authMsg:'' }); self.startLive(me); }).catch(function (e) { self.setState({ authMsg:e.message, authOk:false }); });
+          STORE.setPw(a.pw).then(function () { self.setState({ auth:{ email:'', pw:'', pw2:'' }, authMsg:'' }); }).catch(function (e) { self.setState({ authMsg:e.message, authOk:false }); });
         }
       },
       isBeheer: beheer,
       roleInitial: initial(role),
-      roles: ADMINS.map(function (a) { return { l: a === 'Jeroen' ? 'Jeroen · beheer' : a, cls: role === a ? 'seg on' : 'seg', pick:function () { self.setState(a === 'Jeroen' ? { role:a } : { role:a, page:'klanten' }); } }; }),
+      jaarLabel: String(JAAR), vjLabel: String(vj()),
+      jaren: s.jaren.map(function (y) { return { v:String(y), l:String(y) }; }), jaarSel: String(s.jaar), onJaar: function (ev) { self.kiesJaar(ev.target.value); },
+      kmGedaanCls: s.klikMode === 'gedaan' ? 'seg on' : 'seg', kmWachtCls: s.klikMode === 'wacht' ? 'seg on blauw' : 'seg',
+      kmGedaan: function () { self.setState({ klikMode:'gedaan' }); }, kmWacht: function () { self.setState({ klikMode:'wacht' }); },
+      navWerkCls: s.page === 'werk' ? 'nav on' : 'nav', goWerk: function () { self.setState({ page:'werk' }); }, pageWerk: s.page === 'werk',
+      werkWie: wie, onWerkWie: function (ev) { self.setState({ werkWie:ev.target.value }); },
+      werkTitel: wie === 'alle' ? 'Werkvoorraad van iedereen' : (wie === role ? 'Mijn werkvoorraad' : 'Werkvoorraad van ' + wie),
+      werkSub: mijn.length + ' lopende klanten · administratie telt als achterstand ' + peilLabel() + ' · ' + JAAR,
+      werkSecties: werkSecties, exportWerk: exportWerk, exportKlanten: exportKlanten,
+      team: team, teamKop: teamM.map(function (m) { return { l:m[1] }; }), toonTeam: beheer,
+      bJaarCls: bCls('jaar'), bJaar: goSub('jaar'), showJaar: s.bsub === 'jaar',
+      volgendJaar: String(s.jaar + 1), huidigJaar: String(s.jaar),
+      jaarBtn: s.jaarAsk ? 'Klik nogmaals om ' + (s.jaar + 1) + ' echt te starten' : 'Jaar ' + (s.jaar + 1) + ' starten',
+      jaarStart: function () { if (!s.jaarAsk) { self.setState({ jaarAsk:true, jaarMsg:'' }); return; } self.startJaar(); },
+      hasJaarMsg: !!s.jaarMsg, jaarMsg: s.jaarMsg,
+      peilSel: PEIL_HANDMATIG === null || PEIL_HANDMATIG === undefined ? 'auto' : String(PEIL_HANDMATIG),
+      onPeil: function (ev) { self.zetPeil(ev.target.value); },
+      peilNu: peilLabel(), peilAuto: PEIL_HANDMATIG === null || PEIL_HANDMATIG === undefined,
+      roles: ADMINS.map(function (a) { return { l: a === 'Jeroen' ? 'Jeroen · beheer' : a, cls: role === a ? 'seg on' : 'seg', pick:function () { self.setState(a === 'Jeroen' ? { role:a, werkWie:null } : { role:a, werkWie:null, page: s.page === 'beheer' ? 'werk' : s.page }); } }; }),
       bankF: s.bankF, onBankF: function (ev) { self.setState({ bankF:ev.target.value }); },
       adminF: s.adminF, onAdminF: function (ev) { self.setState({ adminF:ev.target.value, scope:'alle' }); },
       sortBy: sortBy, arrow: arrow,
@@ -483,7 +662,7 @@ class Component extends DCLogic {
       scopeAll: function () { self.setState({ scope:'alle' }); }, scopeMijn: function () { self.setState({ scope:'mijn', adminF:'alle' }); },
       q:s.q, onQ:function (ev) { self.setState({ q:ev.target.value }); },
       kpis:kpis, breakdown:breakdown,
-      viewTitle: (s.scope === 'mijn' ? 'Mijn klanten: ' : 'Alle klanten: ') + cur.label.charAt(0).toLowerCase() + cur.label.slice(1),
+      viewTitle: viewTitleTxt,
       viewCount: list.length + (list.length === 1 ? ' klant' : ' klanten'),
       rows:rows, noRows: rows.length === 0,
       showEmpty: !selC, showDetail: !!selC, hasSel: !!selC, d:d,
@@ -507,7 +686,7 @@ class Component extends DCLogic {
       factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: #F1EFEC' : '',
       factHint: FACT[s.form.pakket] ? 'Vast bij pakket ' + s.form.pakket : 'Zelf invullen bij ' + s.form.pakket.toLowerCase(),
       formTitle: isEdit ? 'Gegevens wijzigen: ' + (mC ? mC.naam : '') : 'Nieuwe klant toevoegen',
-      formHint: isEdit ? 'De wijziging wordt met jouw naam in de historie vastgelegd.' : 'Na opslaan staat de klant direct in Voortgang 2026 bij de gekozen administrateur. Perioden vóór het startkwartaal worden niet van toepassing.',
+      formHint: isEdit ? 'De wijziging wordt met jouw naam in de historie vastgelegd.' : 'Na opslaan staat de klant direct in Voortgang ' + JAAR + ' bij de gekozen administrateur. Perioden vóór het startkwartaal worden niet van toepassing.',
       form:s.form, on:on, err:s.err, hasErr: !!s.err, saveForm:function () { self.saveForm(); },
 
       showMut: s.bsub === 'muteren' && !isEdit, mq:s.mq, onMq:function (ev) { self.setState({ mq:ev.target.value }); }, mlist:mlist,
@@ -522,7 +701,7 @@ class Component extends DCLogic {
         self.setState({ mutMode:'edit', form:f, editId:mC.id, err:'', mutMsg:'' });
       },
       mAdmin:function () { if (mC) self.setState({ mutMode:'admin', mut:{ admin:mC.admin }, mutMsg:'' }); },
-      mStop:function () { self.setState({ mutMode:'stop', mutMsg:'', stop:{ datum:'2026-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true } }); },
+      mStop:function () { self.setState({ mutMode:'stop', mutMsg:'', stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true } }); },
       mut:s.mut, onMut:onMut, stop:s.stop, onStop:onStop,
       doAdmin:function () {
         if (!mC || s.mut.admin === mC.admin) { self.setState({ mutMode:'menu' }); return; }
@@ -540,14 +719,25 @@ class Component extends DCLogic {
       mTerug:function () { if (mC) { self.upd(mC.id, function (n) { n.status = 'Actief'; n.einde = null; n.stopY = null; }, 'Opnieuw geactiveerd'); self.setState({ mutMsg:'Klant is weer actief.' }); } },
 
       showSel: s.bsub === 'sel', sf:s.sf, onSf:onSf,
-      presets: PRESETS.map(function (p) { return { l:p.l, pick:function () { self.setState({ sf:Object.assign(emptySf(), p.f), cols:colSet(p.cols), copied:false }); } }; }),
+      presets: PRESETS.map(function (p) { return { l:p.l, pick:function () { self.setState({ sf:Object.assign(emptySf(), p.f), cols:colSet(p.cols), copied:false }); if (p.tpl) mailVul(p.tpl); } }; }),
       selCount: selList.length + (selList.length === 1 ? ' klant geselecteerd' : ' klanten geselecteerd'),
       selEmpty: selList.length === 0,
       colsUI: COLS.map(function (cl) { return { l:cl[1], on: !!s.cols[cl[0]], toggle:function () { self.setState(function (st) { var o = Object.assign({}, st.cols); o[cl[0]] = !o[cl[0]]; return { cols:o }; }); } }; }),
       prevGrid: 'display: grid; grid-template-columns: repeat(' + activeCols.length + ', minmax(150px, 1fr)); min-width: ' + (activeCols.length * 150) + 'px',
       prevCells: prevCells,
-      expHref: 'data:text/csv;charset=utf-8,' + encodeURIComponent('﻿' + csv), expCls: selList.length ? 'btn dark' : 'btn dark off',
-      mailHref: 'mailto:?bcc=' + mails.join(','), mailCls: mails.length ? 'btn primary' : 'btn primary off',
+      expCls: selList.length ? 'btn dark' : 'btn dark off',
+      exportSel: function () { downloadXlsx('Selectie ' + vandaagIso() + '.xlsx', [{ name:'Selectie', rows:[activeCols.map(function (cl) { return cl[1]; })].concat(selList.map(function (c) { return activeCols.map(function (cl) { return c[cl[0]] == null ? '' : c[cl[0]]; }); })) }]); },
+      mailHref: mailtoLink(mails, s.mailS, s.mailB), mailCls: mails.length ? 'btn primary' : 'btn primary off',
+      mailTeLang: mailtoLink(mails, s.mailS, s.mailB).length > 1900,
+      mailT: s.mailT, onMailT: function (ev) { mailVul(ev.target.value); },
+      mailS: s.mailS, onMailS: function (ev) { self.setState({ mailS:ev.target.value, copiedTxt:false }); },
+      mailB: s.mailB, onMailB: function (ev) { self.setState({ mailB:ev.target.value, copiedTxt:false }); },
+      mailPeriode: s.mailPeriode, onMailPeriode: function (ev) { self.setState({ mailPeriode:ev.target.value }); },
+      mailUiterlijk: s.mailUiterlijk, onMailUiterlijk: function (ev) { self.setState({ mailUiterlijk:ev.target.value }); },
+      mailOpnieuw: function () { mailVul(s.mailT); },
+      mailHeeftPeriode: s.mailT === 'aanlevering' || s.mailT === 'ib',
+      copyTxtLabel: s.copiedTxt ? 'Tekst gekopieerd' : 'Kopieer tekst',
+      copyTxt: function () { try { navigator.clipboard.writeText((s.mailS ? s.mailS + '\n\n' : '') + s.mailB); } catch (x) {} self.setState({ copiedTxt:true }); },
       copyLabel: s.copied ? 'Gekopieerd' : 'Kopieer e-mailadressen',
       copyMails:function () { try { navigator.clipboard.writeText(mails.join('; ')); } catch (x) {} self.setState({ copied:true }); },
       saveName:s.saveName, onSaveName:function (ev) { self.setState({ saveName:ev.target.value }); },

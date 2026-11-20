@@ -65,6 +65,15 @@ create table if not exists public.voortgang (
   gewijzigd_op timestamptz not null default now(),
   primary key (klant_id, jaar)
 );
+-- Wacht op klant: per periode, bijv. {"m10": true, "btw3": true}
+alter table public.voortgang add column if not exists wacht jsonb not null default '{}'::jsonb;
+
+-- Instellingen voor het hele team (huidig werkjaar, peilmaand).
+create table if not exists public.instellingen (
+  sleutel text primary key,
+  waarde jsonb
+);
+insert into public.instellingen (sleutel, waarde) values ('huidig_jaar', '2026'::jsonb) on conflict (sleutel) do nothing;
 
 -- Historie: wie heeft wat wanneer gedaan.
 create table if not exists public.historie (
@@ -86,20 +95,26 @@ create trigger voortgang_gewijzigd before update on public.voortgang for each ro
 
 -- ---------------------------------------------------------------
 -- Rechten (Row Level Security)
+-- Klantgegevens zijn alleen bereikbaar na wachtwoord EN code uit de authenticator-app (aal2).
 -- ---------------------------------------------------------------
+create or replace function public.tweestaps() returns boolean
+language sql stable as $$
+  select coalesce(auth.jwt() ->> 'aal', '') = 'aal2';
+$$;
 create or replace function public.is_beheer() returns boolean
 language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.profielen where id = auth.uid() and rol = 'beheer');
+  select public.tweestaps() and exists (select 1 from public.profielen where id = auth.uid() and rol = 'beheer');
 $$;
 create or replace function public.is_medewerker() returns boolean
 language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.profielen where id = auth.uid());
+  select public.tweestaps() and exists (select 1 from public.profielen where id = auth.uid());
 $$;
 
 alter table public.profielen enable row level security;
 alter table public.klanten enable row level security;
 alter table public.voortgang enable row level security;
 alter table public.historie enable row level security;
+alter table public.instellingen enable row level security;
 
 drop policy if exists "profielen lezen" on public.profielen;
 create policy "profielen lezen" on public.profielen for select to authenticated using (public.is_medewerker() or id = auth.uid());
@@ -125,8 +140,13 @@ create policy "historie lezen" on public.historie for select to authenticated us
 drop policy if exists "historie schrijven" on public.historie;
 create policy "historie schrijven" on public.historie for insert to authenticated with check (public.is_medewerker());
 
+drop policy if exists "instellingen lezen" on public.instellingen;
+create policy "instellingen lezen" on public.instellingen for select to authenticated using (public.is_medewerker());
+drop policy if exists "instellingen beheren" on public.instellingen;
+create policy "instellingen beheren" on public.instellingen for all to authenticated using (public.is_beheer()) with check (public.is_beheer());
+
 -- Geen toegang voor niet-ingelogde bezoekers.
-revoke all on public.profielen, public.klanten, public.voortgang, public.historie from anon;
+revoke all on public.profielen, public.klanten, public.voortgang, public.historie, public.instellingen from anon;
 
 -- ---------------------------------------------------------------
 -- Live bijwerken (Realtime)
@@ -134,6 +154,7 @@ revoke all on public.profielen, public.klanten, public.voortgang, public.histori
 do $$ begin
   begin alter publication supabase_realtime add table public.klanten; exception when duplicate_object then null; end;
   begin alter publication supabase_realtime add table public.voortgang; exception when duplicate_object then null; end;
+  begin alter publication supabase_realtime add table public.instellingen; exception when duplicate_object then null; end;
 end $$;
 
 -- ---------------------------------------------------------------

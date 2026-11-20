@@ -48,13 +48,19 @@ De rechten worden afgedwongen in de database zelf (Row Level Security), niet all
 7. Koppel elke gebruiker aan een naam en rol met de SQL onderaan `schema.sql`. De naam moet gelijk zijn aan de administrateursnaam in het dashboard (Jeroen, Gea, Marco, Yassir).
 8. Ga naar **Project Settings** > **API** en kopieer de **Project URL** en de **anon / publishable key** naar `config.js`. Gebruik nooit de `service_role` of `secret` sleutel.
 9. Na het opslaan van `config.js` in GitHub zet Netlify de nieuwe versie automatisch online. Het dashboard vraagt vanaf dan om in te loggen.
+10. Tweestapsverificatie: controleer onder **Authentication** > **Multi-Factor** dat **TOTP (App Authenticator)** aan staat. Iedereen koppelt bij de eerste keer inloggen zelf een authenticator-app. Zonder code is er geen toegang tot klantgegevens (afgedwongen in de database).
 
 ## Fase 3: klantgegevens importeren
 
-Wordt aangeleverd als importbestanden (CSV) voor de tabellen `klanten` en `voortgang`. BSN's gaan niet mee naar de online versie.
+Wordt los aangeleverd als `import_klanten_2026.sql` (niet in deze repository). Draai het eenmalig in de SQL Editor, na `schema.sql`. Het stopt vanzelf als de tabel `klanten` al gevuld is. BSN's gaan niet mee naar de online versie.
+
+## Jaarovergang en instellingen
+
+- Beheer > Jaar en instellingen > **Jaar 2027 starten** maakt voor alle lopende klanten een lege regel aan. Het oude jaar blijft in te zien via de jaarkeuze bovenin.
+- Achterstand wordt automatisch bepaald op datum (administratie t/m twee maanden terug, BTW na de wettelijke deadline). De beheerder kan de peilmaand tijdelijk handmatig zetten.
 
 ## Afspraken
 
 - Geen BSN's, inloggegevens of bankgegevens in dit dashboard.
 - Ieder een eigen account, tweestapsverificatie aan op GitHub, Netlify en Supabase.
-- Wekelijks een export naar Excel als reservekopie (Beheer > Selecties, mail en export).
+- Wekelijks een export naar Excel als reservekopie (Klanten > Excel, met filter Alle lopende klanten).
