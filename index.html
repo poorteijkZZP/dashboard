@@ -298,8 +298,11 @@
                   <span style="font-size: 12px; font-weight: 600; color: #5E5E5E; margin-left: 8px">{{r.bij}}</span>
                 </div>
                 <div class="cell" style="gap: 4px">
+                  <sc-if value="{{r.btwM}}" hint-placeholder-val="{{ false }}">
+                    <span class="bmtag" title="BTW-aangifte per maand. Een klik vinkt de eerstvolgende open maand af.">m</span>
+                  </sc-if>
                   <sc-for list="{{r.btw}}" as="p" hint-placeholder-count="4">
-                    <button type="button" class="{{p.cls}}" title="{{p.t}}" disabled="{{p.na}}" onClick="{{p.toggle}}">{{p.l}}</button>
+                    <button type="button" class="{{p.cls}}" title="{{p.t}}" disabled="{{p.na}}" onClick="{{p.toggle}}">{{p.l}}<sc-if value="{{p.hasFr}}" hint-placeholder-val="{{ false }}"><small class="pfr">{{p.fr}}</small></sc-if></button>
                   </sc-for>
                 </div>
                 <div class="cell" style="gap: 4px">
@@ -427,6 +430,13 @@
                         </sc-for>
                         <button type="button" class="{{qq.btw.cls}}" aria-pressed="{{qq.btw.on}}" disabled="{{qq.btw.na}}" onClick="{{qq.btw.toggle}}">BTW<small>{{qq.btw.sub}}</small></button>
                       </div>
+                      <sc-if value="{{qq.hasBm}}" hint-placeholder-val="{{ false }}">
+                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+                          <sc-for list="{{qq.bm}}" as="bm" hint-placeholder-count="3">
+                            <button type="button" class="{{bm.cls}} slim" aria-pressed="{{bm.on}}" disabled="{{bm.na}}" onClick="{{bm.toggle}}">{{bm.l}}<small>{{bm.sub}}</small></button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
                       <sc-if value="{{qq.hasCtrl}}" hint-placeholder-val="{{ false }}">
                         <button type="button" class="{{qq.ctrl.cls}}" aria-pressed="{{qq.ctrl.on}}" onClick="{{qq.ctrl.toggle}}">{{qq.ctrl.l}}<small>{{qq.ctrl.sub}}</small></button>
                       </sc-if>

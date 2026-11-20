@@ -51,6 +51,8 @@
     Object.keys(VG).forEach(function (f) { var x = v[VG[f]]; c[f] = x === undefined ? null : x; });
     c.notities = v.notities || '';
     c.wacht = v.wacht || {};
+    var bm = v.btw_maand || {};
+    c.btwm = []; for (var j = 1; j <= 12; j++) c.btwm.push(!!bm[j]);
     c.j25na = false;
     c.log = [];
     return c;
@@ -67,12 +69,13 @@
       if (o[f] !== n[f]) vg[VG[f]] = f === 'notities' ? (n[f] || null) : (n[f] === null ? null : !!n[f]);
     });
     if (JSON.stringify(o.wacht || {}) !== JSON.stringify(n.wacht || {})) vg.wacht = n.wacht || {};
+    if (JSON.stringify(o.btwm || []) !== JSON.stringify(n.btwm || [])) { var bmo = {}; (n.btwm || []).forEach(function (x, i) { if (x) bmo[i + 1] = true; }); vg.btw_maand = bmo; }
     return { kl: kl, vg: vg };
   }
 
   // Lege voortgangsregel voor een nieuw jaar
   function nieuwJaarRij(c, jaar) {
-    var row = { klant_id: c.id, jaar: jaar, wacht: {}, notities: c.notities || null };
+    var row = { klant_id: c.id, jaar: jaar, wacht: {}, btw_maand: {}, notities: c.notities || null };
     var stopt = c.status === 'Opgezegd';
     for (var i = 1; i <= 12; i++) row['m' + i] = stopt ? null : (c.freq === 'kwartaal' ? ((i - 1) % 3 === 0 ? false : null) : false);
     for (var q = 1; q <= 4; q++) row['btw' + q] = stopt || c.regime !== 'Normaal' ? null : false;
@@ -255,7 +258,7 @@
     var row = {};
     Object.keys(KL).forEach(function (f) { row[KL[f]] = toDb(f, c[f]); });
     return sb.from('klanten').insert(row).select('id').single().then(function (r) {
-      var id = must(r).id, vg = { klant_id: id, jaar: jaar, wacht: {} };
+      var id = must(r).id, vg = { klant_id: id, jaar: jaar, wacht: {}, btw_maand: {} };
       for (var i = 0; i < 12; i++) vg['m' + (i + 1)] = c.mna && c.mna[i] ? null : !!c.months[i];
       for (var q = 0; q < 4; q++) vg['btw' + (q + 1)] = c.bna && c.bna[q] ? null : !!c.btw[q];
       vg.controle_q2 = false; vg.controle_q3 = false;
