@@ -233,11 +233,17 @@
   S.subscribe = function (onChange, onConn) {
     var t = null;
     function bump() { clearTimeout(t); t = setTimeout(onChange, 250); }
+    // Live-verbinding altijd met het actuele toegangsbewijs (na de code uit de app), anders laat de database geen meldingen door
+    function zetToken(s) { if (s && s.access_token && sb.realtime && sb.realtime.setAuth) sb.realtime.setAuth(s.access_token); }
+    sb.auth.onAuthStateChange(function (ev, s) { if (ev === 'TOKEN_REFRESHED' || ev === 'MFA_CHALLENGE_VERIFIED' || ev === 'SIGNED_IN') zetToken(s); });
+    sb.auth.getSession().then(function (r) { zetToken(r.data && r.data.session); start(); }).catch(start);
+    function start() {
     sb.channel('klantdashboard')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'klanten' }, bump)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'voortgang' }, bump)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'instellingen' }, bump)
-      .subscribe(function (status) { S.conn = status === 'SUBSCRIBED' ? 'live' : (status === 'CLOSED' ? 'offline' : 'connecting'); onConn(S.conn); });
+      .subscribe(function (status) { S.conn = status === 'SUBSCRIBED' ? 'live' : (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' ? 'offline' : 'connecting'); onConn(S.conn); });
+    }
   };
 
   function log(id, text) {

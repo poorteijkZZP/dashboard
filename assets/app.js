@@ -6,6 +6,9 @@ var FACT = { 'ZZP basis':250, 'ZZP plus':250, 'BV holding':150, 'BV werkmaatscha
 var JAAR = (window.APP_CONFIG && window.APP_CONFIG.jaar) || 2026;
 var DEMO_KEY = 'poorteijk-dashboard-demo-v1';
 var DEMO_INST = 'poorteijk-dashboard-demo-v1-inst';
+// Onthoud per tabblad waar je was, zodat verversen je niet terugstuurt naar de startpagina
+var UI_KEY = 'pz-ui', UI_VELDEN = ['page', 'scope', 'bankF', 'adminF', 'sort', 'filter', 'q', 'sel', 'tab', 'bsub', 'werkWie', 'klikMode', 'role'];
+function uiLaden() { try { return JSON.parse(sessionStorage.getItem(UI_KEY) || '{}') || {}; } catch (x) { return {}; } }
 var VANDAAG = new Date();
 var PEIL_HANDMATIG = null;
 function vj() { return JAAR - 1; }
@@ -200,6 +203,8 @@ class Component extends DCLogic {
       stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
       sf:emptySf(), cols:colSet(['naam','voornaam','email','admin']), saveName:'', saved:[{ l:'Herinnering IB', f:Object.assign(emptySf(), { status:'Actief', ib:'open' }) }], copied:false
     };
+    var ui = uiLaden(), st = this.state;
+    UI_VELDEN.forEach(function (k) { if (ui[k] !== undefined) st[k] = ui[k]; });
   }
 
   componentDidMount() {
@@ -230,14 +235,28 @@ class Component extends DCLogic {
 
   startLive(me) {
     var self = this;
-    this.setState({ me:me, role:me.naam, phase:'loading', werkWie:null });
+    var ui = uiLaden();
+    if (ui.role && ui.role !== me.naam) ui = {};
+    var herstel = { me:me, role:me.naam, phase:'loading', werkWie: ui.werkWie !== undefined ? ui.werkWie : null };
+    if (me.rol !== 'beheer' && (this.state.page === 'beheer')) herstel.page = 'werk';
+    this.setState(herstel);
     STORE.loadSettings().then(function (st) {
       if (st.huidig_jaar) JAAR = parseInt(st.huidig_jaar, 10);
       self.setState({ jaar:JAAR });
       return STORE.loadYears().then(function (ys) { if (ys.indexOf(JAAR) < 0) ys.push(JAAR); self.setState({ jaren:ys.sort() }); });
     }).catch(function () {}).then(function () { return self.reload(); }).then(function () {
       self.setState({ phase:'app' });
-      if (!self.__subscribed) { self.__subscribed = true; STORE.subscribe(function () { self.reload(); }, function (st) { self.setState({ conn:st }); }); }
+      if (!self.__subscribed) {
+        self.__subscribed = true;
+        STORE.subscribe(function () { self.reload(); }, function (st) { self.setState({ conn:st }); });
+        // Vangnet: bij terugkomen in het tabblad, en elke minuut als de live-verbinding hapert, opnieuw ophalen
+        var laatst = Date.now();
+        var opnieuw = function () { if (self.state.phase !== 'app' || Date.now() - laatst < 5000) return; laatst = Date.now(); self.reload(); };
+        document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') opnieuw(); });
+        window.addEventListener('focus', opnieuw);
+        setInterval(function () { if (document.visibilityState === 'visible' && self.state.conn !== 'live') opnieuw(); }, 60000);
+      }
+      if (self.state.sel) self.loadLog(self.state.sel);
     });
   }
 
@@ -261,6 +280,10 @@ class Component extends DCLogic {
   }
 
   afterRender() {
+    var s0 = this.state, ui = {};
+    UI_VELDEN.forEach(function (k) { ui[k] = s0[k]; });
+    var uj = JSON.stringify(ui);
+    if (uj !== this.__ui) { this.__ui = uj; try { sessionStorage.setItem(UI_KEY, uj); } catch (x) {} }
     if (STORE.live) return;
     var cl = this.state.clients, self = this;
     if (cl === this.__saved) return;
