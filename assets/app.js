@@ -537,8 +537,8 @@ class Component extends DCLogic {
     };
     var blok = function (c, qi) {
       var tiles = [];
-      if (qi > 0) { tiles.push(tegel(c, CTRL[qi - 1], 0, 'ctrl Q' + qi, 'Controle Q' + qi)); tiles.push({ isSep:true, isTile:false }); }
-      if (c.freq === 'kwartaal') tiles.push(tegel(c, 'm', qi * 3, MONTHS[qi * 3] + '-' + MONTHS[qi * 3 + 2], 'Administratie Q' + (qi + 1)));
+      if (qi > 0) { var ct = tegel(c, CTRL[qi - 1], 0, 'ctrl Q' + qi, 'Controle Q' + qi); ct.cls += ' ct'; tiles.push(ct); tiles.push({ isSep:true, isTile:false }); }
+      if (c.freq === 'kwartaal') { var kt = tegel(c, 'm', qi * 3, MONTHS[qi * 3] + '-' + MONTHS[qi * 3 + 2], 'Administratie Q' + (qi + 1)); kt.cls += ' kw'; tiles.push(kt); }
       else for (var k = 0; k < 3; k++) tiles.push(tegel(c, 'm', qi * 3 + k, MONTHS[qi * 3 + k], MONTHS[qi * 3 + k]));
       tiles.push({ isSep:true, isTile:false });
       tiles.push(tegel(c, 'btw', qi, 'BTW', 'BTW Q' + (qi + 1)));
