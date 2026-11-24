@@ -1015,17 +1015,24 @@
                   <option value="ja">Geplaatst</option>
                 </select>
               </label>
-            </div>
-            <div class="kenmsel">
-              <span class="klbl">Kenmerken</span>
-              <sc-for list="{{sfKenm}}" as="kc" hint-placeholder-count="6"><button type="button" class="{{kc.cls}}" onClick="{{kc.pick}}">{{kc.l}}</button></sc-for>
-              <div style="display: inline-flex; gap: 2px; padding: 3px; background: #F1EFEC; border-radius: 8px; margin-left: 6px">
-                <button type="button" class="{{kenmAlleCls}}" onClick="{{kenmAlle}}">Alle gekozen</button>
-                <button type="button" class="{{kenmEenCls}}" onClick="{{kenmEen}}">Minstens één</button>
+              <div class="field">Kenmerken
+                <span class="msel">
+                  <button type="button" class="mselbtn" aria-haspopup="true" onClick="{{toggleKenm}}"><span>{{kenmLabel}}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></button>
+                  <sc-if value="{{kenmOpen}}" hint-placeholder-val="{{ false }}">
+                    <div class="mselpop" onClick="{{noop}}">
+                      <sc-for list="{{sfKenm}}" as="kc" hint-placeholder-count="6"><label class="mselitem"><input type="checkbox" checked="{{kc.on}}" onChange="{{kc.pick}}">{{kc.l}}</label></sc-for>
+                      <div class="mselvoet">
+                        <div style="display: inline-flex; gap: 2px; padding: 3px; background: #F1EFEC; border-radius: 8px">
+                          <button type="button" class="{{kenmAlleCls}}" onClick="{{kenmAlle}}">Alle gekozen</button>
+                          <button type="button" class="{{kenmEenCls}}" onClick="{{kenmEen}}">Minstens één</button>
+                        </div>
+                        <button type="button" class="linkbtn" style="font-size: 12px" onClick="{{kenmLeeg}}">wissen</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </span>
               </div>
-              <button type="button" class="linkbtn" style="font-size: 12px" onClick="{{kenmLeeg}}">wissen</button>
             </div>
-
             <div style="border-top: 1px solid #E4E2DF; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
               <span style="font-size: 18px; font-weight: 800">{{selCount}}</span>
               <div style="flex: 1 1 auto"></div>

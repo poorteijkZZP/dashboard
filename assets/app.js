@@ -238,7 +238,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     var self = this;
-    var sluit = function () { if (self.state.menu || self.state.uitleg) self.setState({ menu:null, uitleg:false }); };
+    var sluit = function () { if (self.state.menu || self.state.uitleg || self.state.kenmOpen) self.setState({ menu:null, uitleg:false, kenmOpen:false }); };
     document.addEventListener('click', sluit);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
     window.addEventListener('scroll', sluit, true);
@@ -502,6 +502,9 @@ class Component extends DCLogic {
       y25: function (c) { return -((jwOpen(c) ? 1 : 0) + (ibOpen(c) ? 1 : 0)); }
     };
     var sk = SK[s.sort.k] || SK.naam, sd = s.sort.d;
+    var openFq = s.openF ? (s.openF.charAt(0) === 'm' ? Math.floor(parseInt(s.openF.slice(1), 10) / 3) : s.openF.indexOf('btw') === 0 ? parseInt(s.openF.slice(3), 10) : parseInt(s.openF.slice(2), 10)) : -1;
+    var openFAan = s.openF && (openFq === winQ() || (s.openQ && s.openQ[openFq]));
+    if (s.openF && !openFAan) s.openF = '';
     var list = all.filter(function (c) { return inScope(c) && cur.f(c) && (!q || c.naam.toLowerCase().indexOf(q) >= 0) && (!s.openF || onderdeelOpen(c, s.openF)); })
       .sort(function (a, b) { var x = sk(a), y = sk(b); if (x < y) return -sd; if (x > y) return sd; return a.naam.localeCompare(b.naam); });
     var sortBy = {}, arrow = {};
@@ -1005,6 +1008,7 @@ class Component extends DCLogic {
       openOpties: (function () {
         var o = [{ v:'', l:'Alles' }], wq = winQ();
         for (var qq = wq; qq >= 0; qq--) {
+          if (qq < wq && !(s.openQ && s.openQ[qq])) continue;
           if (qq > 0) o.push({ v:'cq' + qq, l:'Controle Q' + qq + ' open' });
           for (var k2 = 2; k2 >= 0; k2--) o.push({ v:'m' + (qq * 3 + k2), l:MONTHS[qq * 3 + k2] + ' open' });
           o.push({ v:'btw' + qq, l:'btw Q' + (qq + 1) + ' open' });
@@ -1150,9 +1154,11 @@ class Component extends DCLogic {
         try { document.execCommand('copy'); } catch (y) {}
         sel.removeAllRanges(); div.remove(); klaar();
       },
-      sfKenm: KENMSEL.map(function (k) { var ks = Array.isArray(s.sf.kenm) ? s.sf.kenm : []; var on = ks.indexOf(k[0]) >= 0; return { l:k[1], cls: on ? 'kchip on' : 'kchip', pick:function () { var n = ks.filter(function (x) { return x !== k[0]; }); if (!on) n.push(k[0]); self.setState({ sf:Object.assign({}, s.sf, { kenm:n }), copied:false }); } }; }),
+      sfKenm: KENMSEL.map(function (k) { var ks = Array.isArray(s.sf.kenm) ? s.sf.kenm : []; var on = ks.indexOf(k[0]) >= 0; return { l:k[1], on:on, cls: on ? 'kchip on' : 'kchip', pick:function () { var n = ks.filter(function (x) { return x !== k[0]; }); if (!on) n.push(k[0]); self.setState({ sf:Object.assign({}, s.sf, { kenm:n }), copied:false }); } }; }),
       kenmAlleCls: s.sf.kenmMode !== 'een' ? 'seg on' : 'seg', kenmEenCls: s.sf.kenmMode === 'een' ? 'seg on' : 'seg',
       kenmAlle: function () { self.setState({ sf:Object.assign({}, s.sf, { kenmMode:'alle' }) }); }, kenmEen: function () { self.setState({ sf:Object.assign({}, s.sf, { kenmMode:'een' }) }); },
+      kenmOpen: !!s.kenmOpen, toggleKenm: function (ev) { ev.stopPropagation(); self.setState({ kenmOpen: !s.kenmOpen }); },
+      kenmLabel: (function () { var ks = Array.isArray(s.sf.kenm) ? s.sf.kenm : []; if (!ks.length) return 'Alle'; if (ks.length === 1) return KENMSEL.filter(function (k) { return k[0] === ks[0]; })[0][1]; return ks.length + ' gekozen (' + (s.sf.kenmMode === 'een' ? 'minstens één' : 'alle') + ')'; })(),
       kenmLeeg: function () { self.setState({ sf:Object.assign({}, s.sf, { kenm:[] }) }); },
       copyLabel: s.copied ? 'Gekopieerd' : 'Kopieer e-mailadressen',
       copyMails:function () { try { navigator.clipboard.writeText(mails.join('; ')); } catch (x) {} self.setState({ copied:true }); },
