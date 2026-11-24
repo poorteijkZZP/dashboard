@@ -69,6 +69,8 @@ create table if not exists public.voortgang (
 alter table public.voortgang add column if not exists wacht jsonb not null default '{}'::jsonb;
 -- BTW-aangifte per maand (alleen voor maandklanten), bijv. {"10": true, "11": true}
 alter table public.voortgang add column if not exists btw_maand jsonb not null default '{}'::jsonb;
+-- Controle Q1 (zichtbaar in het lopende kwartaal Q2)
+alter table public.voortgang add column if not exists controle_q1 boolean;
 
 -- Instellingen voor het hele team (huidig werkjaar, peilmaand).
 create table if not exists public.instellingen (

@@ -85,7 +85,7 @@
     for (var m in v.attrs) if (old[m] !== v.attrs[m]) el.setAttribute(m, v.attrs[m]);
     el.__attrs = v.attrs;
     if (!el.__ev) el.__ev = {};
-    var evs = ['click', 'input', 'change', 'submit'];
+    var evs = ['click', 'input', 'change', 'submit', 'contextmenu'];
     evs.forEach(function (e) {
       var fn = v.events[e];
       if (fn) {

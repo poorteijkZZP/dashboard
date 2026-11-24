@@ -19,7 +19,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .kpi{text-align:left;background:#fff;border:1px solid #E4E2DF;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:inherit;min-height:92px}
 .kpi:hover{border-color:#FFBF80}
 .kpi.on{border-color:#FF8000;box-shadow:inset 0 0 0 1px #FF8000;background:#FFFBF7}
-.grid{display:grid;grid-template-columns:250px 112px 130px 96px 336px 206px 118px 230px;min-width:1478px}
+.grid{display:grid;grid-template-columns:minmax(240px,300px) 64px 92px 128px max-content max-content 108px minmax(180px,1fr);min-width:1180px}
 .tablebox{overflow:auto;max-height:calc(100vh - 130px)}
 .hbtn{border:0;background:none;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;min-height:28px;text-align:left}
 .hbtn:hover{color:#A94F00}
@@ -39,7 +39,7 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .row.sel .cell{background:#FFF2E5}
 .name{border:0;background:none;padding:0;cursor:pointer;font-weight:700;font-size:14px;color:#2B2B2B;display:inline-flex;align-items:center;gap:8px;min-height:40px;text-align:left}
 .name:hover{color:#A94F00;text-decoration:underline}
-.av{width:26px;height:26px;border-radius:50%;background:#FFD9B3;color:#6B3200;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.av{width:28px;height:28px;border-radius:50%;background:#FFD9B3;color:#6B3200;font-size:11px;letter-spacing:-.02em;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
 .dot{width:15px;height:15px;border-radius:3px;background:#fff;box-shadow:inset 0 0 0 1.5px #CFC9C1;display:inline-block;flex:none}
 .dot.done{background:#FF8000;box-shadow:none}
 .dot.late{background:#fff;box-shadow:inset 0 0 0 2px #A94F00}
@@ -126,3 +126,49 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .mlet i{width:15px}
 .hbij{margin-left:auto;font-size:10px;color:#8E8E8E}
 .bij{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700;color:#3A3A3A;background:#F1EFEC;border-radius:6px;padding:3px 8px;min-width:46px;text-align:center}
+
+/* Linker menu */
+.rail{width:92px;flex:none;background:#2B2B2B;display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 0;position:sticky;top:0;height:100vh;box-sizing:border-box}
+.ri{width:76px;padding:10px 0 8px;border:0;border-radius:12px;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;color:#B5AFA8;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.ri svg{width:22px;height:22px}
+.ri:hover{background:#3A3836;color:#fff}
+.ri.on{background:#3A3836;color:#fff}.ri.on svg{color:#FF8000}
+/* Kwartaalblokken */
+.qb{display:inline-flex;align-items:center;gap:3px;padding:4px;border-radius:10px;background:#F7F5F2;white-space:nowrap}
+.qb.cur{background:#fff;box-shadow:inset 0 0 0 1.5px #FFBF80}
+.qbl{font-size:10.5px;font-weight:800;color:#8E8E8E;padding:0 4px;border:0;background:none;font-family:inherit}
+.qbl.knop{cursor:pointer;color:#5E5E5E}.qbl.knop:hover{color:#2B2B2B}
+.qsep{width:1px;height:18px;background:#DDD7CF;margin:0 2px;display:inline-block}
+.tt{height:26px;min-width:30px;padding:0 5px;border-radius:7px;border:0;display:inline-grid;place-items:center;font-size:11px;font-weight:800;font-family:inherit;cursor:pointer;box-sizing:border-box}
+.tt.breed{min-width:84px;height:30px;font-size:12px}
+.tt.d{background:#FF8000;color:#fff}
+.tt.o{background:#fff;color:#8A857F;box-shadow:inset 0 0 0 1.5px #D9D3CB}
+.tt.o:hover{box-shadow:inset 0 0 0 1.5px #FF8000;color:#B35A00}
+.tt.u{background:#2B2B2B;color:#fff}
+.tt.l{background:#fff;color:#C8412B;box-shadow:inset 0 0 0 2px #C8412B}
+.tt.w{background:#DCE8F7;color:#1F4E8C;box-shadow:inset 0 0 0 2px #3D6FB6}
+.tt.n{background:#EEEBE7;color:#B5AFA8;cursor:default}
+.qchip{border:0;border-radius:8px;padding:5px 9px;font-size:11.5px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.qchip.k{background:#FFBF80;color:#5A2B00}
+.qchip.o{background:#F2F0ED;color:#5E5A55}
+.qchip.l{background:#FCEDEA;color:#C8412B;box-shadow:inset 0 0 0 1.5px #EBB7AD}
+.qchip.w{background:#DCE8F7;color:#1F4E8C}
+.tml{font-size:14px;font-weight:800}
+.bdg{font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.bdg.bg{background:#E7F4EC;color:#2F8F5B}.bdg.bo{background:#FFF2E5;color:#8A3F00}.bdg.br{background:#FCEDEA;color:#C8412B}.bdg.bw{background:#DCE8F7;color:#1F4E8C}
+.ntag{font-size:10.5px;font-weight:800;border-radius:5px;padding:2px 6px;background:#F1EFEC;color:#5E5E5E;white-space:nowrap;flex:none}
+.ntag.o{background:#FFF2E5;color:#8A3F00}
+.linkbtn{border:0;background:none;padding:0;font:inherit;font-size:10.5px;font-weight:700;color:#B35A00;cursor:pointer;text-transform:none;letter-spacing:0}
+.lg{display:inline-flex;align-items:center;gap:6px}.lg .tt{cursor:default;height:20px;min-width:26px;font-size:10px}
+/* Rechtsklikmenu */
+.ctx{position:fixed;z-index:50;background:#fff;border:1px solid #E4E2DF;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.16);padding:5px;min-width:200px}
+.ctxt{font-size:11px;font-weight:700;color:#8E8E8E;padding:5px 8px 6px;border-bottom:1px solid #F0EEEB;margin-bottom:3px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctx button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:none;padding:8px;border-radius:7px;font:inherit;font-size:13px;font-weight:700;color:#2B2B2B;cursor:pointer;text-align:left}
+.ctx button:hover{background:#FFF4E8}
+.mdot{width:13px;height:13px;border-radius:4px;display:inline-block;flex:none}
+.mdot.d{background:#FF8000}.mdot.w{background:#DCE8F7;box-shadow:inset 0 0 0 2px #3D6FB6}.mdot.o{background:#fff;box-shadow:inset 0 0 0 1.5px #D9D3CB}
+/* Jaarwerk */
+.jwrow{display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid #F0EEEB;flex-wrap:wrap}
+.jwrow:hover{background:#FFF8F1}
+.filterbox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #D0CCC6;border-radius:8px;padding:0 4px 0 12px;min-height:42px;font-size:13px;font-weight:600;color:#5E5E5E}
+.filterbox select{border:0;outline:none;font-size:14px;font-weight:600;min-height:40px;background:transparent;color:#2B2B2B}

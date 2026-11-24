@@ -19,7 +19,7 @@
   };
   var BOOL = ['up', 'btwMaand', 'pers', 'best', 'km', 'uzgb', 'kmuzgb', 'motor', 'fiets', 'review'];
   // modelveld -> kolom in tabel "voortgang"
-  var VG = { cq2: 'controle_q2', cq3: 'controle_q3', c25: 'controle_vj', jw25: 'jaarwerk_vj', ib25: 'ib_vj', notities: 'notities' };
+  var VG = { cq1: 'controle_q1', cq2: 'controle_q2', cq3: 'controle_q3', c25: 'controle_vj', jw25: 'jaarwerk_vj', ib25: 'ib_vj', notities: 'notities' };
 
   function toDb(f, v) {
     if (f === 'vanQ') return v === null || v === undefined || v === '' || isNaN(v) ? null : parseInt(v, 10) + 1;
@@ -79,6 +79,7 @@
     var stopt = c.status === 'Opgezegd';
     for (var i = 1; i <= 12; i++) row['m' + i] = stopt ? null : (c.freq === 'kwartaal' ? ((i - 1) % 3 === 0 ? false : null) : false);
     for (var q = 1; q <= 4; q++) row['btw' + q] = stopt || c.regime !== 'Normaal' ? null : false;
+    row.controle_q1 = stopt ? null : false;
     row.controle_q2 = stopt ? null : false;
     row.controle_q3 = stopt ? null : false;
     var e = c.einde || {};
@@ -267,7 +268,7 @@
       var id = must(r).id, vg = { klant_id: id, jaar: jaar, wacht: {}, btw_maand: {} };
       for (var i = 0; i < 12; i++) vg['m' + (i + 1)] = c.mna && c.mna[i] ? null : !!c.months[i];
       for (var q = 0; q < 4; q++) vg['btw' + (q + 1)] = c.bna && c.bna[q] ? null : !!c.btw[q];
-      vg.controle_q2 = false; vg.controle_q3 = false;
+      vg.controle_q1 = false; vg.controle_q2 = false; vg.controle_q3 = false;
       vg.controle_vj = null; vg.jaarwerk_vj = null; vg.ib_vj = null;
       return sb.from('voortgang').insert(vg).then(must).then(function () { return log(id, text); }).then(function () { return id; });
     });
