@@ -235,3 +235,6 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .tdt b{font-size:26px;font-weight:900;color:#C8412B;line-height:1.1}.tdt span{font-size:12px;font-weight:700;color:#5E5E5E}
 .tdt.nul b{color:#2F8F5B}.tdt.w b{color:#3D6FB6}
 @media (max-width:1300px){.todobalk{grid-template-columns:repeat(4,1fr)}}
+.qb .tt.ct{width:48px;font-size:9.5px;letter-spacing:-.02em;gap:1px}
+.qb .tt.ct.d::before{font-size:8px}
+.tt.gap{width:48px!important}
