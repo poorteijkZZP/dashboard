@@ -294,7 +294,6 @@
           <div class="grid">
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.naam}}">Klant {{arrow.naam}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.admin}}">Adm. {{arrow.admin}}</button></div>
-            <div class="hcell"><button type="button" class="hbtn" title="Vraagposten dit jaar" onClick="{{sortBy.vp}}">VP {{arrow.vp}}</button></div>
             <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.btw}}">Lopend kwartaal {{wqLabel}} {{arrow.btw}}</button><div class="hsub">{{wqSub}}</div></div>
             <div class="hcell sep"><sc-if value="{{hasPrevKol}}" hint-placeholder-val="{{ true }}"><span class="hbtn" style="display: inline-flex; align-items: center; cursor: default">{{prevKop}}</span><div class="hsub"><button type="button" class="linkbtn" onClick="{{prevAllesOpen}}">{{prevAllesLabel}}</button></div></sc-if></div>
             <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
@@ -309,7 +308,6 @@
                   <sc-for list="{{r.tags}}" as="tg" hint-placeholder-count="1"><span class="{{tg.cls}}">{{tg.l}}</span></sc-for>
                 </div>
                 <div class="cell"><sc-if value="{{r.hasAdmin}}" hint-placeholder-val="{{ true }}"><span class="av" title="{{r.admin}}">{{r.init}}</span></sc-if></div>
-                <div class="cell"><button type="button" class="{{r.vpCls}}" title="{{r.vpT}}" onClick="{{r.vpOpen}}"><b>{{r.vpN}}</b><span>+</span></button></div>
                 <div class="cell sep">
                   <div class="qb cur"><span class="qbl">{{r.cur.l}}</span><sc-for list="{{r.cur.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
                 </div>
@@ -482,7 +480,7 @@
         <button type="button" class="{{bMutCls}}" onClick="{{bMut}}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h13l-3-3M20 17H7l3 3"></path></svg>Klant muteren</button>
         <button type="button" class="{{bAnaCls}}" onClick="{{bAna}}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg>In- en uitstroom</button>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg>Rapporten</button>
         <button type="button" class="{{bVpCls}}" onClick="{{bVp}}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path><path d="M9 9.5a3 3 0 1 1 3 3v1M12 15.5v.01"></path></svg>Vraagposten</button>
         <button type="button" class="{{bJaarCls}}" onClick="{{bJaar}}">
@@ -831,6 +829,44 @@
         </sc-if>
 
         <sc-if value="{{showAna}}" hint-placeholder-val="{{ false }}">
+          <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 14px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <span style="font-size: 20px; font-weight: 800">Actieve klanten per pakket</span>
+              <span style="font-size: 13px; color: #5E5E5E">{{pakTotaal}} lopende klanten (actief en opgezegd).</span>
+            </div>
+            <div class="paklijst">
+              <sc-for list="{{pakketten}}" as="pk" hint-placeholder-count="5">
+                <div class="pakrij"><b>{{pk.l}}</b><span class="tbar"><span style="{{pk.bar}}; background: #FF8000"></span></span><span class="pakn"><b>{{pk.n}}</b> · {{pk.pct}}</span><span class="pakper">{{pk.per}}</span></div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 14px">
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+              <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px">
+                <span style="font-size: 20px; font-weight: 800">Afgevinkt per maand</span>
+                <span style="font-size: 13px; color: #5E5E5E">Hoeveel kwartaalcontroles, jaarcontroles, jaarrekeningen en IB-aangiften er per maand zijn afgevinkt (min wat weer op open is gezet). Telt vanaf het moment dat in het dashboard wordt afgevinkt; wat in de Excel is gedaan, telt niet mee.</span>
+              </div>
+              <label class="filterbox">Jaar
+                <select aria-label="Jaar rapport" value="{{rapJaarSel}}" onChange="{{onRapJaar}}"><sc-for list="{{rapJaren}}" as="rj" hint-placeholder-count="2"><option value="{{rj.v}}">{{rj.l}}</option></sc-for></select>
+              </label>
+            </div>
+            <sc-if value="{{afvinkLaden}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5E5E5E">Gegevens worden geladen...</span></sc-if>
+            <div class="afvtab">
+              <span class="kh">Maand</span>
+              <sc-for list="{{afvinkKop}}" as="ak" hint-placeholder-count="6"><span class="kh">{{ak.l}}</span></sc-for>
+              <span class="kh">Totaal</span>
+              <sc-for list="{{afvinkRijen}}" as="ar" hint-placeholder-count="6">
+                <span><b>{{ar.m}}</b></span>
+                <sc-for list="{{ar.cellen}}" as="ac" hint-placeholder-count="6"><span class="afv" style="{{ac.stijl}}">{{ac.v}}</span></sc-for>
+                <span><b>{{ar.tot}}</b></span>
+              </sc-for>
+              <span class="kh">Totaal</span>
+              <sc-for list="{{afvinkTot}}" as="at" hint-placeholder-count="6"><span class="kh" style="color: #2B2B2B">{{at.v}}</span></sc-for>
+              <span class="kh"></span>
+            </div>
+          </section>
+
           <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 18px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <span style="font-size: 20px; font-weight: 800">In- en uitstroom van klanten</span>

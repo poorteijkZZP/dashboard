@@ -285,6 +285,9 @@
     }, Promise.resolve()).then(function () { return S.setSetting('huidig_jaar', jaar); }).then(function () { return rows.length; });
   };
 
+  S.loadAfvinkLog = function () {
+    return sb.from('historie').select('wat, wanneer').or('wat.ilike.%afgevinkt%,wat.ilike.% gedaan,wat.ilike.%teruggezet naar open%').order('wanneer', { ascending: false }).range(0, 49999).then(must);
+  };
   S.loadVp = function () {
     return sb.from('vraagposten').select('*').order('wanneer', { ascending: false }).range(0, 19999).then(must);
   };

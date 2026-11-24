@@ -223,7 +223,7 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       phase: STORE.live ? 'loading' : 'app', me:null, auth:{ email:'', pw:'', pw2:'' }, authMode:'login', authMsg:'', authOk:false, conn:'connecting', logs:{}, demoAsk:false, saveErr:'',
-      role:'Jeroen', page:'werk', vp:[], vpPop:null, vpVal:'1', vpJaar:new Date().getFullYear(), openF:'', menu:null, ownNotes:{}, ownDraft:{}, openQ:{}, jwF:'open', jwWie:null, jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
+      role:'Jeroen', page:'werk', afvinkLog:null, rapJaar:new Date().getFullYear(), vp:[], vpPop:null, vpVal:'1', vpJaar:new Date().getFullYear(), openF:'', menu:null, ownNotes:{}, ownDraft:{}, openQ:{}, jwF:'open', jwWie:null, jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
       bsub:'nieuw', form:emptyForm(), editId:null, err:'',
       mq:'', mutSel:null, mutMode:'menu', mut:{ admin:'Jeroen' }, mutMsg:'',
       stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
@@ -985,6 +985,39 @@ class Component extends DCLogic {
     });
     var maxA = Math.max(5, Math.max.apply(null, ACTIEF.map(function (a) { return a.v; }))) * 1.1;
     var act = ACTIEF.map(function (a, i) { var g = i ? a.v - ACTIEF[i - 1].v : null; return { y:a.y, v:a.v, g: g === null ? '' : (g >= 0 ? '+' : '') + g, h:'height: ' + Math.round(a.v / maxA * 200) + 'px; background: #2B2B2B', t: a.y + ': ' + a.v + ' actieve klanten' }; });
+    // ---- Rapport: actieve klanten per pakket
+    var pakAct = {}; all.filter(lopend).forEach(function (c) { var p = c.pakket || 'Onbekend'; pakAct[p] = (pakAct[p] || 0) + 1; });
+    var pakTot = all.filter(lopend).length || 1;
+    var pakketten = Object.keys(pakAct).sort(function (x, y) { return pakAct[y] - pakAct[x]; }).map(function (p) {
+      var per = ADMINS.map(function (adm) { return initial(adm) + ' ' + all.filter(function (c) { return lopend(c) && (c.pakket || 'Onbekend') === p && c.admin === adm; }).length; }).join(' · ');
+      return { l:p, n:pakAct[p], pct: Math.round(pakAct[p] / pakTot * 100) + '%', bar:'width: ' + Math.round(pakAct[p] / pakTot * 100) + '%', per:per };
+    });
+    // ---- Rapport: afgevinkt per maand
+    var MNL = { jan:0, feb:1, mrt:2, apr:3, mei:4, jun:5, jul:6, aug:7, sep:8, okt:9, nov:10, dec:11 };
+    var logBron = STORE.live ? (s.afvinkLog || []) : [].concat.apply([], all.map(function (c) { return (c.log || []).map(function (l) { var m = /(\d+) (\w{3}) (\d{4})/.exec(l.wanneer || ''); return { wat:l.wat, wanneer: m ? new Date(parseInt(m[3], 10), MNL[m[2]] || 0, parseInt(m[1], 10)).toISOString() : null }; }); }));
+    var KATS = [['cq1', 'Controle Q1'], ['cq2', 'Controle Q2'], ['cq3', 'Controle Q3'], ['jc', 'Jaarcontrole'], ['jw', 'Jaarwerk'], ['ib', 'IB-aangifte']];
+    var kat = function (w) {
+      var m = /^Controle Q(\d)/.exec(w); if (m) return 'cq' + m[1];
+      if (/^Controle \d{4}/.test(w)) return 'jc';
+      if (/^Jaarwerk/.test(w)) return 'jw';
+      if (/^IB/.test(w)) return 'ib';
+      return null;
+    };
+    var maandTel = []; for (var mi = 0; mi < 12; mi++) { var o0 = {}; KATS.forEach(function (k) { o0[k[0]] = 0; }); maandTel.push(o0); }
+    logBron.forEach(function (l) {
+      if (!l.wanneer || !l.wat) return;
+      var dt = new Date(l.wanneer); if (dt.getFullYear() !== s.rapJaar) return;
+      var k = kat(l.wat); if (!k) return;
+      var plus = / afgevinkt$| gedaan$/.test(l.wat), min = /teruggezet naar open$/.test(l.wat);
+      if (plus) maandTel[dt.getMonth()][k]++; else if (min) maandTel[dt.getMonth()][k]--;
+    });
+    var maxTel = 1; maandTel.forEach(function (m) { KATS.forEach(function (k) { if (m[k[0]] > maxTel) maxTel = m[k[0]]; }); });
+    var afvinkRijen = maandTel.map(function (m, i) {
+      var tot = 0; KATS.forEach(function (k) { tot += Math.max(0, m[k[0]]); });
+      return { m:MONTHS[i], tot:tot, cellen: KATS.map(function (k) { var v = Math.max(0, m[k[0]]); return { v: v || '', stijl: v ? 'background: rgba(255,128,0,' + (0.12 + 0.6 * v / maxTel).toFixed(2) + ')' : '' }; }) };
+    }).filter(function (r, i) { return s.rapJaar < VANDAAG.getFullYear() || i <= VANDAAG.getMonth(); });
+    var afvinkTot = KATS.map(function (k) { var t = 0; maandTel.forEach(function (m) { t += Math.max(0, m[k[0]]); }); return { v:t }; });
+
     var sumN = ANA.reduce(function (t, a) { return t + a.n; }, 0), sumS = ANA.reduce(function (t, a) { return t + a.s; }, 0);
     // Start- en einddatum per klant
     var startD = function (c) { var y = parseInt(c.vanY, 10); if (!y) return null; var q = parseInt(c.vanQ, 10); return new Date(y, (isNaN(q) ? 0 : q) * 3, 1); };
@@ -1175,7 +1208,7 @@ class Component extends DCLogic {
       muteerSel:function () { if (selC) self.setState({ page:'beheer', bsub:'muteren', mutSel:selC.id, mutMode:'menu', mutMsg:'' }); },
 
       bNieuwCls:bCls('nieuw'), bMutCls:bCls('muteren'), bSelCls:bCls('sel'), bAnaCls:bCls('ana'),
-      bNieuw:goSub('nieuw'), bMut:goSub('muteren'), bSel:goSub('sel'), bAna:goSub('ana'),
+      bNieuw:goSub('nieuw'), bMut:goSub('muteren'), bSel:goSub('sel'), bAna:function () { goSub('ana')(); if (STORE.live) STORE.loadAfvinkLog().then(function (r) { self.setState({ afvinkLog:r }); }).catch(function () { self.setState({ afvinkLog:[] }); }); },
       showForm: s.bsub === 'nieuw' || isEdit, isEdit:isEdit,
       factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: #F1EFEC' : '',
       factHint: FACT[s.form.pakket] ? 'Vast bij pakket ' + s.form.pakket : 'Zelf invullen bij ' + s.form.pakket.toLowerCase(),
@@ -1258,6 +1291,9 @@ class Component extends DCLogic {
       hasSaved: s.saved.length > 0,
       saved: s.saved.map(function (v) { return { l:v.l, pick:function () { self.setState({ sf:Object.assign({}, v.f), cols: v.cols ? Object.assign({}, v.cols) : s.cols, copied:false }); } }; }),
 
+      pakketten:pakketten, pakTotaal: all.filter(lopend).length,
+      afvinkKop: KATS.map(function (k) { return { l:k[1] }; }), afvinkRijen:afvinkRijen, afvinkTot:afvinkTot, afvinkLaden: STORE.live && s.afvinkLog === null,
+      rapJaren: (function () { var y = VANDAAG.getFullYear(); return [y, y - 1].map(function (x) { return { v:String(x), l:String(x) }; }); })(), rapJaarSel: String(s.rapJaar), onRapJaar: function (ev) { self.setState({ rapJaar: parseInt(ev.target.value, 10) }); },
       showAna: s.bsub === 'ana', ana:ana, act:act, lijnSvg:lijnSvg, hasLijn: !!lijnSvg, kwRijen:kwRijen, hasKw: kwRijen.length > 0,
       anaKpi: [{ l:'Nieuwe klanten ' + (JAAR - 4) + ' t/m ' + JAAR, v:sumN }, { l:'Gestopt ' + (JAAR - 4) + ' t/m ' + JAAR, v:sumS }, { l:'Netto groei', v:(sumN - sumS >= 0 ? '+' : '') + (sumN - sumS) }]
     };
