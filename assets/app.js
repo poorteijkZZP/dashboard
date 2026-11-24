@@ -776,7 +776,7 @@ class Component extends DCLogic {
     var mePlain = STORE.live ? (s.me ? s.me.naam : '') : role;
     var herinnering = vulMail('aanlevering', standaardPeriode(), standaardUiterlijk(), mePlain);
     var wachtMails = wWacht.map(function (x) { return x.email; }).filter(Boolean);
-    var vl = function (open, tot) { var pct = tot ? Math.round((tot - open) / tot * 100) : 100; return { vt: open + ' te doen van ' + tot, vpct: pct + '%', vbar: 'width: ' + pct + '%' }; };
+    var vl = function (open, tot) { var pct = tot ? Math.round((tot - open) / tot * 100) : 100; return { vt: (tot - open) + ' van ' + tot + ' klaar', vpct: pct + '%', vbar: 'width: ' + pct + '%', todo: open, todoCls: open ? 'todo' : 'todo nul' }; };
     var telToep = function (f) { return mijn.filter(f).length; };
     var nCtrlTot = 0; ctrlKeys.forEach(function (k) { nCtrlTot += telToep(function (c) { return veldToep(c, k); }); });
     var btwKl = {}; wBtw.forEach(function (x) { btwKl[x.naam] = 1; });
@@ -784,13 +784,13 @@ class Component extends DCLogic {
     var werkSecties = [
       sectie('achter', '1. Administratie verwerken', 'achterstand ' + peilLabel(), wAchter, 'Alles verwerkt ' + peilLabel() + '.', vl(wAchter.length, mijn.length)),
       sectie('ctrl', '2. Kwartaalcontrole', ctrlKeys.length ? 'controle t/m Q' + WQ + ' nog open' : 'nog geen kwartaal om te controleren', wCtrl, 'Alle kwartaalcontroles zijn gedaan.', vl(wCtrl.length, nCtrlTot)),
-      sectie('btw', '3. btw-aangiften', 'periode voorbij, op deadline gesorteerd', wBtw, 'Geen openstaande btw-aangiften.', vl(Object.keys(btwKl).length, telToep(function (c) { return c.regime === 'Normaal'; }))),
+      sectie('btw', '3. Btw-aangiften', 'periode voorbij, op deadline gesorteerd', wBtw, 'Geen openstaande btw-aangiften.', vl(Object.keys(btwKl).length, telToep(function (c) { return c.regime === 'Normaal'; }))),
       sectie('c25', '4. Controle ' + vj(), 'jaarcontrole nog open', wC25, 'Alle jaarcontroles zijn gedaan.', vl(wC25.length, telToep(function (c) { return veldToep(c, 'c25'); }))),
       sectie('jw', '5. Jaarwerk ' + vj(), 'jaarrekening nog open', wJw, 'Alle jaarrekeningen zijn klaar.', vl(wJw.length, telToep(function (c) { return veldToep(c, 'jw25'); }))),
       sectie('ib', '6. IB-aangifte ' + vj(), 'aangifte nog open', wIb, 'Alle IB-aangiften zijn gedaan.', vl(wIb.length, telToep(function (c) { return veldToep(c, 'ib25'); }))),
       sectie('wacht', 'Wacht op klant', 'stukken nog niet aangeleverd', wWacht, 'Bij niemand wachten we op stukken.', vl(wWacht.length, mijn.length), { l:'Herinnering mailen (BCC)', href: mailtoLink(wachtMails, herinnering.s, herinnering.b), t: wachtMails.length + ' e-mailadressen' })
     ];
-    werkSecties[werkSecties.length - 1].vt = wWacht.length + ' klanten';
+    werkSecties[werkSecties.length - 1].vt = 'klanten';
     werkSecties[werkSecties.length - 1].geenBalk = true;
     werkSecties.forEach(function (x) { x.toonBalk = !x.geenBalk; });
     var teamM = [['n','Klanten'],['achter','Achterstand'],['ctrl','Kw.controle open'],['btwLaat','Btw te laat'],['c25','Controle ' + vj()],['jw','Jaarwerk ' + vj()],['ib','IB ' + vj()],['wacht','Wacht op klant']];
@@ -1006,7 +1006,7 @@ class Component extends DCLogic {
       werkWie: wie, onWerkWie: function (ev) { self.setState({ werkWie:ev.target.value }); },
       werkTitel: wie === 'alle' ? 'Werkvoorraad van iedereen' : (wie === role ? 'Mijn werkvoorraad' : 'Werkvoorraad van ' + wie),
       werkSub: mijn.length + ' lopende klanten · administratie telt als achterstand ' + peilLabel() + ' · ' + JAAR,
-      werkSecties: werkSecties, exportWerk: exportWerk, exportKlanten: exportKlanten,
+      werkSecties: werkSecties, todoTegels: werkSecties.map(function (x) { return { l:(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); })(x.titel.replace(/^\d\. /, '')), n:x.todo, cls: x.todo ? (x.id === 'wacht' ? 'tdt w' : 'tdt') : 'tdt nul' }; }), todoTotaal: werkSecties.filter(function (x) { return x.id !== 'wacht'; }).reduce(function (t, x) { return t + x.todo; }, 0), exportWerk: exportWerk, exportKlanten: exportKlanten,
       team: team, teamKop: teamM.map(function (m) { return { l:m[1] }; }), toonTeam: beheer,
       bJaarCls: bCls('jaar'), bJaar: goSub('jaar'), showJaar: s.bsub === 'jaar',
       volgendJaar: String(s.jaar + 1), huidigJaar: String(s.jaar),

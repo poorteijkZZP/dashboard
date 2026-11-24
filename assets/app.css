@@ -224,3 +224,14 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .seg.sterk.on{background:#2B2B2B!important;color:#fff!important;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 .seg.sterk.on .n{background:#FF8000;color:#fff}
 .scopetxt{font-size:13px;font-weight:700;color:#B35A00}
+
+.todo{display:inline-flex;align-items:baseline;gap:5px;font-size:13px;font-weight:700;color:#C8412B;background:#FCEDEA;border-radius:8px;padding:3px 10px}
+.todo b{font-size:20px;font-weight:900}
+.todo.nul{color:#2F8F5B;background:#E7F4EC}
+.todobalk{display:grid;grid-template-columns:1.2fr repeat(7,1fr);gap:10px}
+.tdtot,.tdt{background:#fff;border:1px solid #E4E2DF;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.tdtot{background:#2B2B2B;border-color:#2B2B2B;color:#fff}
+.tdtot b{font-size:32px;font-weight:900;line-height:1}.tdtot span{font-size:12.5px;font-weight:700;color:#FFBF80}
+.tdt b{font-size:26px;font-weight:900;color:#C8412B;line-height:1.1}.tdt span{font-size:12px;font-weight:700;color:#5E5E5E}
+.tdt.nul b{color:#2F8F5B}.tdt.w b{color:#3D6FB6}
+@media (max-width:1300px){.todobalk{grid-template-columns:repeat(4,1fr)}}

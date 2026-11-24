@@ -137,6 +137,10 @@
       </button>
     </div>
 
+    <div class="todobalk">
+      <div class="tdtot"><b>{{todoTotaal}}</b><span>taken nog te doen</span></div>
+      <sc-for list="{{todoTegels}}" as="tg" hint-placeholder-count="7"><div class="{{tg.cls}}"><b>{{tg.n}}</b><span>{{tg.l}}</span></div></sc-for>
+    </div>
     <sc-if value="{{toonTeam}}" hint-placeholder-val="{{ true }}">
       <section class="card" style="overflow: hidden">
         <div style="padding: 14px 16px; border-bottom: 1px solid #E4E2DF; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap">
@@ -170,8 +174,8 @@
         <section class="card" style="overflow: hidden">
           <div style="padding: 14px 16px; border-bottom: 1px solid #E4E2DF; display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
             <span style="font-size: 15px; font-weight: 800">{{ws.titel}}</span>
-            <span class="mini o">{{ws.n}}</span>
             <span style="font-size: 12px; color: #5E5E5E; flex: 1 1 160px">{{ws.sub}}</span>
+            <span class="{{ws.todoCls}}"><b>{{ws.todo}}</b> te doen</span>
             <sc-if value="{{ws.toonBalk}}" hint-placeholder-val="{{ true }}">
               <div class="wverloop"><span class="tbar"><span style="{{ws.vbar}}; background: #FF8000"></span></span><span><b>{{ws.vpct}}</b> · {{ws.vt}}</span></div>
             </sc-if>
