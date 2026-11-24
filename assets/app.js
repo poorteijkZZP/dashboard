@@ -240,7 +240,7 @@ class Component extends DCLogic {
     var self = this;
     var sluit = function () { if (self.state.menu || self.state.uitleg || self.state.kenmOpen) self.setState({ menu:null, uitleg:false, kenmOpen:false }); };
     document.addEventListener('click', sluit);
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
+    document.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (self.state.menu || self.state.uitleg || self.state.kenmOpen) { sluit(); return; } if (self.state.sel) self.setState({ sel:null }); });
     window.addEventListener('scroll', sluit, true);
     window.addEventListener('resize', sluit);
     if (!STORE.live) {

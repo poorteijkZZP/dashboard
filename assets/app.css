@@ -317,3 +317,13 @@ input[type=date]{font-family:inherit}
 .kpi:hover{border-color:#B5AFA8}
 .kpi.on{border-color:#2B2B2B;box-shadow:inset 0 0 0 1px #2B2B2B;background:#fff}
 .sec{color:#5E5E5E!important}
+
+/* Klantkaart als schuifpaneel */
+@keyframes inschuiven{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes indimmen{from{opacity:0}to{opacity:1}}
+aside.schuif{position:fixed!important;top:0;right:0;bottom:0;width:min(580px,94vw);z-index:60;border-radius:18px 0 0 18px!important;border-right:0!important;overflow-y:auto!important;box-shadow:-24px 0 60px rgba(0,0,0,.20);animation:inschuiven .22s cubic-bezier(.2,.8,.2,1)}
+.schuifdek{position:fixed;inset:0;background:rgba(43,43,43,.28);z-index:55;animation:indimmen .2s ease-out}
+.schuifsluit{position:fixed;top:18px;right:calc(min(580px,94vw) + 14px);z-index:61;background:#fff;border:0;border-radius:999px;padding:8px 14px;font:700 13px 'Plus Jakarta Sans',sans-serif;color:#2B2B2B;box-shadow:0 6px 18px rgba(0,0,0,.18);display:flex;gap:8px;align-items:center;cursor:pointer;animation:indimmen .2s ease-out}
+.schuifsluit kbd{border:1px solid #D0CCC6;border-radius:5px;padding:0 5px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#5E5E5E}
+@media (max-width:700px){.schuifsluit{display:none}}
+@media (prefers-reduced-motion:reduce){aside.schuif,.schuifdek,.schuifsluit{animation:none}}

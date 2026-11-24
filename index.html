@@ -330,7 +330,13 @@
       </section>
 
       <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
-      <aside class="card" style="flex: 1 1 430px; min-width: 0; max-width: 100%; overflow: hidden">
+      <div class="schuifdek" onClick="{{closePanel}}"></div>
+      </sc-if>
+      <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+      <button type="button" class="schuifsluit" onClick="{{closePanel}}">✕ Sluiten <kbd>Esc</kbd></button>
+      </sc-if>
+      <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+      <aside class="card schuif" role="dialog" aria-label="Klantkaart">
 
         <sc-if value="{{showEmpty}}" hint-placeholder-val="{{ true }}">
           <div style="padding: 48px 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
