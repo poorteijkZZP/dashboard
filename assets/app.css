@@ -212,3 +212,15 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .qb .tt.ct{width:66px}
 .qb .tt.kw{width:150px}
 .qb .tt.breed{width:auto;min-width:84px;padding:0 8px}
+
+.tt.gap{visibility:hidden;width:66px!important}
+.qb .qbl{min-width:34px;justify-content:center}
+.kwtab{display:grid;grid-template-columns:1.3fr repeat(3,0.7fr) 1.2fr;border:1px solid #E4E2DF;border-radius:10px;overflow:hidden;font-size:14px;max-width:720px}
+.kwtab > span{padding:9px 12px;border-bottom:1px solid #F0EEEB}
+.kwtab .kh{background:#F7F5F2;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#6B6B6B}
+.witem .tt{cursor:pointer}
+
+.seg.sterk{font-size:14px;padding:9px 14px}
+.seg.sterk.on{background:#2B2B2B!important;color:#fff!important;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.seg.sterk.on .n{background:#FF8000;color:#fff}
+.scopetxt{font-size:13px;font-weight:700;color:#B35A00}

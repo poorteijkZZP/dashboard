@@ -183,6 +183,9 @@
             <div class="wlist">
               <sc-for list="{{ws.items}}" as="wi" hint-placeholder-count="4">
                 <div class="witem">
+                  <sc-if value="{{wi.hasTiles}}" hint-placeholder-val="{{ false }}">
+                    <span style="display: inline-flex; gap: 3px; flex-wrap: wrap"><sc-for list="{{wi.tiles}}" as="tt" hint-placeholder-count="2"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></span>
+                  </sc-if>
                   <sc-if value="{{wi.hasPill}}" hint-placeholder-val="{{ false }}">
                     <button type="button" class="{{wi.pillCls}}" title="{{wi.pillT}}" onClick="{{wi.toggle}}" onContextMenu="{{wi.menu}}">{{wi.pillL}}</button>
                   </sc-if>
@@ -208,6 +211,7 @@
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px">
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Overzicht</h1>
+        <span class="scopetxt">{{scopeTekst}}</span>
       </div>
       <div style="display: inline-flex; gap: 2px; padding: 3px; background: #EAE7E2; border-radius: 9px" role="group" aria-label="Welke klanten">
         <button type="button" class="{{scopeAllCls}}" onClick="{{scopeAll}}">Alle klanten<span class="n">{{scopeAllN}}</span></button>
@@ -220,16 +224,6 @@
           <option value="Gea">GW</option>
           <option value="Marco">MK</option>
           <option value="Yassir">YO</option>
-        </select>
-      </label>
-      <label style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: #5E5E5E">Bank
-        <select aria-label="Filter op bank" value="{{bankF}}" onChange="{{onBankF}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: #2B2B2B">
-          <option value="alle">Alle banken</option>
-          <option value="BK">BK</option>
-          <option value="camt.053">camt.053</option>
-          <option value="MT940">MT940</option>
-          <option value="geen">geen</option>
-          <option value="overig">overig</option>
         </select>
       </label>
       <label style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 12px; min-height: 42px; flex: 0 1 260px">
@@ -380,7 +374,7 @@
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <p class="sec">Voortgang {{jaarLabel}}</p>
                 <sc-for list="{{d.blokken}}" as="bk" hint-placeholder-count="4">
-                  <div class="{{bk.cls}}"><span class="qbl">{{bk.l}}</span><sc-for list="{{bk.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
+                  <div class="{{bk.cls}}"><span class="qbl">{{bk.l}}</span><sc-for list="{{bk.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isGap}}" hint-placeholder-val="{{ false }}"><span class="tt gap"></span></sc-if><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
                 </sc-for>
                 <div class="qb"><span class="qbl">{{vjLabel}}</span><sc-for list="{{d.jaarTegels}}" as="tt" hint-placeholder-count="3"><button type="button" class="{{tt.cls}} breed" title="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></div>
                 <span style="font-size: 12px; color: #5E5E5E">Klik = gedaan aan/uit · rechtermuisknop = wacht op klant of terug naar open</span>
@@ -553,11 +547,11 @@
                   <option value="Overig">Overig</option>
                 </select>
               </label>
-              <label class="field">BTW-regime
+              <label class="field">Btw-regime
                 <select value="{{form.regime}}" onChange="{{on.regime}}">
                   <option value="Normaal">Normaal</option>
                   <option value="KOR">KOR</option>
-                  <option value="Vrijgesteld">BTW-vrijgesteld</option>
+                  <option value="Vrijgesteld">Btw-vrijgesteld</option>
                   <option value="KOR/vrij">KOR of vrijgesteld (nog splitsen)</option>
                 </select>
               </label>
@@ -570,7 +564,7 @@
               </label>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 8px">
-              <label class="check" style="border-color: #FFBF80; background: #FFFBF7"><input type="checkbox" checked="{{form.btwMaand}}" onChange="{{on.btwMaand}}">BTW-aangifte per maand</label>
+              <label class="check" style="border-color: #FFBF80; background: #FFFBF7"><input type="checkbox" checked="{{form.btwMaand}}" onChange="{{on.btwMaand}}">Btw-aangifte per maand</label>
               <label class="check"><input type="checkbox" checked="{{form.pers}}" onChange="{{on.pers}}">Personenauto</label>
               <label class="check"><input type="checkbox" checked="{{form.best}}" onChange="{{on.best}}">Bestelauto</label>
               <label class="check"><input type="checkbox" checked="{{form.km}}" onChange="{{on.km}}">KM-registratie</label>
@@ -644,7 +638,7 @@
                     <button type="button" class="mopt" onClick="{{mEdit}}"><b>Gegevens wijzigen</b><span>Kenmerken, verwerking, bank, contact, bijzonderheden</span></button>
                     <button type="button" class="mopt" onClick="{{mAdmin}}"><b>Andere administrateur</b><span>Klant overdragen aan een collega</span></button>
                     <sc-if value="{{m.kanStoppen}}" hint-placeholder-val="{{ true }}">
-                      <button type="button" class="mopt" onClick="{{mStop}}" style="border-color: #FFBF80; background: #FFFBF7"><b>Klant stopt</b><span>Vastleggen t/m welke periode wij nog administratie, BTW, jaarwerk en IB doen</span></button>
+                      <button type="button" class="mopt" onClick="{{mStop}}" style="border-color: #FFBF80; background: #FFFBF7"><b>Klant stopt</b><span>Vastleggen t/m welke periode wij nog administratie, btw, jaarwerk en IB doen</span></button>
                     </sc-if>
                     <sc-if value="{{m.isOpgezegd}}" hint-placeholder-val="{{ false }}">
                       <button type="button" class="mopt" onClick="{{mDefinitief}}"><b>Definitief afsluiten</b><span>Al het resterende werk is klaar, klant naar archief</span></button>
@@ -705,7 +699,7 @@
                           <option value="11">december {{jaarLabel}} (Q4)</option>
                         </select>
                       </label>
-                      <label class="field">BTW-aangifte t/m
+                      <label class="field">Btw-aangifte t/m
                         <select value="{{stop.btw}}" onChange="{{onStop.btw}}">
                           <option value="-1">Geen meer</option>
                           <option value="0">Q1 {{jaarLabel}}</option>
@@ -753,7 +747,7 @@
             </sc-if>
             <div style="border-top: 1px solid #E4E2DF; padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
               <span style="font-size: 16px; font-weight: 800">Wanneer telt iets als achterstand?</span>
-              <span style="font-size: 13px; color: #5E5E5E">Automatisch: administratie moet bij zijn tot en met twee maanden terug (half november dus t/m september). BTW telt als achterstand zodra de wettelijke deadline voorbij is. Nu: administratie <b>{{peilNu}}</b>.</span>
+              <span style="font-size: 13px; color: #5E5E5E">Automatisch: administratie moet bij zijn tot en met de vorige maand (in november dus t/m oktober). Btw telt als achterstand zodra de wettelijke deadline voorbij is. Nu: administratie <b>{{peilNu}}</b>.</span>
               <label class="field" style="max-width: 320px">Peilmaand administratie
                 <select value="{{peilSel}}" onChange="{{onPeil}}">
                   <option value="auto">Automatisch op datum (aanbevolen)</option>
@@ -783,6 +777,25 @@
               <span style="font-size: 20px; font-weight: 800">In- en uitstroom van klanten</span>
               <span style="font-size: 13px; color: #5E5E5E">Jaartotalen uit het klantenbestand ({{jaarLabel}}* = tot nu toe). Omdat start en einde voortaan per kwartaal worden vastgelegd, kan dit overzicht vanaf nu ook per kwartaal.</span>
             </div>
+            <sc-if value="{{hasLijn}}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span style="font-size: 15px; font-weight: 800">Aantal actieve klanten</span>
+                <span style="font-size: 12px; color: #5E5E5E">T/m 2025 per jaareinde, vanaf 2026 per kwartaaleinde (lopend kwartaal: stand van vandaag). Gestopte klanten zonder einddatum tellen tot het einde van hun stopjaar.</span>
+                <img src="{{lijnSvg}}" alt="Lijngrafiek met het aantal actieve klanten" style="width: 100%; max-width: 980px; height: auto">
+              </div>
+            </sc-if>
+            <sc-if value="{{hasKw}}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <span style="font-size: 15px; font-weight: 800">Verloop per kwartaal vanaf 2026</span>
+                <div class="kwtab">
+                  <span class="kh">Kwartaal</span><span class="kh">Nieuw</span><span class="kh">Gestopt</span><span class="kh">Saldo</span><span class="kh">Actief einde kwartaal</span>
+                  <sc-for list="{{kwRijen}}" as="kr" hint-placeholder-count="4">
+                    <span><b>{{kr.p}}</b></span><span style="color: #B35A00; font-weight: 700">{{kr.n}}</span><span style="color: #4A4A4A; font-weight: 700">{{kr.s}}</span><span style="font-weight: 800">{{kr.net}}</span><span style="font-weight: 800">{{kr.a}}</span>
+                  </sc-for>
+                </div>
+                <span style="font-size: 12px; color: #5E5E5E">* lopend kwartaal, stand van vandaag. Gestopt telt mee in het kwartaal van de einddatum.</span>
+              </div>
+            </sc-if>
             <div style="display: flex; flex-direction: column; gap: 10px">
               <span style="font-size: 15px; font-weight: 800">Aantal actieve klanten per jaareinde</span>
               <span style="font-size: 12px; color: #5E5E5E">Teruggerekend vanaf het huidige aantal actieve klanten, met de nieuwe en gestopte klanten per jaar. Boven elke staaf de groei ten opzichte van het jaar ervoor.</span>
@@ -907,7 +920,7 @@
                   <option value="kwartaal">Per kwartaal</option>
                 </select>
               </label>
-              <label class="field">BTW open
+              <label class="field">Btw open
                 <select value="{{sf.btw3}}" onChange="{{onSf.btw3}}">
                   <option value="alle">Alle</option>
                   <option value="open">Nog open</option>
@@ -957,7 +970,7 @@
                 </select>
               </label>
 
-              <label class="field">BTW-regime
+              <label class="field">Btw-regime
                 <select value="{{sf.regime}}" onChange="{{onSf.regime}}">
                   <option value="alle">Alle</option>
                   <option value="Normaal">Normaal</option>
