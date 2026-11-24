@@ -287,7 +287,7 @@
         <div class="verloop">
           <span class="vtitel">{{verloopTitel}}</span>
           <sc-for list="{{verloop}}" as="vl" hint-placeholder-count="3">
-            <div class="vitem"><span class="vl">{{vl.l}}</span><span class="tbar"><span style="{{vl.bar}}; background: #FF8000"></span></span><span class="vt"><b>{{vl.pct}}</b> · {{vl.tekst}}</span></div>
+            <div class="vitem"><span class="vl">{{vl.l}}</span><span class="tbar"><span style="{{vl.bar}}; background: {{vl.kleur}}"></span></span><span class="vt"><b>{{vl.pct}}</b> · {{vl.tekst}}</span></div>
           </sc-for>
         </div>
         <div class="tablebox">
@@ -309,7 +309,7 @@
                 </div>
                 <div class="cell"><sc-if value="{{r.hasAdmin}}" hint-placeholder-val="{{ true }}"><span class="av" title="{{r.admin}}">{{r.init}}</span></sc-if></div>
                 <div class="cell sep">
-                  <div class="qb cur"><span class="qbl">{{r.cur.l}}</span><sc-for list="{{r.cur.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
+                  <div class="{{r.cur.cls}}"><span class="qbl">{{r.cur.l}}</span><sc-for list="{{r.cur.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for><sc-if value="{{r.cur.rond}}" hint-placeholder-val="{{ false }}"><span class="rondbdg" title="Alles voor dit kwartaal is gedaan">✓ rond</span></sc-if></div>
                 </div>
                 <div class="cell sep" style="gap: 6px; flex-wrap: wrap">
                   <sc-for list="{{r.prev}}" as="pv" hint-placeholder-count="3">
