@@ -344,6 +344,7 @@ class Component extends DCLogic {
   }
 
   toggle(c, key, idx, label) {
+    this.markeer(c, key, idx);
     if (key === 'btw' && BTWM && c.btwMaand) {
       var ms = qMaanden(c, idx);
       if (!ms.length) return;
@@ -393,7 +394,14 @@ class Component extends DCLogic {
     }, label + (nv ? ' afgevinkt' : ' teruggezet naar open'));
   }
 
+  markeer(c, key, idx) {
+    var self = this, sleutel = c.id + '|' + key + '|' + idx;
+    this.__net = sleutel; clearTimeout(this.__netT);
+    this.__netT = setTimeout(function () { if (self.__net === sleutel) { self.__net = null; self.forceUpdate ? self.forceUpdate() : self.setState({}); } }, 700);
+  }
+
   setStatus(c, key, idx, st, label) {
+    if (st === 'gedaan') this.markeer(c, key, idx);
     var wkey = key === 'm' ? 'm' + (idx + 1) : key === 'btw' ? 'btw' + (idx + 1) : key;
     this.upd(c.id, function (n) {
       var v = st === 'gedaan';
@@ -538,7 +546,7 @@ class Component extends DCLogic {
       if (key === 'm') { on = c.months[idx]; na = mNa(c, idx); late = mLate(c, idx); due = mDue(c, idx); w = wk(c, 'm' + (idx + 1)) && !on; }
       else if (key === 'btw') { on = c.btw[idx]; na = btwNa(c, idx) || !lopend(c); late = bLate(c, idx); due = bDue(c, idx); w = wk(c, 'btw' + (idx + 1)) && !on; }
       else { on = !!c[key]; na = c[key] === null || c[key] === undefined || (c.j25na && (key === 'c25' || key === 'jw25' || key === 'ib25')); w = wk(c, key) && !on; }
-      var cls = 'tt ' + (na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : due ? 'u' : 'o');
+      var cls = 'tt ' + (na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : due ? 'u' : 'o') + (self.__net === c.id + '|' + key + '|' + idx ? ' net' : '');
       var stTxt = na ? 'n.v.t.' : on ? 'gedaan' : w ? 'wacht op klant' : late ? 'achterstand' : due ? 'nu doen' : 'open';
       return { isTile:true, isSep:false, kind: key === 'm' ? 'adm' : key === 'btw' ? 'btw' : 'ctrl', l:l, cls:cls, na:na, st: na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : 'o',
         t: title + ': ' + stTxt + (na ? '' : ' (klik: gedaan aan/uit, rechtsklik: meer)'),

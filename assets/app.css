@@ -136,7 +136,7 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 /* Kwartaalblokken */
 .qb{display:inline-flex;align-items:center;gap:3px;padding:4px;border-radius:10px;background:#F7F5F2;white-space:nowrap}
 .qb.cur{background:#fff;box-shadow:inset 0 0 0 1.5px #FFBF80}
-.qbl{font-size:13px;font-weight:900;color:#B35A00;padding:0 8px 0 4px;margin-right:2px;border:0;border-right:2px solid #FFD9B3;background:none;font-family:inherit;align-self:stretch;display:inline-flex;align-items:center;letter-spacing:-.01em;cursor:default}
+.qbl{font-size:13px;font-weight:800;color:#B35A00;padding:0 8px 0 4px;margin-right:2px;border:0;border-right:2px solid #FFD9B3;background:none;font-family:inherit;align-self:stretch;display:inline-flex;align-items:center;letter-spacing:-.01em;cursor:default}
 .qbl.knop{cursor:pointer;color:#5E5E5E}.qbl.knop:hover{color:#2B2B2B}
 .qsep{width:1px;height:18px;background:#DDD7CF;margin:0 2px;display:inline-block}
 .tt{height:28px;min-width:40px;padding:0 6px;border-radius:7px;border:0;display:inline-flex;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:800;font-family:inherit;cursor:pointer;box-sizing:border-box}
@@ -179,7 +179,7 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .hstap{display:inline-flex;align-items:center;gap:6px}
 .hstap b{font-weight:800;color:#2B2B2B}
 .hstap .tt{cursor:default;height:24px;min-width:38px}
-.pijl{color:#B35A00;font-weight:900}
+.pijl{color:#B35A00;font-weight:800}
 .muis{font-weight:800;color:#2B2B2B;border:1px solid #D0CCC6;border-radius:6px;padding:2px 7px;background:#fff;font-size:11.5px}
 .snel{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .snel > div{background:#F7F5F2;border-radius:10px;padding:8px 11px;display:flex;flex-direction:column;gap:2px}
@@ -226,13 +226,13 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .scopetxt{font-size:13px;font-weight:700;color:#B35A00}
 
 .todo{display:inline-flex;align-items:baseline;gap:5px;font-size:13px;font-weight:700;color:#C8412B;background:#FCEDEA;border-radius:8px;padding:3px 10px}
-.todo b{font-size:20px;font-weight:900}
+.todo b{font-size:20px;font-weight:800}
 .todo.nul{color:#2F8F5B;background:#E7F4EC}
 .todobalk{display:grid;grid-template-columns:1.2fr repeat(7,1fr);gap:10px}
 .tdtot,.tdt{background:#fff;border:1px solid #E4E2DF;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
 .tdtot{background:#2B2B2B;border-color:#2B2B2B;color:#fff}
-.tdtot b{font-size:32px;font-weight:900;line-height:1}.tdtot span{font-size:12.5px;font-weight:700;color:#FFBF80}
-.tdt b{font-size:26px;font-weight:900;color:#C8412B;line-height:1.1}.tdt span{font-size:12px;font-weight:700;color:#5E5E5E}
+.tdtot b{font-size:32px;font-weight:800;line-height:1}.tdtot span{font-size:12.5px;font-weight:700;color:#FFBF80}
+.tdt b{font-size:26px;font-weight:800;color:#C8412B;line-height:1.1}.tdt span{font-size:12px;font-weight:700;color:#5E5E5E}
 .tdt.nul b{color:#2F8F5B}.tdt.w b{color:#3D6FB6}
 @media (max-width:1300px){.todobalk{grid-template-columns:repeat(4,1fr)}}
 .qb .tt.ct{width:48px;font-size:9.5px;letter-spacing:-.02em;gap:1px}
@@ -246,7 +246,7 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .witem > span:last-child{flex:0 1 130px;min-width:80px}
 
 .infowrap{position:relative;display:inline-flex}
-.infobtn{width:22px;height:22px;border-radius:50%;border:1.5px solid #B35A00;background:#fff;color:#B35A00;font:800 12px/1 Georgia,serif;font-style:italic;cursor:pointer;display:grid;place-items:center;padding:0}
+.infobtn{width:22px;height:22px;border-radius:50%;border:1.5px solid #B35A00;background:#fff;color:#B35A00;font:800 12px/1 inherit;font-family:inherit;cursor:pointer;display:grid;place-items:center;padding:0}
 .infobtn:hover{background:#FFF2E5}
 .infopop{position:absolute;top:30px;left:0;z-index:40;width:520px;background:#fff;border:1px solid #E4E2DF;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.16);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .hulp.pop{padding:0;background:none;border:0;flex-direction:column;align-items:flex-start;gap:8px}
@@ -280,3 +280,40 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .field .mselitem{flex-direction:row!important;align-items:center;min-height:0;gap:9px;padding:6px 8px;margin:0}
 .field .mselitem input{width:16px!important;height:16px!important;min-height:0!important;padding:0!important;margin:0;flex:none;border:0}
 .field .mselpop{gap:0}
+
+/* ===== Eén lettertype, rustiger kleur, animatie, logo ===== */
+input,select,textarea,button{font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+input[type=checkbox],input[type=radio]{accent-color:#FF8000}
+input[type=date]{font-family:inherit}
+.raillogo{width:44px;height:44px;margin:2px 0 18px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.kopnaam{font-size:15px;font-weight:800;color:#2B2B2B;margin:0 0 10px;letter-spacing:-.01em}
+.kopnaam span{font-weight:600;color:#8E8E8E;margin-left:6px}
+
+/* oranje alleen voor gedaan en acties; rood alleen voor echte problemen */
+.qbl{color:#4A4642;border-right-color:#E4E2DF}
+.qb.cur{box-shadow:inset 0 0 0 1.5px #D9D3CB;background:#fff}
+.scopetxt{color:#5E5E5E;font-weight:600}
+.linkbtn{color:#2B2B2B;text-decoration:underline;text-underline-offset:2px}
+.infobtn{border-color:#8E8E8E;color:#5E5E5E}
+.infobtn:hover{background:#F1EFEC}
+.av{background:#EEEBE7!important;color:#4A4642!important}
+.ntag.o{background:#EEF0F4;color:#4A5568}
+.todo{color:#2B2B2B;background:#F1EFEC}
+.todo.nul{color:#2F8F5B;background:#E7F4EC}
+.tdt b{color:#2B2B2B}
+.tdt.w b{color:#3D6FB6}
+.tdtot span{color:#D9D3CB}
+.mini.o{background:#F1EFEC;color:#4A4642}
+.jwknop.on b{background:#fff;color:#2B2B2B}
+.kchip.on::before{color:#FFBF80}
+.qchip.k{background:#F3E3D2;color:#7A4A1E}
+
+/* afvinkanimatie */
+@keyframes plof{0%{transform:scale(.82)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes glans{0%{box-shadow:0 0 0 0 rgba(255,128,0,.55)}100%{box-shadow:0 0 0 9px rgba(255,128,0,0)}}
+.tt.d.net{animation:plof .32s cubic-bezier(.3,1.4,.5,1),glans .6s ease-out}
+.tt{transition:background-color .15s,color .15s,box-shadow .15s}
+@media (prefers-reduced-motion:reduce){.tt.d.net{animation:none}.tt{transition:none}}
+.kpi:hover{border-color:#B5AFA8}
+.kpi.on{border-color:#2B2B2B;box-shadow:inset 0 0 0 1px #2B2B2B;background:#fff}
+.sec{color:#5E5E5E!important}

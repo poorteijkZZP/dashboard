@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Klantdashboard PoortEijk ZZP</title>
-<link rel="icon" href="assets/logo.png">
+<link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/app.css">
@@ -69,6 +69,7 @@
 <sc-if value="{{showApp}}" hint-placeholder-val="{{ true }}">
 <div style="min-height: 100vh; display: flex">
   <nav class="rail" aria-label="Hoofdmenu">
+    <img class="raillogo" src="assets/logo-icoon.png" alt="PoortEijk ZZP">
     <button type="button" class="{{navWerkCls}}" onClick="{{goWerk}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4h6v4h-6zM4 20h6v-3H4z"></path></svg>Vandaag</button>
     <button type="button" class="{{navKlantCls}}" onClick="{{goKlanten}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M19 14.5c1.4.9 2.2 2.8 2.5 5.5"></path></svg>Overzicht</button>
     <button type="button" class="{{navJwCls}}" onClick="{{goJw}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5M10 13h6M10 17h6"></path></svg>Jaarwerk</button>
@@ -82,7 +83,7 @@
 
   <header style="background: #ffffff; border-bottom: 1px solid #E4E2DF">
     <div style="max-width: 1440px; margin: 0 auto; padding: 10px 24px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px">
-      <img src="assets/logo.png" alt="PoortEijk ZZP" style="height: 34px; width: auto; display: block; margin: 0 0 10px">
+      <span class="kopnaam">PoortEijk ZZP <span>Klantdashboard</span></span>
       <div style="flex: 1 1 auto"></div>
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px">
         <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #5E5E5E">Jaar
