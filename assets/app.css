@@ -19,7 +19,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .kpi{text-align:left;background:#fff;border:1px solid #E4E2DF;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:inherit;min-height:92px}
 .kpi:hover{border-color:#FFBF80}
 .kpi.on{border-color:#FF8000;box-shadow:inset 0 0 0 1px #FF8000;background:#FFFBF7}
-.grid{display:grid;grid-template-columns:minmax(240px,320px) 64px max-content minmax(240px,1fr);min-width:900px}
+.grid{display:grid;grid-template-columns:minmax(240px,340px) 64px max-content max-content;min-width:900px;justify-content:start}
 .tablebox{overflow:auto;max-height:calc(100vh - 130px)}
 .hbtn{border:0;background:none;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;min-height:28px;text-align:left}
 .hbtn:hover{color:#A94F00}
@@ -251,3 +251,20 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .infopop{position:absolute;top:30px;left:0;z-index:40;width:520px;background:#fff;border:1px solid #E4E2DF;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.16);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .hulp.pop{padding:0;background:none;border:0;flex-direction:column;align-items:flex-start;gap:8px}
 .hbtn{white-space:nowrap}
+
+/* eerdere kwartalen compacter */
+.qchip{padding:3px 7px;font-size:11px;border-radius:6px}
+/* Vandaag: alle koppen gelijk */
+.whead{padding:14px 16px 12px;border-bottom:1px solid #E4E2DF;display:flex;flex-direction:column;gap:10px}
+.wkop{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;min-height:44px}
+.wkt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.wkt .t{font-size:15px;font-weight:800}
+.wkt .s{font-size:12px;color:#5E5E5E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Jaarwerk: compacte rij */
+.jwrow{display:grid;grid-template-columns:28px minmax(200px,340px) auto 1fr;gap:12px;align-items:center}
+.jwnaam{display:flex;align-items:center;gap:8px;min-width:0}
+
+.kolkeuze{display:flex;flex-direction:column;gap:8px;background:#FBFAF8;border:1px solid #E4E2DF;border-radius:10px;padding:12px 14px}
+.kolkeuze .klbl,.kenmsel .klbl{font-size:12px;font-weight:800;color:#5E5E5E;text-transform:uppercase;letter-spacing:.04em}
+.kolchips{display:flex;flex-wrap:wrap;gap:6px}
+.kchip.on::before{content:'✓ ';color:#FF8000}
