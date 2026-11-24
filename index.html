@@ -251,6 +251,21 @@
       <section class="card" style="flex: 999 1 620px; min-width: 0; overflow: hidden">
         <div style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 14px 16px; border-bottom: 1px solid #E4E2DF">
           <span style="font-size: 15px; font-weight: 800">{{viewTitle}}</span>
+          <span class="infowrap">
+            <button type="button" class="infobtn" title="Uitleg afvinken" aria-label="Uitleg afvinken" onClick="{{toggleUitleg}}">i</button>
+            <sc-if value="{{toonUitleg}}" hint-placeholder-val="{{ false }}">
+              <div class="infopop" onClick="{{noop}}">
+                <b style="font-size: 14px">Zo vink je af</b>
+        <div class="hulp pop">
+          <span class="hstap"><span class="tt o">nov</span><b>klik</b><span class="pijl">→</span><span class="tt d">nov</span>gedaan</span>
+          <span class="hstap"><span class="tt d">nov</span><b>nog eens klikken</b><span class="pijl">→</span><span class="tt o">nov</span>weer open</span>
+          <span class="hstap"><span class="muis">rechtermuisknop</span><span class="pijl">→</span><span class="tt w">nov</span>wacht op klant</span>
+          <span class="hstap"><span class="tt l">nov</span>= achterstand<span class="tt u" style="margin-left: 8px">nov</span>= nu doen</span>
+        </div>
+                <span style="font-size: 12px; color: #5E5E5E">Eerdere kwartalen klap je open door erop te klikken. Klik op een kolomkop met ⇅ om te sorteren.</span>
+              </div>
+            </sc-if>
+          </span>
           <span style="font-size: 13px; color: #5E5E5E">{{viewCount}}</span>
           <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{exportKlanten}}" title="Exporteert precies deze weergave, met filters en sortering">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
@@ -267,12 +282,6 @@
           <sc-for list="{{verloop}}" as="vl" hint-placeholder-count="3">
             <div class="vitem"><span class="vl">{{vl.l}}</span><span class="tbar"><span style="{{vl.bar}}; background: #FF8000"></span></span><span class="vt"><b>{{vl.pct}}</b> · {{vl.tekst}}</span></div>
           </sc-for>
-        </div>
-        <div class="hulp">
-          <span class="hstap"><span class="tt o">nov</span><b>klik</b><span class="pijl">→</span><span class="tt d">nov</span>gedaan</span>
-          <span class="hstap"><span class="tt d">nov</span><b>nog eens klikken</b><span class="pijl">→</span><span class="tt o">nov</span>weer open</span>
-          <span class="hstap"><span class="muis">rechtermuisknop</span><span class="pijl">→</span><span class="tt w">nov</span>wacht op klant</span>
-          <span class="hstap"><span class="tt l">nov</span>= achterstand<span class="tt u" style="margin-left: 8px">nov</span>= nu doen</span>
         </div>
         <div class="tablebox">
           <div class="grid">

@@ -244,3 +244,10 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .witem .tlist{display:inline-flex;flex-wrap:wrap;gap:3px;max-width:159px;flex:none}
 .witem .name{min-width:120px}
 .witem > span:last-child{flex:0 1 130px;min-width:80px}
+
+.infowrap{position:relative;display:inline-flex}
+.infobtn{width:22px;height:22px;border-radius:50%;border:1.5px solid #B35A00;background:#fff;color:#B35A00;font:800 12px/1 Georgia,serif;font-style:italic;cursor:pointer;display:grid;place-items:center;padding:0}
+.infobtn:hover{background:#FFF2E5}
+.infopop{position:absolute;top:30px;left:0;z-index:40;width:520px;background:#fff;border:1px solid #E4E2DF;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.16);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.hulp.pop{padding:0;background:none;border:0;flex-direction:column;align-items:flex-start;gap:8px}
+.hbtn{white-space:nowrap}

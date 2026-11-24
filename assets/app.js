@@ -231,7 +231,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     var self = this;
-    var sluit = function () { if (self.state.menu) self.setState({ menu:null }); };
+    var sluit = function () { if (self.state.menu || self.state.uitleg) self.setState({ menu:null, uitleg:false }); };
     document.addEventListener('click', sluit);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
     window.addEventListener('scroll', sluit, true);
@@ -500,7 +500,7 @@ class Component extends DCLogic {
     var sortBy = {}, arrow = {};
     Object.keys(SK).forEach(function (k) {
       sortBy[k] = function () { self.setState({ sort:{ k:k, d: s.sort.k === k ? -s.sort.d : 1 } }); };
-      arrow[k] = s.sort.k === k ? (s.sort.d === 1 ? '↑' : '↓') : '';
+      arrow[k] = s.sort.k === k ? (s.sort.d === 1 ? '↑' : '↓') : '⇅';
     });
     var viewTitleTxt = (s.scope === 'mijn' ? 'Mijn klanten: ' : (s.adminF !== 'alle' ? s.adminF + ': ' : 'Alle klanten: ')) + cur.label.charAt(0).toLowerCase() + cur.label.slice(1) + (s.bankF !== 'alle' ? ' (bank ' + s.bankF + ')' : '');
     var vis = FILTERS.filter(function (f) { return ['alles', 'btw', 'achter', 'wacht'].indexOf(f.id) >= 0; });
@@ -988,6 +988,7 @@ class Component extends DCLogic {
       jaarLabel: String(JAAR), vjLabel: String(vj()),
       jaren: s.jaren.map(function (y) { return { v:String(y), l:String(y) }; }), jaarSel: String(s.jaar), onJaar: function (ev) { self.kiesJaar(ev.target.value); },
       noop: function (ev) { ev.stopPropagation(); },
+      toonUitleg: !!s.uitleg, toggleUitleg: function (ev) { ev.stopPropagation(); self.setState({ uitleg: !s.uitleg }); },
       hasMenu: !!(mn && menuC), menuPos: mn ? 'left: ' + mn.x + 'px; top: ' + mn.y + 'px' : '', menuTitel: mn && menuC ? menuC.naam + ' · ' + mn.label : '', menuItems: menuItems,
       wqLabel: 'Q' + (WQ + 1) + ' ' + JAAR, wqSub: (WQ > 0 ? 'controle Q' + WQ + ' · ' : '') + 'administratie · btw Q' + (WQ + 1) + ' ' + btwDlLabel(WQ),
       prevKop: WQ > 0 ? 'Eerdere kwartalen' : '', hasPrevKol: WQ > 0,
