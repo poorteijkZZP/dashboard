@@ -327,3 +327,4 @@ aside.schuif{position:fixed!important;top:0;right:0;bottom:0;width:min(580px,94v
 .schuifsluit kbd{border:1px solid #D0CCC6;border-radius:5px;padding:0 5px;font:700 11px 'Plus Jakarta Sans',sans-serif;color:#5E5E5E}
 @media (max-width:700px){.schuifsluit{display:none}}
 @media (prefers-reduced-motion:reduce){aside.schuif,.schuifdek,.schuifsluit{animation:none}}
+.rail{z-index:58}
