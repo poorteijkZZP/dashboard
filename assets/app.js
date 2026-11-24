@@ -480,7 +480,7 @@ class Component extends DCLogic {
     var inBase = function (c) { return (s.scope === 'alle' || c.admin === role) && (s.bankF === 'alle' || c.bank === s.bankF); };
     var inScope = function (c) { return inBase(c) && (s.adminF === 'alle' || c.admin === s.adminF); };
     var cur = FILTERS.filter(function (f) { return f.id === s.filter; })[0];
-    if (!beheer && (cur.id === 'opgezegd' || cur.id === 'gestopt')) cur = FILTERS[0];
+    if (['alles', 'btw', 'achter', 'wacht'].indexOf(cur.id) < 0) cur = FILTERS[0];
     var q = s.q.trim().toLowerCase();
     var BANKORD = { 'BK':0, 'camt.053':1, 'MT940':2, 'geen':3, 'overig':4 };
     var progress = function (c) { var n = 0; for (var i = 0; i < 12; i++) { if (mNa(c, i)) continue; if (!c.months[i]) break; n = i + 1; } return n; };
@@ -503,7 +503,7 @@ class Component extends DCLogic {
       arrow[k] = s.sort.k === k ? (s.sort.d === 1 ? '↑' : '↓') : '';
     });
     var viewTitleTxt = (s.scope === 'mijn' ? 'Mijn klanten: ' : (s.adminF !== 'alle' ? s.adminF + ': ' : 'Alle klanten: ')) + cur.label.charAt(0).toLowerCase() + cur.label.slice(1) + (s.bankF !== 'alle' ? ' (bank ' + s.bankF + ')' : '');
-    var vis = FILTERS.filter(function (f) { return beheer || (f.id !== 'opgezegd' && f.id !== 'gestopt'); });
+    var vis = FILTERS.filter(function (f) { return ['alles', 'btw', 'achter', 'wacht'].indexOf(f.id) >= 0; });
     var kpis = vis.map(function (f) {
       var nOp = f.id === 'alles' ? all.filter(function (c) { return inScope(c) && c.status === 'Opgezegd'; }).length : 0;
       return { label:f.kpi, sub: nOp ? 'waarvan ' + nOp + ' opgezegd' : f.sub, value: all.filter(function (c) { return inScope(c) && f.f(c); }).length, cls: cur.id === f.id ? 'kpi on' : 'kpi', pick:function () { self.setState({ filter:f.id }); } };
@@ -530,7 +530,7 @@ class Component extends DCLogic {
       else { on = !!c[key]; na = c[key] === null || c[key] === undefined || (c.j25na && (key === 'c25' || key === 'jw25' || key === 'ib25')); w = wk(c, key) && !on; }
       var cls = 'tt ' + (na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : due ? 'u' : 'o');
       var stTxt = na ? 'n.v.t.' : on ? 'gedaan' : w ? 'wacht op klant' : late ? 'achterstand' : due ? 'nu doen' : 'open';
-      return { isTile:true, isSep:false, l:l, cls:cls, na:na, st: na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : 'o',
+      return { isTile:true, isSep:false, kind: key === 'm' ? 'adm' : key === 'btw' ? 'btw' : 'ctrl', l:l, cls:cls, na:na, st: na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : 'o',
         t: title + ': ' + stTxt + (na ? '' : ' (klik: gedaan aan/uit, rechtsklik: meer)'),
         click: function () { if (!na) self.toggle(c, key, idx, title); },
         menu: function (ev) { if (na) { ev.preventDefault(); return; } self.openMenu(ev, c, key, idx, title); } };
@@ -576,6 +576,7 @@ class Component extends DCLogic {
     var rows = list.map(function (c) {
       var ti = tmInfo(c);
       var tags = [];
+      if (c.status !== 'Actief') tags.push({ l:c.status.toLowerCase(), cls:'ntag z' });
       if (c.btwMaand && c.regime === 'Normaal') tags.push({ l:'btw p/m', cls:'ntag o' });
       return {
         tags:tags, tmL:ti.lbl, tmB:ti.bdg, tmCls:ti.bcls, hasTmB: !!ti.bdg,
@@ -611,6 +612,19 @@ class Component extends DCLogic {
         open: function () { self.openClient(c.id); }
       };
     });
+
+    var verloop = (function () {
+      var g = { adm:[0, 0], ctrl:[0, 0], btw:[0, 0] };
+      rows.forEach(function (r) { r.cur.tiles.forEach(function (t) {
+        if (!t.isTile || t.st === 'n') return;
+        var k = t.kind; g[k][1]++; if (t.st === 'd') g[k][0]++;
+      }); });
+      var regel = function (l, x) { var pct = x[1] ? Math.round(x[0] / x[1] * 100) : 100; return { l:l, tekst: (x[1] - x[0]) + ' te doen van ' + x[1], pct: pct + '%', bar:'width: ' + pct + '%', toon: x[1] > 0 }; };
+      var out = [regel('Administratie', g.adm)];
+      if (WQ > 0) out.push(regel('Controle Q' + WQ, g.ctrl));
+      out.push(regel('BTW Q' + (WQ + 1), g.btw));
+      return out.filter(function (x) { return x.toon; });
+    })();
 
     var selC = all.filter(function (c) { return c.id === s.sel; })[0] || null;
     var d = { kenm:[], quarters:[], year:[], gegevens:[], log:[] };
@@ -726,28 +740,54 @@ class Component extends DCLogic {
       var w = wk(c, 'btw' + (q + 1)) && !c.btw[q] && !btwNa(c, q), late = bLate(c, q), due = bDue(c, q);
       if (!(late || due || w)) return;
       var dl = btwDeadline(q), dg = dagenTot(dl);
-      wBtw.push({ naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:true, pillL:'Q' + (q + 1), pillCls: w ? 'pill wacht' : late ? 'pill late' : 'pill due', pillT:'Klik om af te vinken (volgens de klikstand)', toggle:function () { self.toggle(c, 'btw', q, 'BTW Q' + (q + 1)); },
+      wBtw.push({ menu:function (ev) { self.openMenu(ev, c, 'btw', q, 'BTW Q' + (q + 1)); }, naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:true, pillL:'Q' + (q + 1), pillCls: w ? 'pill wacht' : late ? 'pill late' : 'pill due', pillT:'Klik om af te vinken (volgens de klikstand)', toggle:function () { self.toggle(c, 'btw', q, 'BTW Q' + (q + 1)); },
         info: w ? 'wacht op klant' : late ? 'deadline ' + (-dg) + (-dg === 1 ? ' dag' : ' dagen') + ' verstreken' : 'nog ' + dg + (dg === 1 ? ' dag' : ' dagen') + ', ' + btwDlLabel(q), sv: w ? 9e15 : dl.getTime(), email:c.email });
     }); });
     wBtw.sort(function (a, b) { return a.sv - b.sv || a.naam.localeCompare(b.naam); });
-    var wAchter = mijn.filter(function (c) { return lateLabels(c).length; }).map(function (c) { return { naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:false, info:'open: ' + lateLabels(c).join(', '), email:c.email }; });
-    var wWacht = mijn.filter(heeftWacht).map(function (c) { return { naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:false, info:'wacht op: ' + wachtLabels(c).join(', '), email:c.email }; });
-    var wJaar = mijn.filter(function (c) { return jwOpen(c) || ibOpen(c); }).map(function (c) { return { naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:false, info:[jwOpen(c) ? 'jaarwerk' : '', ibOpen(c) ? 'IB-aangifte' : ''].filter(Boolean).join(' en ') + ' ' + vj() + ' open', email:c.email }; });
+    var item = function (c, info, pill) {
+      var o = { naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:!!pill, info:info, email:c.email, pillL:'', pillCls:'', pillT:'', toggle:function () {}, menu:function (ev) { ev.preventDefault(); } };
+      if (pill) { o.pillL = pill.l; o.pillCls = pill.cls; o.pillT = pill.t; o.toggle = pill.click; o.menu = pill.menu; }
+      return o;
+    };
+    var wAchter = mijn.filter(function (c) { return lateLabels(c).length; }).map(function (c) { return item(c, 'open: ' + lateLabels(c).join(', ')); });
+    var wWacht = mijn.filter(heeftWacht).map(function (c) { return item(c, 'wacht op: ' + wachtLabels(c).join(', ')); });
+    var veldOpen = function (c, k) { var v = c[k]; return v !== null && v !== undefined && !v && !(c.j25na && (k === 'c25' || k === 'jw25' || k === 'ib25')); };
+    var veldToep = function (c, k) { var v = c[k]; return v !== null && v !== undefined && !(c.j25na && (k === 'c25' || k === 'jw25' || k === 'ib25')); };
+    var lijstVeld = function (k, l, info) {
+      return mijn.filter(function (c) { return veldOpen(c, k); }).map(function (c) { var t = tegel(c, k, 0, l, info); return item(c, wk(c, k) ? 'wacht op klant' : info + ' open', { l:t.l, cls:t.cls, t:t.t, click:t.click, menu:t.menu }); });
+    };
+    var ctrlKeys = []; for (var cq = 1; cq <= WQ; cq++) ctrlKeys.push(CTRL[cq - 1]);
+    var wCtrl = [];
+    ctrlKeys.forEach(function (k, n) { wCtrl = wCtrl.concat(lijstVeld(k, 'ctrl Q' + (n + 1), 'Controle Q' + (n + 1))); });
+    var wC25 = lijstVeld('c25', 'controle', 'Controle ' + vj());
+    var wJw = lijstVeld('jw25', 'jaarwerk', 'Jaarwerk ' + vj());
+    var wIb = lijstVeld('ib25', 'IB', 'IB-aangifte ' + vj());
+    wBtw.forEach(function (x) { if (!x.menu) x.menu = function (ev) { ev.preventDefault(); }; });
     var mePlain = STORE.live ? (s.me ? s.me.naam : '') : role;
     var herinnering = vulMail('aanlevering', standaardPeriode(), standaardUiterlijk(), mePlain);
     var wachtMails = wWacht.map(function (x) { return x.email; }).filter(Boolean);
-    var sectie = function (id, titel, sub, items, leeg, actie) { return { id:id, titel:titel, sub:sub, n:items.length, items:items, hasItems:items.length > 0, leegTonen:items.length === 0, leeg:leeg, hasActie: !!actie && items.length > 0, actie: actie || {} }; };
+    var vl = function (open, tot) { var pct = tot ? Math.round((tot - open) / tot * 100) : 100; return { vt: open + ' te doen van ' + tot, vpct: pct + '%', vbar: 'width: ' + pct + '%' }; };
+    var telToep = function (f) { return mijn.filter(f).length; };
+    var nCtrlTot = 0; ctrlKeys.forEach(function (k) { nCtrlTot += telToep(function (c) { return veldToep(c, k); }); });
+    var btwKl = {}; wBtw.forEach(function (x) { btwKl[x.naam] = 1; });
+    var sectie = function (id, titel, sub, items, leeg, v, actie) { return Object.assign({ id:id, titel:titel, sub:sub, n:items.length, items:items, hasItems:items.length > 0, leegTonen:items.length === 0, leeg:leeg, hasActie: !!actie && items.length > 0, actie: actie || {} }, v); };
     var werkSecties = [
-      sectie('btw', 'BTW-aangiften', 'periode voorbij en nog niet gedaan, op deadline gesorteerd', wBtw, 'Geen openstaande BTW-aangiften.'),
-      sectie('achter', 'Achterstand administratie', 'nog niet verwerkt ' + peilLabel(), wAchter, 'Geen achterstand.'),
-      sectie('wacht', 'Wacht op klant', 'stukken nog niet aangeleverd', wWacht, 'Bij niemand wachten we op stukken.', { l:'Herinnering mailen (BCC)', href: mailtoLink(wachtMails, herinnering.s, herinnering.b), t: wachtMails.length + ' e-mailadressen' }),
-      sectie('jaar', 'Jaarwerk en IB ' + vj(), 'nog open', wJaar, 'Alle jaarwerk en IB-aangiften zijn gedaan.')
+      sectie('achter', '1. Administratie verwerken', 'achterstand ' + peilLabel(), wAchter, 'Alles verwerkt ' + peilLabel() + '.', vl(wAchter.length, mijn.length)),
+      sectie('ctrl', '2. Kwartaalcontrole', ctrlKeys.length ? 'controle t/m Q' + WQ + ' nog open' : 'nog geen kwartaal om te controleren', wCtrl, 'Alle kwartaalcontroles zijn gedaan.', vl(wCtrl.length, nCtrlTot)),
+      sectie('btw', '3. BTW-aangiften', 'periode voorbij, op deadline gesorteerd', wBtw, 'Geen openstaande BTW-aangiften.', vl(Object.keys(btwKl).length, telToep(function (c) { return c.regime === 'Normaal'; }))),
+      sectie('c25', '4. Controle ' + vj(), 'jaarcontrole nog open', wC25, 'Alle jaarcontroles zijn gedaan.', vl(wC25.length, telToep(function (c) { return veldToep(c, 'c25'); }))),
+      sectie('jw', '5. Jaarwerk ' + vj(), 'jaarrekening nog open', wJw, 'Alle jaarrekeningen zijn klaar.', vl(wJw.length, telToep(function (c) { return veldToep(c, 'jw25'); }))),
+      sectie('ib', '6. IB-aangifte ' + vj(), 'aangifte nog open', wIb, 'Alle IB-aangiften zijn gedaan.', vl(wIb.length, telToep(function (c) { return veldToep(c, 'ib25'); }))),
+      sectie('wacht', 'Wacht op klant', 'stukken nog niet aangeleverd', wWacht, 'Bij niemand wachten we op stukken.', vl(wWacht.length, mijn.length), { l:'Herinnering mailen (BCC)', href: mailtoLink(wachtMails, herinnering.s, herinnering.b), t: wachtMails.length + ' e-mailadressen' })
     ];
-    var teamM = [['n','Klanten'],['achter','Achterstand'],['btwLaat','BTW te laat'],['btwNu','BTW nu doen'],['wacht','Wacht op klant'],['jw','Jaarwerk ' + vj()],['ib','IB ' + vj()]];
+    werkSecties[werkSecties.length - 1].vt = wWacht.length + ' klanten';
+    werkSecties[werkSecties.length - 1].geenBalk = true;
+    werkSecties.forEach(function (x) { x.toonBalk = !x.geenBalk; });
+    var teamM = [['n','Klanten'],['achter','Achterstand'],['ctrl','Kw.controle open'],['btwLaat','BTW te laat'],['c25','Controle ' + vj()],['jw','Jaarwerk ' + vj()],['ib','IB ' + vj()],['wacht','Wacht op klant']];
     var teamRaw = ADMINS.map(function (a) {
       var kl = all.filter(function (c) { return lopend(c) && c.admin === a; });
       var cnt = function (f) { return kl.filter(f).length; };
-      return { a:a, n:kl.length, achter:cnt(isAchter), btwLaat:cnt(function (c) { return [0,1,2,3].some(function (q) { return bLate(c, q); }); }), btwNu:cnt(function (c) { return [0,1,2,3].some(function (q) { return bDue(c, q); }); }), wacht:cnt(heeftWacht), jw:cnt(jwOpen), ib:cnt(ibOpen) };
+      return { ctrl:cnt(function (c) { return ctrlKeys.some(function (k) { return veldOpen(c, k); }); }), c25:cnt(function (c) { return veldOpen(c, 'c25'); }), a:a, n:kl.length, achter:cnt(isAchter), btwLaat:cnt(function (c) { return [0,1,2,3].some(function (q) { return bLate(c, q); }); }), btwNu:cnt(function (c) { return [0,1,2,3].some(function (q) { return bDue(c, q); }); }), wacht:cnt(heeftWacht), jw:cnt(function (c) { return veldOpen(c, 'jw25'); }), ib:cnt(function (c) { return veldOpen(c, 'ib25'); }) };
     });
     var teamMax = {}; teamM.forEach(function (m) { teamMax[m[0]] = Math.max(1, Math.max.apply(null, teamRaw.map(function (r) { return r[m[0]]; }))); });
     var team = teamRaw.map(function (r) { return { a:r.a, init:initial(r.a), pick:function () { self.setState({ werkWie:r.a }); }, cls: wie === r.a ? 'teamrow on' : 'teamrow', cells: teamM.map(function (m) { return { v:r[m[0]], bar:'width: ' + Math.round(r[m[0]] / teamMax[m[0]] * 100) + '%; background: ' + (m[0] === 'n' ? '#D9D9D9' : m[0] === 'wacht' ? '#7FA3D6' : m[0] === 'btwLaat' || m[0] === 'achter' ? '#C0392B' : '#FF8000') }; }) }; });
@@ -777,7 +817,8 @@ class Component extends DCLogic {
     var jwVan = jwBasis.filter(function (c) { return jwWie === 'alle' || c.admin === jwWie; });
     var isOpen = function (v) { return v !== null && v !== undefined && !v; };
     var jwOpenF = function (c) { return isOpen(c.c25) || isOpen(c.jw25) || isOpen(c.ib25); };
-    var jwLijst = jwVan.filter(function (c) { return s.jwF === 'alles' || (s.jwF === 'open' ? jwOpenF(c) : !jwOpenF(c)); }).sort(function (x, y) { return x.naam.localeCompare(y.naam); });
+    var jwPas = { alles:function () { return true; }, open:jwOpenF, klaar:function (c) { return !jwOpenF(c); }, ctrl:function (c) { return isOpen(c.c25); }, jw:function (c) { return isOpen(c.jw25); }, ib:function (c) { return isOpen(c.ib25); } };
+    var jwLijst = jwVan.filter(jwPas[s.jwF] || jwOpenF).sort(function (x, y) { return x.naam.localeCompare(y.naam); });
     var telK = function (lst, k) { var n = lst.filter(function (c) { return c[k] !== null && c[k] !== undefined; }); return { klaar: n.filter(function (c) { return !!c[k]; }).length, tot: n.length }; };
     var jwStat = [['c25', 'Controle ' + vj()], ['jw25', 'Jaarwerk ' + vj()], ['ib25', 'IB-aangifte ' + vj()]].map(function (x) {
       var t = telK(jwVan, x[0]), pct = t.tot ? Math.round(t.klaar / t.tot * 100) : 100;
@@ -907,6 +948,7 @@ class Component extends DCLogic {
       navSelCls: s.page === 'sel' ? 'ri on' : 'ri', goSel: function () { self.setState({ page:'sel' }); }, pageSel: s.page === 'sel',
       jwTitel: 'Jaarwerk en IB ' + vj(), jwStat: jwStat, jwRows: jwRows, jwLeeg: jwRows.length === 0, jwCount: jwRows.length + ' klanten',
       jwWie: jwWie, onJwWie: function (ev) { self.setState({ jwWie:ev.target.value }); },
+      jwKnoppen: [['ctrl','Controle open'],['jw','Jaarwerk open'],['ib','IB open'],['open','Alles wat open is'],['klaar','Klaar'],['alles','Alle klanten']].map(function (x) { return { l:x[0] === 'alles' || x[0] === 'open' || x[0] === 'klaar' ? x[1] : x[1], n: jwVan.filter(jwPas[x[0]]).length, cls: s.jwF === x[0] ? 'jwknop on' : 'jwknop', pick:function () { self.setState({ jwF:x[0] }); } }; }),
       jwSegOpen: jwSeg('open'), jwSegKlaar: jwSeg('klaar'), jwSegAlles: jwSeg('alles'),
       jwOpen: function () { self.setState({ jwF:'open' }); }, jwKlaar: function () { self.setState({ jwF:'klaar' }); }, jwAlles: function () { self.setState({ jwF:'alles' }); },
       kmGedaanCls: s.klikMode === 'gedaan' ? 'seg on' : 'seg', kmWachtCls: s.klikMode === 'wacht' ? 'seg on blauw' : 'seg',
@@ -937,7 +979,7 @@ class Component extends DCLogic {
       scopeAllN: all.filter(function (c) { return lopend(c) && (s.bankF === 'alle' || c.bank === s.bankF); }).length, scopeMijnN: all.filter(function (c) { return lopend(c) && c.admin === role && (s.bankF === 'alle' || c.bank === s.bankF); }).length,
       scopeAll: function () { self.setState({ scope:'alle' }); }, scopeMijn: function () { self.setState({ scope:'mijn', adminF:'alle' }); },
       q:s.q, onQ:function (ev) { self.setState({ q:ev.target.value }); },
-      kpis:kpis, breakdown:breakdown,
+      kpis:kpis, breakdown:breakdown, verloop:verloop, verloopTitel: 'Lopend kwartaal Q' + (WQ + 1) + ' voor deze ' + list.length + ' klanten',
       viewTitle: viewTitleTxt,
       viewCount: list.length + (list.length === 1 ? ' klant' : ' klanten'),
       rows:rows, noRows: rows.length === 0,

@@ -103,7 +103,7 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .tog.wacht small{color:#1F4E8C}
 .seg.on.blauw{background:#DCE8F7;color:#1F4E8C}
 /* Werkvoorraad */
-.teamgrid{display:grid;grid-template-columns:170px repeat(7,minmax(110px,1fr));min-width:940px}
+.teamgrid{display:grid;grid-template-columns:150px repeat(8,minmax(100px,1fr));min-width:960px}
 .teamrow{display:contents}
 .teamrow:hover .cell{background:#FFF8F1}
 .teamrow.on .cell{background:#FFF2E5}
@@ -136,7 +136,7 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 /* Kwartaalblokken */
 .qb{display:inline-flex;align-items:center;gap:3px;padding:4px;border-radius:10px;background:#F7F5F2;white-space:nowrap}
 .qb.cur{background:#fff;box-shadow:inset 0 0 0 1.5px #FFBF80}
-.qbl{font-size:10.5px;font-weight:800;color:#8E8E8E;padding:0 4px;border:0;background:none;font-family:inherit}
+.qbl{font-size:13px;font-weight:900;color:#B35A00;padding:0 8px 0 4px;margin-right:2px;border:0;border-right:2px solid #FFD9B3;background:none;font-family:inherit;align-self:stretch;display:inline-flex;align-items:center;letter-spacing:-.01em;cursor:default}
 .qbl.knop{cursor:pointer;color:#5E5E5E}.qbl.knop:hover{color:#2B2B2B}
 .qsep{width:1px;height:18px;background:#DDD7CF;margin:0 2px;display:inline-block}
 .tt{height:28px;min-width:40px;padding:0 6px;border-radius:7px;border:0;display:inline-flex;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:800;font-family:inherit;cursor:pointer;box-sizing:border-box}
@@ -194,3 +194,15 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .kenmsel .klbl{font-size:13px;font-weight:700;color:#5E5E5E;margin-right:4px}
 .kchip{border:1px solid #D0CCC6;background:#fff;border-radius:999px;padding:6px 11px;font:inherit;font-size:12.5px;font-weight:700;color:#4A4642;cursor:pointer}
 .kchip.on{background:#2B2B2B;border-color:#2B2B2B;color:#fff}
+
+.ntag.z{background:#2B2B2B;color:#fff}
+.verloop{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;padding:12px 16px;border-bottom:1px solid #E4E2DF}
+.vtitel{font-size:13px;font-weight:800;color:#2B2B2B;flex:1 0 100%}
+.vitem{display:grid;grid-template-columns:auto 140px auto;align-items:center;gap:8px;font-size:12.5px;color:#5E5E5E}
+.vitem .vl{font-weight:700;color:#4A4642}
+.vitem .tbar,.wverloop .tbar{height:8px}
+.vitem .vt b,.wverloop b{color:#2B2B2B}
+.wverloop{flex:1 0 100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:12px;color:#5E5E5E}
+.jwknop{border:1px solid #D0CCC6;background:#fff;border-radius:10px;padding:9px 14px;font:inherit;font-size:13.5px;font-weight:700;color:#4A4642;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.jwknop b{background:#F1EFEC;border-radius:999px;padding:1px 8px;font-size:12px;color:#2B2B2B}
+.jwknop.on{background:#2B2B2B;border-color:#2B2B2B;color:#fff}.jwknop.on b{background:#FF8000;color:#fff}
