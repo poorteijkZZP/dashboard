@@ -243,6 +243,7 @@
       .on('postgres_changes', { event: '*', schema: 'public', table: 'klanten' }, bump)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'voortgang' }, bump)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'instellingen' }, bump)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vraagposten' }, bump)
       .subscribe(function (status) { S.conn = status === 'SUBSCRIBED' ? 'live' : (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' ? 'offline' : 'connecting'); onConn(S.conn); });
     }
   };
@@ -282,6 +283,21 @@
     return parts.reduce(function (p, part) {
       return p.then(function () { return sb.from('voortgang').upsert(part, { onConflict: 'klant_id,jaar', ignoreDuplicates: true }).then(must); });
     }, Promise.resolve()).then(function () { return S.setSetting('huidig_jaar', jaar); }).then(function () { return rows.length; });
+  };
+
+  S.loadVp = function () {
+    return sb.from('vraagposten').select('*').order('wanneer', { ascending: false }).range(0, 19999).then(must);
+  };
+  S.addVp = function (klantId, aantal) {
+    return sb.from('vraagposten').insert({ klant_id: klantId, jaar: new Date().getFullYear(), aantal: aantal, wie: S.me ? S.me.naam : '?' }).then(must)
+      .then(function () { return log(klantId, 'Vraagposten geregistreerd: ' + aantal); });
+  };
+  S.updVp = function (row, aantal) {
+    return sb.from('vraagposten').update({ aantal: aantal, gewijzigd_door: S.me ? S.me.naam : '?', gewijzigd_op: new Date().toISOString() }).eq('id', row.id).then(must)
+      .then(function () { return log(row.klant_id, 'Vraagposten gecorrigeerd: ' + row.aantal + ' → ' + aantal); });
+  };
+  S.delVp = function (row) {
+    return sb.from('vraagposten').delete().eq('id', row.id).then(must).then(function () { return log(row.klant_id, 'Vraagposten verwijderd: ' + row.aantal); });
   };
 
   S.loadOwnNotes = function () {

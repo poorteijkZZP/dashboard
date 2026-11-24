@@ -76,7 +76,7 @@
     <button type="button" class="{{navSelCls}}" onClick="{{goSel}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"></path></svg>Selecties</button>
     <div style="flex: 1 1 auto"></div>
     <sc-if value="{{isBeheer}}" hint-placeholder-val="{{ true }}">
-      <button type="button" class="{{navBeheerCls}}" onClick="{{goBeheer}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Instellingen</button>
+      <button type="button" class="{{navBeheerCls}}" onClick="{{goBeheer}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Beheer</button>
     </sc-if>
   </nav>
 <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column">
@@ -294,6 +294,7 @@
           <div class="grid">
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.naam}}">Klant {{arrow.naam}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.admin}}">Adm. {{arrow.admin}}</button></div>
+            <div class="hcell"><button type="button" class="hbtn" title="Vraagposten dit jaar" onClick="{{sortBy.vp}}">VP {{arrow.vp}}</button></div>
             <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.btw}}">Lopend kwartaal {{wqLabel}} {{arrow.btw}}</button><div class="hsub">{{wqSub}}</div></div>
             <div class="hcell sep"><sc-if value="{{hasPrevKol}}" hint-placeholder-val="{{ true }}"><span class="hbtn" style="display: inline-flex; align-items: center; cursor: default">{{prevKop}}</span><div class="hsub"><button type="button" class="linkbtn" onClick="{{prevAllesOpen}}">{{prevAllesLabel}}</button></div></sc-if></div>
             <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
@@ -308,6 +309,7 @@
                   <sc-for list="{{r.tags}}" as="tg" hint-placeholder-count="1"><span class="{{tg.cls}}">{{tg.l}}</span></sc-for>
                 </div>
                 <div class="cell"><sc-if value="{{r.hasAdmin}}" hint-placeholder-val="{{ true }}"><span class="av" title="{{r.admin}}">{{r.init}}</span></sc-if></div>
+                <div class="cell"><button type="button" class="{{r.vpCls}}" title="{{r.vpT}}" onClick="{{r.vpOpen}}"><b>{{r.vpN}}</b><span>+</span></button></div>
                 <div class="cell sep">
                   <div class="qb cur"><span class="qbl">{{r.cur.l}}</span><sc-for list="{{r.cur.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
                 </div>
@@ -374,18 +376,12 @@
             </sc-if>
             <div style="display: flex; gap: 20px; border-bottom: 1px solid #E4E2DF">
               <button type="button" class="{{tabOverCls}}" onClick="{{tabOver}}">Klantkaart</button>
-              <button type="button" class="{{tabGegCls}}" onClick="{{tabGeg}}">Alle gegevens</button>
               <button type="button" class="{{tabHistCls}}" onClick="{{tabHist}}">Historie</button>
             </div>
           </div>
 
           <sc-if value="{{tOver}}" hint-placeholder-val="{{ true }}">
             <div style="padding: 16px 20px 22px; display: flex; flex-direction: column; gap: 18px">
-              <div class="snel">
-                <sc-for list="{{d.snel}}" as="sn" hint-placeholder-count="7">
-                  <div><span>{{sn.k}}</span><b>{{sn.v}}</b></div>
-                </sc-for>
-              </div>
 
               <sc-if value="{{d.hasBijz}}" hint-placeholder-val="{{ true }}">
                 <div style="background: #FFF2E5; border: 1px solid #FFBF80; border-radius: 10px; padding: 12px 14px; display: flex; gap: 10px">
@@ -404,6 +400,22 @@
                 </sc-for>
                 <div class="qb"><span class="qbl">{{vjLabel}}</span><sc-for list="{{d.jaarTegels}}" as="tt" hint-placeholder-count="3"><button type="button" class="{{tt.cls}} breed" title="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></div>
                 <span style="font-size: 12px; color: #5E5E5E">Klik = gedaan aan/uit · rechtermuisknop = wacht op klant of terug naar open</span>
+              </div>
+
+              <div class="vpkaart">
+                <div class="vpkop"><p class="sec">Vraagposten {{d.vpJaar}}</p><span class="vptot"><b>{{d.vpSom}}</b> in {{d.vpAantalMails}} mails</span><button type="button" class="btn primary" style="min-height: 34px; font-size: 13px" onClick="{{d.vpSnel}}">+ Vraagposten</button></div>
+                <sc-for list="{{d.vpRijen}}" as="vr" hint-placeholder-count="2">
+                  <div class="vpregel"><span class="av">{{vr.init}}</span><span class="vpwie">{{vr.wie}} · {{vr.wanneer}}<sc-if value="{{vr.hasGew}}" hint-placeholder-val="{{ false }}"><em> · {{vr.gewijzigd}}</em></sc-if></span><input type="text" inputmode="numeric" aria-label="Aantal" value="{{vr.aantal}}" onChange="{{vr.wijzig}}"><button type="button" class="vpweg" title="Verwijderen" onClick="{{vr.weg}}">✕</button></div>
+                </sc-for>
+                <sc-if value="{{d.vpLeeg}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: #8E8E8E">Nog geen vraagposten dit jaar.</span></sc-if>
+              </div>
+
+              <div class="secties">
+                <sc-for list="{{d.secties}}" as="sc" hint-placeholder-count="5">
+                  <div class="sectie"><p class="sec">{{sc.t}}</p>
+                    <sc-for list="{{sc.r}}" as="sr" hint-placeholder-count="3"><div class="sregel"><span>{{sr.k}}</span><b>{{sr.v}}</b></div></sc-for>
+                  </div>
+                </sc-for>
               </div>
 
               <div class="notes2">
@@ -460,7 +472,7 @@
 
   <sc-if value="{{pageBeheer}}" hint-placeholder-val="{{ false }}">
     <div style="display: flex; flex-direction: column; gap: 4px">
-      <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Instellingen</h1>
+      <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Beheer</h1>
       <p style="margin: 0; font-size: 14px; color: #5E5E5E">Alleen zichtbaar voor de beheerder. Wijzigingen komen direct in het klantoverzicht van het hele team.</p>
     </div>
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
@@ -471,6 +483,8 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h13l-3-3M20 17H7l3 3"></path></svg>Klant muteren</button>
         <button type="button" class="{{bAnaCls}}" onClick="{{bAna}}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg>In- en uitstroom</button>
+        <button type="button" class="{{bVpCls}}" onClick="{{bVp}}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"></path><path d="M9 9.5a3 3 0 1 1 3 3v1M12 15.5v.01"></path></svg>Vraagposten</button>
         <button type="button" class="{{bJaarCls}}" onClick="{{bJaar}}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Jaar en instellingen</button>
         <sc-if value="{{isDemo}}" hint-placeholder-val="{{ true }}">
@@ -756,6 +770,25 @@
               </sc-if>
             </section>
           </div>
+        </sc-if>
+
+        <sc-if value="{{showVp}}" hint-placeholder-val="{{ false }}">
+          <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 16px">
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+              <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 300px">
+                <span style="font-size: 20px; font-weight: 800">Vraagposten per klant</span>
+                <span style="font-size: 13px; color: #5E5E5E">Iedereen registreert vraagposten via de kolom VP in het overzicht of op de klantkaart. Exporteer na afloop van het jaar naar Excel om in AFAS te factureren.</span>
+              </div>
+              <label class="filterbox">Jaar
+                <select aria-label="Jaar vraagposten" value="{{vpJaarSel}}" onChange="{{onVpJaar}}"><sc-for list="{{vpJaren}}" as="vj2" hint-placeholder-count="1"><option value="{{vj2.v}}">{{vj2.l}}</option></sc-for></select>
+              </label>
+              <button type="button" class="btn dark" onClick="{{vpExport}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>Exporteer naar Excel</button>
+            </div>
+            <div class="vptab">
+              <span class="kh">Klant</span><span class="kh">Adm.</span><span class="kh">Mails</span><span class="kh">Vraagposten</span>
+              <sc-for list="{{vpTotaal}}" as="vt" hint-placeholder-count="4"><span><b>{{vt.naam}}</b></span><span>{{vt.init}}</span><span>{{vt.m}}</span><span style="font-weight: 800">{{vt.n}}</span></sc-for>
+            </div>
+          </section>
         </sc-if>
 
         <sc-if value="{{showJaar}}" hint-placeholder-val="{{ false }}">
@@ -1173,6 +1206,18 @@
   </sc-if>
   </main>
 </div>
+<sc-if value="{{hasVpPop}}" hint-placeholder-val="{{ false }}">
+  <form class="vppop" style="{{vpPos}}" onClick="{{noop}}" onSubmit="{{vpBewaar}}">
+    <span class="ctxt">Vraagposten gemaild · {{vpPopNaam}}</span>
+    <div class="vprij">
+      <button type="button" class="vpst" onClick="{{vpMin}}" aria-label="Eén minder">−</button>
+      <input type="text" inputmode="numeric" aria-label="Aantal vraagposten" value="{{vpVal}}" onInput="{{onVpVal}}">
+      <button type="button" class="vpst" onClick="{{vpPlus}}" aria-label="Eén meer">+</button>
+      <button type="submit" class="btn primary" style="min-height: 38px">Opslaan</button>
+    </div>
+    <span style="font-size: 11.5px; color: #8E8E8E">Enter = opslaan · Esc = annuleren</span>
+  </form>
+</sc-if>
 <sc-if value="{{hasMenu}}" hint-placeholder-val="{{ false }}">
   <div class="ctx" style="{{menuPos}}" role="menu" onClick="{{noop}}">
     <div class="ctxt">{{menuTitel}}</div>
