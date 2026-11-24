@@ -740,7 +740,7 @@ class Component extends DCLogic {
       var w = wk(c, 'btw' + (q + 1)) && !c.btw[q] && !btwNa(c, q), late = bLate(c, q), due = bDue(c, q);
       if (!(late || due || w)) return;
       var dl = btwDeadline(q), dg = dagenTot(dl);
-      wBtw.push({ tiles:[], hasTiles:false, menu:function (ev) { self.openMenu(ev, c, 'btw', q, 'Btw Q' + (q + 1)); }, naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:true, pillL:'Q' + (q + 1), pillCls: w ? 'pill wacht' : late ? 'pill late' : 'pill due', pillT:'Klik om af te vinken (volgens de klikstand)', toggle:function () { self.toggle(c, 'btw', q, 'Btw Q' + (q + 1)); },
+      wBtw.push({ tiles:[], hasTiles:false, menu:function (ev) { self.openMenu(ev, c, 'btw', q, 'Btw Q' + (q + 1)); }, naam:c.naam, admin:initial(c.admin), toonAdmin: wie === 'alle', open:openKl(c), hasPill:true, pillL:'btw Q' + (q + 1), pillCls: w ? 'pill wacht' : late ? 'pill late' : 'pill due', pillT:'Klik om af te vinken (volgens de klikstand)', toggle:function () { self.toggle(c, 'btw', q, 'Btw Q' + (q + 1)); },
         info: w ? 'wacht op klant' : late ? 'deadline ' + (-dg) + (-dg === 1 ? ' dag' : ' dagen') + ' verstreken' : 'nog ' + dg + (dg === 1 ? ' dag' : ' dagen') + ', ' + btwDlLabel(q), sv: w ? 9e15 : dl.getTime(), email:c.email });
     }); });
     wBtw.sort(function (a, b) { return a.sv - b.sv || a.naam.localeCompare(b.naam); });

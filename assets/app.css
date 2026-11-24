@@ -238,3 +238,9 @@ button.dot:disabled,button.pill:disabled{cursor:default}
 .qb .tt.ct{width:48px;font-size:9.5px;letter-spacing:-.02em;gap:1px}
 .qb .tt.ct.d::before{font-size:8px}
 .tt.gap{width:48px!important}
+/* Vandaag: alle vakjes even groot */
+.witem .tt,.witem .pill{width:78px;min-width:0;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex:none;box-sizing:border-box;border-radius:7px}
+.witem > span:first-of-type{flex:none}
+.witem .tlist{display:inline-flex;flex-wrap:wrap;gap:3px;max-width:159px;flex:none}
+.witem .name{min-width:120px}
+.witem > span:last-child{flex:0 1 130px;min-width:80px}

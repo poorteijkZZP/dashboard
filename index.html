@@ -188,10 +188,10 @@
               <sc-for list="{{ws.items}}" as="wi" hint-placeholder-count="4">
                 <div class="witem">
                   <sc-if value="{{wi.hasTiles}}" hint-placeholder-val="{{ false }}">
-                    <span style="display: inline-flex; gap: 3px; flex-wrap: wrap"><sc-for list="{{wi.tiles}}" as="tt" hint-placeholder-count="2"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></span>
+                    <span class="tlist"><sc-for list="{{wi.tiles}}" as="tt" hint-placeholder-count="2"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></span>
                   </sc-if>
                   <sc-if value="{{wi.hasPill}}" hint-placeholder-val="{{ false }}">
-                    <button type="button" class="{{wi.pillCls}}" title="{{wi.pillT}}" onClick="{{wi.toggle}}" onContextMenu="{{wi.menu}}">{{wi.pillL}}</button>
+                    <span class="tlist"><button type="button" class="{{wi.pillCls}}" title="{{wi.pillT}}" onClick="{{wi.toggle}}" onContextMenu="{{wi.menu}}">{{wi.pillL}}</button></span>
                   </sc-if>
                   <button type="button" class="name" style="flex: 1 1 auto; min-width: 0; text-align: left" onClick="{{wi.open}}">{{wi.naam}}</button>
                   <sc-if value="{{wi.toonAdmin}}" hint-placeholder-val="{{ false }}">
