@@ -72,6 +72,20 @@ alter table public.voortgang add column if not exists btw_maand jsonb not null d
 -- Controle Q1 (zichtbaar in het lopende kwartaal Q2)
 alter table public.voortgang add column if not exists controle_q1 boolean;
 
+-- Eigen notities: alleen zichtbaar voor de schrijver zelf
+create table if not exists public.eigen_notities (
+  gebruiker uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  klant_id bigint not null references public.klanten(id) on delete cascade,
+  tekst text,
+  gewijzigd_op timestamptz not null default now(),
+  primary key (gebruiker, klant_id)
+);
+alter table public.eigen_notities enable row level security;
+drop policy if exists "eigen notities" on public.eigen_notities;
+create policy "eigen notities" on public.eigen_notities for all to authenticated
+  using (gebruiker = auth.uid() and public.is_medewerker()) with check (gebruiker = auth.uid() and public.is_medewerker());
+revoke all on public.eigen_notities from anon;
+
 -- Instellingen voor het hele team (huidig werkjaar, peilmaand).
 create table if not exists public.instellingen (
   sleutel text primary key,

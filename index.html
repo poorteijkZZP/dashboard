@@ -261,16 +261,18 @@
             <button type="button" class="{{b.cls}}" title="{{b.t}}" onClick="{{b.pick}}">{{b.admin}} <b>{{b.n}}</b></button>
           </sc-for>
         </div>
+        <div class="hulp">
+          <span class="hstap"><span class="tt o">nov</span><b>klik</b><span class="pijl">→</span><span class="tt d">nov</span>gedaan</span>
+          <span class="hstap"><span class="tt d">nov</span><b>nog eens klikken</b><span class="pijl">→</span><span class="tt o">nov</span>weer open</span>
+          <span class="hstap"><span class="muis">rechtermuisknop</span><span class="pijl">→</span><span class="tt w">nov</span>wacht op klant</span>
+          <span class="hstap"><span class="tt l">nov</span>= achterstand<span class="tt u" style="margin-left: 8px">nov</span>= nu doen</span>
+        </div>
         <div class="tablebox">
           <div class="grid">
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.naam}}">Klant {{arrow.naam}}</button></div>
             <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.admin}}">Adm. {{arrow.admin}}</button></div>
-            <div class="hcell"><button type="button" class="hbtn" onClick="{{sortBy.bank}}">Bank {{arrow.bank}}</button></div>
-            <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.adm}}">Verwerkt t/m {{arrow.adm}}</button><div class="hsub">stand {{peilNu}}</div></div>
             <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.btw}}">Lopend kwartaal {{wqLabel}} {{arrow.btw}}</button><div class="hsub">{{wqSub}}</div></div>
             <div class="hcell sep"><sc-if value="{{hasPrevKol}}" hint-placeholder-val="{{ true }}"><span class="hbtn" style="display: inline-flex; align-items: center; cursor: default">{{prevKop}}</span><div class="hsub"><button type="button" class="linkbtn" onClick="{{prevAllesOpen}}">{{prevAllesLabel}}</button></div></sc-if></div>
-            <div class="hcell sep"><button type="button" class="hbtn" onClick="{{sortBy.y25}}">Jaar {{vjLabel}} {{arrow.y25}}</button><div class="hsub">jaarwerk · IB</div></div>
-            <div class="hcell sep"><span class="hbtn" style="display: inline-flex; align-items: center; cursor: default">Kenmerken</span></div>
             <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
               <div class="{{r.cls}}">
                 <div class="cell" style="gap: 8px">
@@ -286,11 +288,6 @@
                   </sc-if>
                 </div>
                 <div class="cell"><sc-if value="{{r.hasAdmin}}" hint-placeholder-val="{{ true }}"><span class="av" title="{{r.admin}}">{{r.init}}</span></sc-if></div>
-                <div class="cell" style="font-weight: 600">{{r.bank}}</div>
-                <div class="cell sep" style="flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px">
-                  <span class="tml">{{r.tmL}}</span>
-                  <sc-if value="{{r.hasTmB}}" hint-placeholder-val="{{ true }}"><span class="{{r.tmCls}}">{{r.tmB}}</span></sc-if>
-                </div>
                 <div class="cell sep">
                   <div class="qb cur"><span class="qbl">{{r.cur.l}}</span><sc-for list="{{r.cur.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
                 </div>
@@ -298,15 +295,6 @@
                   <sc-for list="{{r.prev}}" as="pv" hint-placeholder-count="3">
                     <sc-if value="{{pv.isChip}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{pv.chipCls}}" title="{{pv.chipT}}" onClick="{{pv.wissel}}">{{pv.chipL}}</button></sc-if>
                     <sc-if value="{{pv.isBlok}}" hint-placeholder-val="{{ false }}"><div class="qb"><button type="button" class="qbl knop" title="Inklappen" onClick="{{pv.wissel}}">{{pv.blk.l}} ▴</button><sc-for list="{{pv.blk.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div></sc-if>
-                  </sc-for>
-                </div>
-                <div class="cell sep" style="gap: 4px">
-                  <button type="button" class="{{r.jw}}" title="{{r.jwT}}" disabled="{{r.jwNa}}" onClick="{{r.jwToggle}}" onContextMenu="{{r.jwMenu}}">JW</button>
-                  <button type="button" class="{{r.ib}}" title="{{r.ibT}}" disabled="{{r.ibNa}}" onClick="{{r.ibToggle}}" onContextMenu="{{r.ibMenu}}">IB</button>
-                </div>
-                <div class="cell sep" style="gap: 4px; flex-wrap: wrap">
-                  <sc-for list="{{r.kenm}}" as="km" hint-placeholder-count="2">
-                    <span class="{{km.cls}}">{{km.l}}</span>
                   </sc-for>
                 </div>
               </div>
@@ -317,13 +305,7 @@
           </sc-if>
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding: 12px 16px; border-top: 1px solid #E4E2DF; font-size: 12px; color: #5E5E5E">
-          <span class="lg"><span class="tt d">JA</span>Gedaan</span>
-          <span class="lg"><span class="tt o">JA</span>Open</span>
-          <span class="lg"><span class="tt u">JA</span>Nu doen</span>
-          <span class="lg"><span class="tt l">JA</span>Achterstand</span>
-          <span class="lg"><span class="tt w">JA</span>Wacht op klant</span>
-          <span class="lg"><span class="tt n">JA</span>n.v.t.</span>
-          <span>Klik = gedaan aan/uit. Rechtsklik = gedaan, wacht op klant of terug naar open. Eerdere kwartalen klap je open door erop te klikken.</span>
+          <span>Eerdere kwartalen klap je open door erop te klikken. Kenmerken, jaarwerk en IB vind je op de klantkaart en onder Jaarwerk.</span>
         </div>
       </section>
 
@@ -345,12 +327,7 @@
             <div style="display: flex; align-items: flex-start; gap: 12px">
               <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 auto; min-width: 0">
                 <span style="font-size: 20px; font-weight: 800; line-height: 1.2">{{d.naam}}</span>
-                <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
-                  <span class="chip">{{d.admin}}</span>
-                  <span class="chip">{{d.rechtsvorm}}</span>
-                  <span class="chip o">{{d.freq}}</span>
-                  <span class="chip">Klant sinds {{d.vanaf}}</span>
-                </div>
+                <span style="font-size: 13px; color: #5E5E5E">{{d.admin}} · klant sinds {{d.vanaf}}</span>
               </div>
               <button type="button" class="btn icon" aria-label="Sluiten" onClick="{{closePanel}}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -370,14 +347,19 @@
               </div>
             </sc-if>
             <div style="display: flex; gap: 20px; border-bottom: 1px solid #E4E2DF">
-              <button type="button" class="{{tabOverCls}}" onClick="{{tabOver}}">Overzicht</button>
-              <button type="button" class="{{tabGegCls}}" onClick="{{tabGeg}}">Klantgegevens</button>
+              <button type="button" class="{{tabOverCls}}" onClick="{{tabOver}}">Klantkaart</button>
+              <button type="button" class="{{tabGegCls}}" onClick="{{tabGeg}}">Alle gegevens</button>
               <button type="button" class="{{tabHistCls}}" onClick="{{tabHist}}">Historie</button>
             </div>
           </div>
 
           <sc-if value="{{tOver}}" hint-placeholder-val="{{ true }}">
             <div style="padding: 16px 20px 22px; display: flex; flex-direction: column; gap: 18px">
+              <div class="snel">
+                <sc-for list="{{d.snel}}" as="sn" hint-placeholder-count="7">
+                  <div><span>{{sn.k}}</span><b>{{sn.v}}</b></div>
+                </sc-for>
+              </div>
 
               <sc-if value="{{d.hasBijz}}" hint-placeholder-val="{{ true }}">
                 <div style="background: #FFF2E5; border: 1px solid #FFBF80; border-radius: 10px; padding: 12px 14px; display: flex; gap: 10px">
@@ -389,77 +371,27 @@
                 </div>
               </sc-if>
 
-              <div style="display: flex; flex-direction: column; gap: 10px">
-                <p class="sec">Kenmerken</p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px">
-                  <sc-for list="{{d.kenm}}" as="kt" hint-placeholder-count="8">
-                    <div class="{{kt.cls}}">
-                      <sc-if value="{{kt.on}}" hint-placeholder-val="{{ true }}">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A94F00" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
-                      </sc-if>
-                      <sc-if value="{{kt.off}}" hint-placeholder-val="{{ false }}">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A8A8" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle></svg>
-                      </sc-if>
-                      {{kt.l}}<b>{{kt.v}}</b>
-                    </div>
-                  </sc-for>
-                </div>
-                <span style="font-size: 13px; color: #5E5E5E">{{d.werk}}</span>
-              </div>
-
-              <div style="display: flex; flex-direction: column; gap: 10px">
-                <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
-                  <p class="sec">Voortgang {{jaarLabel}}</p>
-                  <span style="font-size: 12px; color: #5E5E5E">{{d.freqUitleg}} · bijgewerkt {{d.bij}}</span>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px">
-                  <sc-for list="{{d.quarters}}" as="qq" hint-placeholder-count="4">
-                    <div style="border: 1px solid #E4E2DF; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px">
-                      <div style="display: flex; justify-content: space-between; align-items: baseline">
-                        <span style="font-size: 14px; font-weight: 800">{{qq.label}}</span>
-                        <span style="font-size: 11px; color: #5E5E5E">{{qq.dl}}</span>
-                      </div>
-                      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px">
-                        <sc-for list="{{qq.items}}" as="mm" hint-placeholder-count="3">
-                          <button type="button" class="{{mm.cls}}" aria-pressed="{{mm.on}}" disabled="{{mm.na}}" onClick="{{mm.toggle}}">{{mm.l}}<small>{{mm.sub}}</small></button>
-                        </sc-for>
-                        <button type="button" class="{{qq.btw.cls}}" aria-pressed="{{qq.btw.on}}" disabled="{{qq.btw.na}}" onClick="{{qq.btw.toggle}}">BTW<small>{{qq.btw.sub}}</small></button>
-                      </div>
-                      <sc-if value="{{qq.hasBm}}" hint-placeholder-val="{{ false }}">
-                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
-                          <sc-for list="{{qq.bm}}" as="bm" hint-placeholder-count="3">
-                            <button type="button" class="{{bm.cls}} slim" aria-pressed="{{bm.on}}" disabled="{{bm.na}}" onClick="{{bm.toggle}}">{{bm.l}}<small>{{bm.sub}}</small></button>
-                          </sc-for>
-                        </div>
-                      </sc-if>
-                      <sc-if value="{{qq.hasCtrl}}" hint-placeholder-val="{{ false }}">
-                        <button type="button" class="{{qq.ctrl.cls}}" aria-pressed="{{qq.ctrl.on}}" onClick="{{qq.ctrl.toggle}}">{{qq.ctrl.l}}<small>{{qq.ctrl.sub}}</small></button>
-                      </sc-if>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-
-              <div style="display: flex; flex-direction: column; gap: 10px">
-                <p class="sec">Jaarwerk {{vjLabel}}</p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px">
-                  <sc-for list="{{d.year}}" as="y" hint-placeholder-count="3">
-                    <button type="button" class="{{y.cls}}" aria-pressed="{{y.on}}" disabled="{{y.na}}" onClick="{{y.toggle}}">{{y.l}}<small>{{y.sub}}</small></button>
-                  </sc-for>
-                </div>
-              </div>
-
               <div style="display: flex; flex-direction: column; gap: 8px">
-                <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
-                  <p class="sec">Teamnotities</p>
-                  <span style="font-size: 12px; color: #5E5E5E">Iedereen kan hier schrijven, iedereen ziet het</span>
+                <p class="sec">Voortgang {{jaarLabel}}</p>
+                <sc-for list="{{d.blokken}}" as="bk" hint-placeholder-count="4">
+                  <div class="{{bk.cls}}"><span class="qbl">{{bk.l}}</span><sc-for list="{{bk.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
+                </sc-for>
+                <div class="qb"><span class="qbl">{{vjLabel}}</span><sc-for list="{{d.jaarTegels}}" as="tt" hint-placeholder-count="3"><button type="button" class="{{tt.cls}} breed" title="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></div>
+                <span style="font-size: 12px; color: #5E5E5E">Klik = gedaan aan/uit · rechtermuisknop = wacht op klant of terug naar open</span>
+              </div>
+
+              <div class="notes2">
+                <div>
+                  <p class="sec">Teamnotitie</p>
+                  <span class="nsub">Iedereen ziet dit</span>
+                  <textarea aria-label="Teamnotitie" value="{{d.noteDraft}}" onChange="{{onNote}}" placeholder="Bijv. klant belt liever dan dat hij mailt"></textarea>
+                  <div class="nact"><button type="button" class="{{noteBtnCls}}" onClick="{{saveNote}}">Opslaan</button><span>{{d.noteInfo}}</span></div>
                 </div>
-                <label class="field" style="gap: 0">
-                  <textarea aria-label="Teamnotities" value="{{d.noteDraft}}" onChange="{{onNote}}" placeholder="Bijv. klant belt liever dan dat hij mailt"></textarea>
-                </label>
-                <div style="display: flex; align-items: center; gap: 10px">
-                  <button type="button" class="{{noteBtnCls}}" onClick="{{saveNote}}">Notitie opslaan</button>
-                  <span style="font-size: 12px; color: #5E5E5E">{{d.noteInfo}}</span>
+                <div>
+                  <p class="sec">Eigen notitie</p>
+                  <span class="nsub">Alleen jij ziet dit</span>
+                  <textarea aria-label="Eigen notitie" value="{{d.ownDraft}}" onChange="{{onOwn}}" placeholder="Bijv. volgende week terugbellen over de auto"></textarea>
+                  <div class="nact"><button type="button" class="{{d.ownBtnCls}}" onClick="{{saveOwn}}">Opslaan</button><span>{{d.ownInfo}}</span></div>
                 </div>
               </div>
             </div>
@@ -467,8 +399,12 @@
 
           <sc-if value="{{tGeg}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 14px">
-              <span style="font-size: 13px; color: #5E5E5E">Achtergrondgegevens, niet nodig voor het dagelijkse werk. Alleen de beheerder wijzigt deze.</span>
+              <span style="font-size: 13px; color: #5E5E5E">Alle gegevens en kenmerken. Alleen de beheerder wijzigt deze via Muteren.</span>
               <dl class="kv">
+                <sc-for list="{{d.gegevens2}}" as="g" hint-placeholder-count="10">
+                  <dt>{{g.k}}</dt>
+                  <dd>{{g.v}}</dd>
+                </sc-for>
                 <sc-for list="{{d.gegevens}}" as="g" hint-placeholder-count="10">
                   <dt>{{g.k}}</dt>
                   <dd>{{g.v}}</dd>
@@ -993,6 +929,20 @@
                   <option value="klaar">Gedaan</option>
                 </select>
               </label>
+              <label class="field">Controle jaarwerk {{vjLabel}}
+                <select value="{{sf.ctrl}}" onChange="{{onSf.ctrl}}">
+                  <option value="alle">Alle</option>
+                  <option value="open">Nog open</option>
+                  <option value="klaar">Gedaan</option>
+                </select>
+              </label>
+              <label class="field">Altijd up2date
+                <select value="{{sf.up}}" onChange="{{onSf.up}}">
+                  <option value="alle">Alle</option>
+                  <option value="ja">Ja</option>
+                  <option value="nee">Nee</option>
+                </select>
+              </label>
               <label class="field">IB-aangifte {{vjLabel}}
                 <select value="{{sf.ib}}" onChange="{{onSf.ib}}">
                   <option value="alle">Alle</option>
@@ -1000,22 +950,7 @@
                   <option value="klaar">Gedaan</option>
                 </select>
               </label>
-              <label class="field">Kenmerk
-                <select value="{{sf.kenm}}" onChange="{{onSf.kenm}}">
-                  <option value="alle">Alle</option>
-                  <option value="pers">Personenauto</option>
-                  <option value="best">Bestelauto</option>
-                  <option value="bestZonder">Bestelauto zonder UZGB</option>
-                  <option value="kmuzgb">KM/UZGB nog splitsen</option>
-                  <option value="km">KM-registratie</option>
-                  <option value="uzgb">Verklaring UZGB</option>
-                  <option value="motor">Motor</option>
-                  <option value="fiets">Fiets</option>
-                  <option value="pandKoop">Pand (koop)</option>
-                  <option value="pandHuur">Pand (huur)</option>
-                  <option value="btwMaand">BTW-aangifte per maand</option>
-                </select>
-              </label>
+
               <label class="field">BTW-regime
                 <select value="{{sf.regime}}" onChange="{{onSf.regime}}">
                   <option value="alle">Alle</option>
@@ -1042,6 +977,15 @@
                   <option value="ja">Geplaatst</option>
                 </select>
               </label>
+            </div>
+            <div class="kenmsel">
+              <span class="klbl">Kenmerken</span>
+              <sc-for list="{{sfKenm}}" as="kc" hint-placeholder-count="6"><button type="button" class="{{kc.cls}}" onClick="{{kc.pick}}">{{kc.l}}</button></sc-for>
+              <div style="display: inline-flex; gap: 2px; padding: 3px; background: #F1EFEC; border-radius: 8px; margin-left: 6px">
+                <button type="button" class="{{kenmAlleCls}}" onClick="{{kenmAlle}}">Alle gekozen</button>
+                <button type="button" class="{{kenmEenCls}}" onClick="{{kenmEen}}">Minstens één</button>
+              </div>
+              <button type="button" class="linkbtn" style="font-size: 12px" onClick="{{kenmLeeg}}">wissen</button>
             </div>
 
             <div style="border-top: 1px solid #E4E2DF; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
@@ -1088,7 +1032,7 @@
               </label>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
                 <button type="button" class="btn" onClick="{{copyTxt}}">{{copyTxtLabel}}</button>
-                <span style="font-size: 12px; color: #5E5E5E">Mail selectie (BCC) opent je mailprogramma met deze tekst. De adressen staan in BCC, klanten zien elkaar niet.</span>
+                <span style="font-size: 12px; color: #5E5E5E">Mail selectie (BCC) opent Outlook met deze tekst in je standaardlettertype. Wil je Manrope 10: klik op Kopieer tekst en plak die in de mail over de tekst heen.</span>
               </div>
               <sc-if value="{{mailTeLang}}" hint-placeholder-val="{{ false }}">
                 <div role="alert" style="background: #FFF2E5; color: #8A3F00; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600">Veel adressen: Outlook kapt lange mail-links soms af. Gebruik dan "Kopieer e-mailadressen" en "Kopieer tekst" en plak ze zelf in een nieuwe mail.</div>

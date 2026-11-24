@@ -117,7 +117,8 @@ function bDue(c, q) {
   return lopend(c) && !btwNa(c, q) && !c.btw[q] && !wk(c, 'btw' + (q + 1)) && kwartaalVoorbij(q) && !bLate(c, q);
 }
 function heeftWacht(c) { if (!lopend(c) || !c.wacht) return false; for (var k in c.wacht) if (c.wacht[k]) return true; return false; }
-function wachtLabels(c) { var out = []; for (var i = 0; i < 12; i++) if (wk(c, 'm' + (i + 1)) && !c.months[i]) out.push(MONTHS[i]); if (BTWM && c.btwMaand) { for (var j = 0; j < 12; j++) if (bmWacht(c, j) && !bmNa(c, j)) out.push('BTW ' + MONTHS[j]); } else for (var q = 0; q < 4; q++) if (wk(c, 'btw' + (q + 1)) && !c.btw[q]) out.push('BTW Q' + (q + 1)); return out; }
+var WLBL = { cq1:'controle Q1', cq2:'controle Q2', cq3:'controle Q3', c25:'controle jaar', jw25:'jaarwerk', ib25:'IB' };
+function wachtLabels(c) { var out = []; Object.keys(WLBL).forEach(function (k) { if (wk(c, k) && !c[k]) out.push(WLBL[k]); }); for (var i = 0; i < 12; i++) if (wk(c, 'm' + (i + 1)) && !c.months[i]) out.push(MONTHS[i]); if (BTWM && c.btwMaand) { for (var j = 0; j < 12; j++) if (bmWacht(c, j) && !bmNa(c, j)) out.push('BTW ' + MONTHS[j]); } else for (var q = 0; q < 4; q++) if (wk(c, 'btw' + (q + 1)) && !c.btw[q]) out.push('BTW Q' + (q + 1)); return out; }
 function lateLabels(c) { var out = []; for (var i = 0; i < 12; i++) if (mLate(c, i)) out.push(c.freq === 'kwartaal' ? 'Q' + (Math.floor(i / 3) + 1) : MONTHS[i]); return out; }
 function btwOpenNu(c) { for (var q = 0; q < 4; q++) if (bLate(c, q) || bDue(c, q)) return true; return false; }
 function isAchter(c) {
@@ -146,7 +147,15 @@ function getFilters() { return [
   { id:'gestopt', label:'Gestopt (archief)', kpi:'Gestopt', sub:'archief', f:function (c) { return c.status === 'Gestopt'; } }
 ]; }
 
-function emptySf() { return { status:'lopend', admin:'alle', bank:'alle', freq:'alle', btw3:'alle', achter:'alle', jw:'alle', ib:'alle', kenm:'alle', regime:'alle', rechtsvorm:'alle', review:'alle', wacht:'alle' }; }
+function emptySf() { return { status:'lopend', admin:'alle', bank:'alle', freq:'alle', btw3:'alle', achter:'alle', jw:'alle', ib:'alle', ctrl:'alle', up:'alle', kenm:[], kenmMode:'alle', regime:'alle', rechtsvorm:'alle', review:'alle', wacht:'alle' }; }
+var KENMSEL = [['pers','Personenauto'],['best','Bestelauto'],['bestZonder','Bestelauto zonder UZGB'],['km','KM-registratie'],['uzgb','Verklaring UZGB'],['kmuzgb','KM/UZGB nog splitsen'],['motor','Motor'],['fiets','Fiets'],['pandKoop','Pand (koop)'],['pandHuur','Pand (huur)'],['btwMaand','BTW per maand']];
+function kenmHeeft(c, k) {
+  if (k === 'bestZonder') return !!(c.best && !c.uzgb);
+  if (k === 'pandKoop') return c.pand === 'Koop';
+  if (k === 'pandHuur') return c.pand === 'Huur';
+  return !!c[k];
+}
+function htmlEsc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function sfMatch(c, f) {
   if (f.status === 'lopend' ? !lopend(c) : c.status !== f.status) return false;
   if (f.admin !== 'alle' && c.admin !== f.admin) return false;
@@ -162,10 +171,15 @@ function sfMatch(c, f) {
   if (f.jw === 'klaar' && !c.jw25) return false;
   if (f.ib === 'open' && !ibOpen(c)) return false;
   if (f.ib === 'klaar' && !c.ib25) return false;
-  if (f.kenm === 'bestZonder') { if (!(c.best && !c.uzgb)) return false; }
-  else if (f.kenm === 'pandKoop') { if (c.pand !== 'Koop') return false; }
-  else if (f.kenm === 'pandHuur') { if (c.pand !== 'Huur') return false; }
-  else if (f.kenm !== 'alle' && !c[f.kenm]) return false;
+  var ks = Array.isArray(f.kenm) ? f.kenm : (f.kenm && f.kenm !== 'alle' ? [f.kenm] : []);
+  if (ks.length) {
+    var hits = ks.filter(function (k) { return kenmHeeft(c, k); }).length;
+    if (f.kenmMode === 'een' ? hits === 0 : hits < ks.length) return false;
+  }
+  if (f.ctrl === 'open' && !(c.c25 !== null && c.c25 !== undefined && !c.c25 && !c.j25na)) return false;
+  if (f.ctrl === 'klaar' && !c.c25) return false;
+  if (f.up === 'ja' && !c.up) return false;
+  if (f.up === 'nee' && c.up) return false;
   if (f.regime !== 'alle' && c.regime !== f.regime) return false;
   if (f.rechtsvorm !== 'alle' && c.rechtsvorm !== f.rechtsvorm) return false;
   if (f.review === 'ja' && !c.review) return false;
@@ -177,7 +191,7 @@ var PRESETS = [
   { l:'Wacht op klant (herinnering)', f:{ wacht:'ja' }, cols:['naam','voornaam','email','admin'], tpl:'aanlevering' },
   { l:'Geen BK en BTW open', f:{ bank:'geenBK', btw3:'open' }, cols:['naam','voornaam','email','admin'] },
   { l:'IB vorig jaar open, actief', f:{ status:'Actief', ib:'open' }, cols:['naam','voornaam','email','admin'], tpl:'ib' },
-  { l:'Bestelauto zonder UZGB', f:{ kenm:'bestZonder' }, cols:['naam','voornaam','email'] }
+  { l:'Bestelauto zonder UZGB', f:{ kenm:['bestZonder'] }, cols:['naam','voornaam','email'] }
 ];
 var MAILT = {
   aanlevering: { s:'Graag je stukken over {periode} aanleveren', b:'Hoi,\n\nWe willen je administratie over {periode} graag verwerken, maar we missen nog stukken van je. Wil je je facturen, bonnen en eventuele bankafschriften uiterlijk {uiterlijk} aanleveren? Dan kunnen we alles op tijd verwerken en je btw-aangifte verzorgen.\n\nHeb je vragen? Laat het gerust weten.\n\nGroet,\n{naam}\nPoortEijk ZZP' },
@@ -203,7 +217,7 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       phase: STORE.live ? 'loading' : 'app', me:null, auth:{ email:'', pw:'', pw2:'' }, authMode:'login', authMsg:'', authOk:false, conn:'connecting', logs:{}, demoAsk:false, saveErr:'',
-      role:'Jeroen', page:'werk', menu:null, openQ:{}, jwF:'open', jwWie:null, jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
+      role:'Jeroen', page:'werk', menu:null, ownNotes:{}, ownDraft:{}, openQ:{}, jwF:'open', jwWie:null, jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
       bsub:'nieuw', form:emptyForm(), editId:null, err:'',
       mq:'', mutSel:null, mutMode:'menu', mut:{ admin:'Jeroen' }, mutMsg:'',
       stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
@@ -257,7 +271,7 @@ class Component extends DCLogic {
       if (st.huidig_jaar) JAAR = parseInt(st.huidig_jaar, 10);
       self.setState({ jaar:JAAR });
       return STORE.loadYears().then(function (ys) { if (ys.indexOf(JAAR) < 0) ys.push(JAAR); self.setState({ jaren:ys.sort() }); });
-    }).catch(function () {}).then(function () { return self.reload(); }).then(function () {
+    }).catch(function () {}).then(function () { return STORE.loadOwnNotes().then(function (o) { self.setState({ ownNotes:o }); }).catch(function () {}); }).then(function () { return self.reload(); }).then(function () {
       self.setState({ phase:'app' });
       if (!self.__subscribed) {
         self.__subscribed = true;
@@ -368,12 +382,12 @@ class Component extends DCLogic {
     var nv = !cur;
     this.upd(c.id, function (n) {
       if (key === 'm') n.months[idx] = nv; else if (key === 'btw') n.btw[idx] = nv; else n[key] = nv ? 1 : 0;
-      if (wkey && nv) delete n.wacht[wkey];
+      if (nv) delete n.wacht[wkey || key];
     }, label + (nv ? ' afgevinkt' : ' teruggezet naar open'));
   }
 
   setStatus(c, key, idx, st, label) {
-    var wkey = key === 'm' ? 'm' + (idx + 1) : key === 'btw' ? 'btw' + (idx + 1) : null;
+    var wkey = key === 'm' ? 'm' + (idx + 1) : key === 'btw' ? 'btw' + (idx + 1) : key;
     this.upd(c.id, function (n) {
       var v = st === 'gedaan';
       if (key === 'm') n.months[idx] = v; else if (key === 'btw') n.btw[idx] = v; else n[key] = v;
@@ -385,7 +399,7 @@ class Component extends DCLogic {
     ev.preventDefault();
     ev.stopPropagation();
     var x = Math.min(ev.clientX, window.innerWidth - 220), y = Math.min(ev.clientY, window.innerHeight - 170);
-    this.setState({ menu:{ x:x, y:y, cid:c.id, key:key, idx:idx, label:label, wacht: key === 'm' || key === 'btw' } });
+    this.setState({ menu:{ x:x, y:y, cid:c.id, key:key, idx:idx, label:label, wacht:true } });
   }
 
   startJaar() {
@@ -451,8 +465,16 @@ class Component extends DCLogic {
     this.setState(function (s) { return { clients:[nc].concat(s.clients), page:'klanten', sel:nid, tab:'over', filter:'alles', scope:'alle', q:'', err:'', form:emptyForm() }; });
   }
 
+  demoOwn(role) {
+    if (STORE.live || this.__ownRole === role) return;
+    this.__ownRole = role;
+    var o = {}; try { o = JSON.parse(localStorage.getItem('pz-eigen-' + role) || '{}'); } catch (x) {}
+    this.state.ownNotes = o; this.state.ownDraft = {};
+  }
+
   renderVals() {
     var FILTERS = getFilters();
+    this.demoOwn(this.state.role);
     var self = this, s = this.state, role = STORE.live ? (s.me ? s.me.naam : '') : s.role, beheer = STORE.live ? !!(s.me && s.me.rol === 'beheer') : role === 'Jeroen', all = s.clients;
 
     var inBase = function (c) { return (s.scope === 'alle' || c.admin === role) && (s.bankF === 'alle' || c.bank === s.bankF); };
@@ -505,7 +527,7 @@ class Component extends DCLogic {
       var on, na, late = false, due = false, w = false;
       if (key === 'm') { on = c.months[idx]; na = mNa(c, idx); late = mLate(c, idx); due = mDue(c, idx); w = wk(c, 'm' + (idx + 1)) && !on; }
       else if (key === 'btw') { on = c.btw[idx]; na = btwNa(c, idx) || !lopend(c); late = bLate(c, idx); due = bDue(c, idx); w = wk(c, 'btw' + (idx + 1)) && !on; }
-      else { on = !!c[key]; na = c[key] === null || c[key] === undefined || (c.j25na && (key === 'c25' || key === 'jw25' || key === 'ib25')); }
+      else { on = !!c[key]; na = c[key] === null || c[key] === undefined || (c.j25na && (key === 'c25' || key === 'jw25' || key === 'ib25')); w = wk(c, key) && !on; }
       var cls = 'tt ' + (na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : due ? 'u' : 'o');
       var stTxt = na ? 'n.v.t.' : on ? 'gedaan' : w ? 'wacht op klant' : late ? 'achterstand' : due ? 'nu doen' : 'open';
       return { isTile:true, isSep:false, l:l, cls:cls, na:na, st: na ? 'n' : on ? 'd' : w ? 'w' : late ? 'l' : 'o',
@@ -515,9 +537,9 @@ class Component extends DCLogic {
     };
     var blok = function (c, qi) {
       var tiles = [];
-      if (qi > 0) { tiles.push(tegel(c, CTRL[qi - 1], 0, 'C' + qi, 'Controle Q' + qi)); tiles.push({ isSep:true, isTile:false }); }
-      if (c.freq === 'kwartaal') tiles.push(Object.assign(tegel(c, 'm', qi * 3, M2[qi * 3] + '-' + M2[qi * 3 + 2], 'Administratie Q' + (qi + 1)), {}));
-      else for (var k = 0; k < 3; k++) tiles.push(tegel(c, 'm', qi * 3 + k, M2[qi * 3 + k], MONTHS[qi * 3 + k]));
+      if (qi > 0) { tiles.push(tegel(c, CTRL[qi - 1], 0, 'ctrl Q' + qi, 'Controle Q' + qi)); tiles.push({ isSep:true, isTile:false }); }
+      if (c.freq === 'kwartaal') tiles.push(tegel(c, 'm', qi * 3, MONTHS[qi * 3] + '-' + MONTHS[qi * 3 + 2], 'Administratie Q' + (qi + 1)));
+      else for (var k = 0; k < 3; k++) tiles.push(tegel(c, 'm', qi * 3 + k, MONTHS[qi * 3 + k], MONTHS[qi * 3 + k]));
       tiles.push({ isSep:true, isTile:false });
       tiles.push(tegel(c, 'btw', qi, 'BTW', 'BTW Q' + (qi + 1)));
       var echte = tiles.filter(function (t) { return t.isTile && t.st !== 'n'; });
@@ -554,7 +576,6 @@ class Component extends DCLogic {
     var rows = list.map(function (c) {
       var ti = tmInfo(c);
       var tags = [];
-      if (c.freq === 'kwartaal') tags.push({ l:'per kw.', cls:'ntag' });
       if (c.btwMaand && c.regime === 'Normaal') tags.push({ l:'btw p/m', cls:'ntag o' });
       return {
         tags:tags, tmL:ti.lbl, tmB:ti.bdg, tmCls:ti.bcls, hasTmB: !!ti.bdg,
@@ -650,7 +671,28 @@ class Component extends DCLogic {
         { k:'Klant vanaf', v:vanLabel(c) },
         { k:'Klant t/m', v: e ? e.datum + ' (' + e.reden + ')' : 'Actief' }
       ]);
+      // Snel overzicht: alleen wat van toepassing is
+      var snel = [{ k:'Rechtsvorm', v:c.rechtsvorm }, { k:'Verwerking', v: c.freq === 'maand' ? 'Per maand' : 'Per kwartaal' }];
+      snel.push({ k:'BTW', v: c.regime === 'Normaal' ? (c.btwMaand ? 'Aangifte per maand' : 'Aangifte per kwartaal') : c.regime });
+      var auto = [];
+      if (c.pers) auto.push('personenauto');
+      if (c.best) auto.push('bestelauto' + (c.uzgb ? ' (UZGB)' : '') + (c.km ? ' (km-registratie)' : ''));
+      if (!c.best && c.pers && c.km) auto[0] += ' (km-registratie)';
+      if (auto.length) snel.push({ k:'Auto', v: auto.join(' en ').replace(/^./, function (x) { return x.toUpperCase(); }) });
+      if (c.kmuzgb) snel.push({ k:'Let op', v:'KM/UZGB nog splitsen' });
+      snel.push({ k:'Bank', v: c.bank === 'BK' ? 'Bankkoppeling (BK)' : c.bank === 'geen' ? 'Geen koppeling' : c.bank });
+      if (c.up) snel.push({ k:'Up2date', v:'Levert minimaal 1x per maand aan' });
+      snel.push({ k:'Software', v:c.software });
+      var alleKenm = [{ k:'BTW-aangifte', v: c.btwMaand ? 'Per maand' : 'Per kwartaal' }, { k:'BTW-regime', v:c.regime }];
+      KENM.forEach(function (k) { alleKenm.push({ k:k[1], v: c[k[0]] ? 'Ja' : 'Nee' }); });
+      alleKenm.push({ k:'KM/UZGB nog splitsen', v: c.kmuzgb ? 'Ja' : 'Nee' }, { k:'Pand', v: c.pand || 'Nee' });
+      var ownSaved = s.ownNotes[c.id] || '', ownDraft = s.ownDraft[c.id] !== undefined ? s.ownDraft[c.id] : ownSaved;
       d = {
+        snel:snel, blokken:[0,1,2,3].map(function (qi) { var b = blok(c, qi); b.cls = qi === WQ ? 'qb cur' : 'qb'; return b; }),
+        jaarTegels:[tegel(c, 'c25', 0, 'controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, 'IB', 'IB-aangifte ' + vj())],
+        ownDraft: ownDraft, ownInfo: s.ownDraft[c.id] !== undefined && s.ownDraft[c.id] !== ownSaved ? 'Niet opgeslagen' : (ownSaved ? 'Alleen voor jou zichtbaar' : ''),
+        ownBtnCls: s.ownDraft[c.id] !== undefined && s.ownDraft[c.id] !== ownSaved ? 'btn primary' : 'btn',
+        gegevens2: alleKenm,
         naam:c.naam, admin:c.admin, rechtsvorm:c.rechtsvorm, freq: c.freq === 'maand' ? 'Verwerking per maand' : 'Verwerking per kwartaal',
         freqUitleg: c.freq === 'maand' ? 'per maand verwerken' : 'per kwartaal: alleen jan, apr, jul en okt afvinken',
         vanaf: vanLabel(c),
@@ -857,7 +899,7 @@ class Component extends DCLogic {
       jaren: s.jaren.map(function (y) { return { v:String(y), l:String(y) }; }), jaarSel: String(s.jaar), onJaar: function (ev) { self.kiesJaar(ev.target.value); },
       noop: function (ev) { ev.stopPropagation(); },
       hasMenu: !!(mn && menuC), menuPos: mn ? 'left: ' + mn.x + 'px; top: ' + mn.y + 'px' : '', menuTitel: mn && menuC ? menuC.naam + ' · ' + mn.label : '', menuItems: menuItems,
-      wqLabel: 'Q' + (WQ + 1) + ' ' + JAAR, wqSub: (WQ > 0 ? 'C' + WQ + ' = controle Q' + WQ + ' · ' : '') + 'BTW Q' + (WQ + 1) + ' ' + btwDlLabel(WQ),
+      wqLabel: 'Q' + (WQ + 1) + ' ' + JAAR, wqSub: (WQ > 0 ? 'controle Q' + WQ + ' · ' : '') + 'administratie · BTW Q' + (WQ + 1) + ' ' + btwDlLabel(WQ),
       prevKop: WQ > 0 ? 'Eerdere kwartalen' : '', hasPrevKol: WQ > 0,
       prevAllesOpen: function () { var o = {}, alles = true; for (var i = 0; i < WQ; i++) if (!(s.openQ && s.openQ[i])) alles = false; for (var j = 0; j < WQ; j++) o[j] = !alles; self.setState({ openQ:o }); },
       prevAllesLabel: (function () { for (var i = 0; i < WQ; i++) if (!(s.openQ && s.openQ[i])) return 'alles openklappen'; return 'alles dichtklappen'; })(),
@@ -906,6 +948,14 @@ class Component extends DCLogic {
       closePanel:function () { self.setState({ sel:null }); },
       onNote:function (ev) { var v = ev.target.value; self.setState(function (st) { var n = Object.assign({}, st.notes); n[st.sel] = v; return { notes:n }; }); },
       noteBtnCls: selC && s.notes[selC.id] !== undefined && s.notes[selC.id] !== selC.notities ? 'btn primary' : 'btn',
+      onOwn:function (ev) { var v = ev.target.value; self.setState(function (st) { var n = Object.assign({}, st.ownDraft); n[st.sel] = v; return { ownDraft:n }; }); },
+      saveOwn:function () {
+        if (!selC || s.ownDraft[selC.id] === undefined) return;
+        var id = selC.id, v = s.ownDraft[id];
+        var done = function () { self.setState(function (st) { var o = Object.assign({}, st.ownNotes), dr = Object.assign({}, st.ownDraft); if (v) o[id] = v; else delete o[id]; delete dr[id]; return { ownNotes:o, ownDraft:dr }; }); };
+        if (STORE.live) STORE.saveOwnNote(id, v).then(done).catch(function (e) { self.setState({ saveErr:'Eigen notitie opslaan mislukt: ' + e.message }); });
+        else { try { var all2 = JSON.parse(localStorage.getItem('pz-eigen-' + role) || '{}'); if (v) all2[id] = v; else delete all2[id]; localStorage.setItem('pz-eigen-' + role, JSON.stringify(all2)); } catch (x) {} done(); }
+      },
       saveNote:function () {
         if (!selC || s.notes[selC.id] === undefined) return;
         var v = s.notes[selC.id], id = selC.id;
@@ -970,8 +1020,25 @@ class Component extends DCLogic {
       mailUiterlijk: s.mailUiterlijk, onMailUiterlijk: function (ev) { self.setState({ mailUiterlijk:ev.target.value }); },
       mailOpnieuw: function () { mailVul(s.mailT); },
       mailHeeftPeriode: s.mailT === 'aanlevering' || s.mailT === 'ib',
-      copyTxtLabel: s.copiedTxt ? 'Tekst gekopieerd' : 'Kopieer tekst',
-      copyTxt: function () { try { navigator.clipboard.writeText((s.mailS ? s.mailS + '\n\n' : '') + s.mailB); } catch (x) {} self.setState({ copiedTxt:true }); },
+      copyTxtLabel: s.copiedTxt ? 'Gekopieerd, plak in Outlook' : 'Kopieer tekst (Manrope 10)',
+      copyTxt: function () {
+        var html = '<div style="font-family:Manrope,Arial,sans-serif;font-size:10pt;line-height:1.45">' + htmlEsc(s.mailB).replace(/\n/g, '<br>') + '</div>';
+        var klaar = function () { self.setState({ copiedTxt:true }); };
+        try {
+          if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+            navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type:'text/html' }), 'text/plain': new Blob([s.mailB], { type:'text/plain' }) })]).then(klaar, klaar);
+            return;
+          }
+        } catch (x) {}
+        var div = document.createElement('div'); div.innerHTML = html; div.style.position = 'fixed'; div.style.left = '-9999px'; document.body.appendChild(div);
+        var r = document.createRange(); r.selectNodeContents(div); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        try { document.execCommand('copy'); } catch (y) {}
+        sel.removeAllRanges(); div.remove(); klaar();
+      },
+      sfKenm: KENMSEL.map(function (k) { var ks = Array.isArray(s.sf.kenm) ? s.sf.kenm : []; var on = ks.indexOf(k[0]) >= 0; return { l:k[1], cls: on ? 'kchip on' : 'kchip', pick:function () { var n = ks.filter(function (x) { return x !== k[0]; }); if (!on) n.push(k[0]); self.setState({ sf:Object.assign({}, s.sf, { kenm:n }), copied:false }); } }; }),
+      kenmAlleCls: s.sf.kenmMode !== 'een' ? 'seg on' : 'seg', kenmEenCls: s.sf.kenmMode === 'een' ? 'seg on' : 'seg',
+      kenmAlle: function () { self.setState({ sf:Object.assign({}, s.sf, { kenmMode:'alle' }) }); }, kenmEen: function () { self.setState({ sf:Object.assign({}, s.sf, { kenmMode:'een' }) }); },
+      kenmLeeg: function () { self.setState({ sf:Object.assign({}, s.sf, { kenm:[] }) }); },
       copyLabel: s.copied ? 'Gekopieerd' : 'Kopieer e-mailadressen',
       copyMails:function () { try { navigator.clipboard.writeText(mails.join('; ')); } catch (x) {} self.setState({ copied:true }); },
       saveName:s.saveName, onSaveName:function (ev) { self.setState({ saveName:ev.target.value }); },

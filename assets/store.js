@@ -284,6 +284,17 @@
     }, Promise.resolve()).then(function () { return S.setSetting('huidig_jaar', jaar); }).then(function () { return rows.length; });
   };
 
+  S.loadOwnNotes = function () {
+    return sb.from('eigen_notities').select('klant_id, tekst').then(function (r) {
+      var out = {};
+      (r.data || []).forEach(function (x) { if (x.tekst) out[x.klant_id] = x.tekst; });
+      return out;
+    });
+  };
+  S.saveOwnNote = function (id, tekst) {
+    return sb.from('eigen_notities').upsert({ gebruiker: S.me.id, klant_id: id, tekst: tekst || null, gewijzigd_op: new Date().toISOString() }, { onConflict: 'gebruiker,klant_id' }).then(must);
+  };
+
   S.loadLog = function (id) {
     return sb.from('historie').select('wie, wat, wanneer').eq('klant_id', id).order('wanneer', { ascending: false }).limit(100).then(function (r) {
       return must(r).map(function (l) {
