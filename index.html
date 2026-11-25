@@ -287,7 +287,7 @@
             Excel
           </button>
           <div style="flex: 1 1 auto"></div>
-          <span style="font-size: 12px; font-weight: 600; color: var(--tx-5e5e5e)">Per collega</span>
+          <sc-if value="{{hasBreakdown}}" hint-placeholder-val="{{ true }}"><span style="font-size: 12px; font-weight: 600; color: var(--tx-5e5e5e)">Per collega</span></sc-if>
           <sc-for list="{{breakdown}}" as="b" hint-placeholder-count="4">
             <button type="button" class="{{b.cls}}" title="{{b.t}}" onClick="{{b.pick}}">{{b.admin}} <b>{{b.n}}</b></button>
           </sc-for>

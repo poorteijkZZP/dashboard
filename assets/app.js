@@ -1202,7 +1202,7 @@ class Component extends DCLogic {
       scopeAllN: all.filter(function (c) { return lopend(c) && (s.bankF === 'alle' || c.bank === s.bankF); }).length, scopeMijnN: all.filter(function (c) { return lopend(c) && c.admin === role && (s.bankF === 'alle' || c.bank === s.bankF); }).length,
       scopeAll: function () { self.setState({ scope:'alle' }); }, scopeMijn: function () { self.setState({ scope:'mijn', adminF:'alle' }); },
       q:s.q, onQ:function (ev) { self.setState({ q:ev.target.value }); },
-      kpis:kpis, breakdown:breakdown, verloop:verloop, verloopTitel: 'Lopend kwartaal Q' + (WQ + 1) + ' voor deze ' + list.length + ' klanten',
+      kpis:kpis, breakdown:breakdown, hasBreakdown: breakdown.length > 0, verloop:verloop, verloopTitel: 'Lopend kwartaal Q' + (WQ + 1) + ' voor deze ' + list.length + ' klanten',
       viewTitle: viewTitleTxt,
       viewCount: list.length + (list.length === 1 ? ' klant' : ' klanten'),
       rows:rows, noRows: rows.length === 0,
