@@ -235,7 +235,7 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       phase: STORE.live ? 'loading' : 'app', me:null, auth:{ email:'', pw:'', pw2:'' }, authMode:'login', authMsg:'', authOk:false, conn:'connecting', logs:{}, demoAsk:false, saveErr:'',
-      role:'Jeroen', page:'werk', afvinkLog:null, rapJaar:new Date().getFullYear(), vp:[], vpPop:null, vpVal:'1', vpJaar:new Date().getFullYear(), openF:'', menu:null, ownNotes:{}, ownDraft:{}, openQ:{}, jwF:'open', jwWie:null, jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
+      thema: window.THEMA ? THEMA.get() : 'licht', role:'Jeroen', page:'werk', afvinkLog:null, rapJaar:new Date().getFullYear(), vp:[], vpPop:null, vpVal:'1', vpJaar:new Date().getFullYear(), openF:'', menu:null, ownNotes:{}, ownDraft:{}, openQ:{}, jwF:'open', jwWie:null, jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
       bsub:'nieuw', form:emptyForm(), editId:null, err:'',
       mq:'', mutSel:null, mutMode:'menu', mut:{ admin:'Jeroen' }, mutMsg:'',
       stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
@@ -249,6 +249,7 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    var zelf = this; window.__herteken = function () { zelf.setState({}); };
     var self = this;
     var sluit = function () { if (self.state.menu || self.state.uitleg || self.state.kenmOpen || self.state.vpPop) self.setState({ menu:null, uitleg:false, kenmOpen:false, vpPop:null }); };
     document.addEventListener('click', sluit);
@@ -270,7 +271,7 @@ class Component extends DCLogic {
       if (ev.type === 'signedOut') self.setState({ phase:'auth', authMode:'login', me:null, clients:[] });
       else if (ev.type === 'newPassword') self.setState({ phase:'auth', authMode:'newpw', authMsg:'' });
       else if (ev.type === 'noProfile') self.setState({ phase:'auth', authMode:'login', authOk:false, authMsg:'Je bent ingelogd als ' + ev.email + ', maar je account is nog niet gekoppeld aan een naam en rol. Vraag de beheerder dit te doen.' });
-      else if (ev.type === 'signedIn') self.startLive(ev.me);
+      else if (ev.type === 'signedIn') { if (ev.me.thema && window.THEMA && ev.me.thema !== THEMA.get()) { THEMA.zet(ev.me.thema); self.setState({ thema: ev.me.thema }); } self.startLive(ev.me); }
       else if (ev.type === 'mfa') self.setState({ phase:'auth', authMode:'mfa', mfa:{ factorId:ev.factorId }, code:'', authMsg:'' });
       else if (ev.type === 'enroll') {
         self.setState({ phase:'auth', authMode:'enroll', mfa:null, code:'', authMsg:'QR-code wordt gemaakt...', authOk:true });
@@ -1148,6 +1149,7 @@ class Component extends DCLogic {
         var blad2 = [['Datum', 'Klant', 'Aantal', 'Geregistreerd door', 'Gecorrigeerd door']].concat(rijen.slice().reverse().map(function (r) { var dt = new Date(r.wanneer); return [dt.toLocaleDateString('nl-NL') + ' ' + dt.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' }), kl(r.klant_id).naam, r.aantal, r.wie || '', r.gewijzigd_door || '']; }));
         downloadXlsx('Vraagposten ' + s.vpJaar + ' per klant ' + vandaagIso() + '.xlsx', [{ name:'Per klant', rows:blad1 }, { name:'Alle registraties', rows:blad2 }]);
       },
+      thema: s.thema || 'licht', onThema: function (ev) { var v = ev.target.value; if (window.THEMA) THEMA.zet(v); self.setState({ thema:v }); if (STORE.live && STORE.saveThema) STORE.saveThema(v).catch(function () {}); },
       openF: s.openF || '', onOpenF: function (ev) { self.setState({ openF: ev.target.value }); },
       openOpties: (function () {
         var o = [{ v:'', l:'Alles' }, { v:'nietrond', l:'Q' + (winQ() + 1) + ' nog niet rond' }, { v:'rond', l:'Q' + (winQ() + 1) + ' rond' }], wq = winQ();

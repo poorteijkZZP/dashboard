@@ -142,10 +142,13 @@
   function laadProfiel(session) {
     return sb.from('profielen').select('naam, rol').eq('id', session.user.id).maybeSingle().then(function (r) {
       if (r.error || !r.data) { cbAuth({ type: 'noProfile', email: session.user.email }); return; }
-      S.me = { id: session.user.id, naam: r.data.naam, rol: r.data.rol, email: session.user.email };
+      S.me = { id: session.user.id, naam: r.data.naam, rol: r.data.rol, email: session.user.email, thema: (session.user.user_metadata || {}).thema || null };
       cbAuth({ type: 'signedIn', me: S.me });
     });
   }
+
+  // Weergavekeuze per gebruiker online bewaren (in het eigen account, geen tabel nodig)
+  S.saveThema = function (v) { return sb.auth.updateUser({ data: { thema: v } }).then(function (r) { if (r && r.error) throw r.error; }); };
 
   S.init = function (cb) {
     cbAuth = cb;

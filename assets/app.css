@@ -100,6 +100,107 @@
   /* Overig */
   --ot-ff8000:#ff8000;
 }
+/* ===== Donkere weergave: alleen de centrale kleuren anders ===== */
+:root[data-thema="donker"]{
+  color-scheme:dark;
+  --ic-ff8000:#f59e47;
+  --ln-eeeae5:#5f5344;
+  --bg-2b2b2b:#46423e;
+  --bg-3a3836:#544f4a;
+  --bg-4f8a3c:#4d7f3d;
+  --bg-6b6b6b:#54504c;
+  --bg-7fa3d6:#779bcd;
+  --bg-8e8780:#87807a;
+  --bg-c8412b:#b74330;
+  --bg-d9d9d9:#3d3a36;
+  --bg-dce8f7:#1d324d;
+  --bg-ddd7cf:#d3ccc3;
+  --bg-ddefd3:#345621;
+  --bg-e3f0dc:#314e21;
+  --bg-e7f4ec:#1f452e;
+  --bg-eae7e2:#413a2f;
+  --bg-ece9e5:#312e2b;
+  --bg-eeebe7:#2f2d2a;
+  --bg-eef0f4:#2a2825;
+  --bg-f07400:#d96f0b;
+  --bg-f1efec:#2c2a27;
+  --bg-f2f0ed:#2b2926;
+  --bg-f3e3d2:#553b20;
+  --bg-f3f8ef:#2c3f1c;
+  --bg-f7f5f2:#272523;
+  --bg-f7f6f4:#272422;
+  --bg-fbfaf8:#23211f;
+  --bg-fcedea:#432019;
+  --bg-ff8000:#e67a0c;
+  --bg-ffbf80:#f8b574;
+  --bg-ffd9b3:#5f4124;
+  --bg-fff2e5:#442f1a;
+  --bg-fff4e8:#422e19;
+  --bg-fff7ef:#3e2b18;
+  --bg-fff8f1:#3d2a17;
+  --bg-fffbf7:#3a2816;
+  --bg-ffffff:#1f1d1c;
+  --tx-1f1f1f:#dfdcd9;
+  --tx-1f4e8c:#8db1e0;
+  --tx-2b2b2b:#d9d5d2;
+  --tx-2f5e22:#bce0b2;
+  --tx-2f8f5b:#8ad3ab;
+  --tx-3a3a3a:#d1cdc9;
+  --tx-3d1c00:#fce3ce;
+  --tx-3d6fb6:#7397ca;
+  --tx-4a4642:#c7c3c0;
+  --tx-4a4a4a:#c9c4c0;
+  --tx-4a5568:#a8b0bf;
+  --tx-5a2b00:#fbd7b6;
+  --tx-5c2b00:#fbd6b5;
+  --tx-5e5a55:#b6b3af;
+  --tx-5e5e5e:#bfb9b4;
+  --tx-6b3200:#facfa9;
+  --tx-6b6b6b:#b8b2ac;
+  --tx-7a3900:#fac89c;
+  --tx-7a4a1e:#e2bd9b;
+  --tx-7a7a7a:#b1aaa3;
+  --tx-8a3f00:#f9c090;
+  --tx-8a857f:#a29e9a;
+  --tx-8e8e8e:#a79f97;
+  --tx-9a9a9a:#a19890;
+  --tx-a94f00:#f8b377;
+  --tx-b35a00:#f7b36e;
+  --tx-b5afa8:#a59f97;
+  --tx-c8412b:#d67666;
+  --tx-d9d3cb:#aca091;
+  --tx-ff8000:#f59e47;
+  --tx-ffbf80:#f59d47;
+  --tx-ffffff:#ffffff;
+  --ln-2b2b2b:#726b65;
+  --ln-3d6fb6:#4e77b3;
+  --ln-8dba7a:#95b787;
+  --ln-8e8e8e:#625d57;
+  --ln-a8a8a8:#534e4a;
+  --ln-a94f00:#a75813;
+  --ln-b35a00:#b06214;
+  --ln-b5afa8:#b7b3ae;
+  --ln-c8412b:#c2513f;
+  --ln-cfc9c1:#5a5349;
+  --ln-d0ccc6:#58534b;
+  --ln-d9d3cb:#5c5347;
+  --ln-d9d9d9:#373330;
+  --ln-e4e2df:#322f2c;
+  --ln-ebb7ad:#79372a;
+  --ln-ece8e3:#5e5345;
+  --ln-eeebe7:#2c2a27;
+  --ln-f07400:#e47b19;
+  --ln-f0eeeb:#2b2826;
+  --ln-ff8000:#e78625;
+  --ln-ffbf80:#935110;
+  --ln-ffd9b3:#935210;
+  --ic-5e5e5e:#bfb9b4;
+  --ic-a94f00:#f8b377;
+  --ot-ff8000:ff8000;
+}
+
+:root[data-thema="donker"] .rail{background:#141312}
+:root[data-thema="donker"] .raillogo{filter:none}
 body{margin:0;background:var(--bg-f7f6f4);font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--tx-2b2b2b)}
 a{color:var(--tx-a94f00)}a:hover{color:var(--tx-7a3900)}
 button,input,select,textarea{font-family:inherit}
@@ -479,3 +580,5 @@ aside.schuif{position:fixed!important;top:0;right:0;bottom:0;width:min(580px,94v
 .row.rondnet .cell{animation:rondglow 1.4s ease-out}
 .row.rondnet .rondbdg{animation:rondplof .45s cubic-bezier(.3,1.4,.5,1)}
 @media (prefers-reduced-motion:reduce){.row.rondnet .cell,.row.rondnet .rondbdg{animation:none}}
+
+:root[data-thema="donker"] img[src="assets/logo.png"]{background:#fff;padding:6px 10px;border-radius:8px}
