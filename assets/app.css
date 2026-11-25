@@ -657,3 +657,6 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .chipbtn .av{margin-right:2px}
 .kswatch{font:800 12px inherit;font-family:inherit}
 .bijzico{display:inline-flex;cursor:help}
+.kleurchip.on,.wiek.on[style*="background"]{box-shadow:0 0 0 2px var(--bg-ffffff),0 0 0 4px var(--ln-2b2b2b)}
+.kleurchip b,.wiek[style*="background"] b{background:rgba(255,255,255,.55)!important;color:inherit!important}
+.wiek[style*="background"]{border-color:transparent!important}
