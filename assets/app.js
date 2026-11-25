@@ -140,6 +140,22 @@ function kwStappen(c, q) {
 function kwRond(c, q) { if (!lopend(c)) return false; var st = kwStappen(c, q); return st.length > 0 && st.every(function (x) { return x; }); }
 // Leest een centrale kleur (CSS-variabele) uit, voor plaatjes waar var() niet werkt (svg als data-URI)
 function kleurVar(naam, terug) { try { var v = getComputedStyle(document.documentElement).getPropertyValue(naam).trim(); return v || terug; } catch (e) { return terug; } }
+// Ringen: voorlopig alleen in de demo. Live aanzetten = deze regel op true zetten.
+function ringenAan() { return !STORE.live; }
+function ringStijl(pct, kleur) { return 'background: conic-gradient(' + kleur + ' ' + pct + '%, var(--ring-spoor) 0)'; }
+function ringKleur(pct) { return pct >= 100 ? 'var(--bg-4f8a3c)' : 'var(--bg-ff8000)'; }
+// Telt per soort (administratie, controle, btw) wat in kwartaal q van toepassing en gedaan is
+function kwSoorten(list, q) {
+  var t = { adm:[0, 0], ctrl:[0, 0], btw:[0, 0] };
+  list.forEach(function (c) {
+    if (!lopend(c)) return;
+    if (q > 0) { var v = c[CTRL[q - 1]]; if (v !== null && v !== undefined) { t.ctrl[1]++; if (v) t.ctrl[0]++; } }
+    var ms = c.freq === 'kwartaal' ? [q * 3] : [q * 3, q * 3 + 1, q * 3 + 2];
+    ms.forEach(function (i) { if (!mNa(c, i)) { t.adm[1]++; if (c.months[i]) t.adm[0]++; } });
+    if (!btwNa(c, q)) { t.btw[1]++; if (bOn(c, q)) t.btw[0]++; }
+  });
+  return t;
+}
 function isAchter(c) {
   if (!lopend(c)) return false;
   for (var i = 0; i < 12; i++) if (mLate(c, i)) return true;
@@ -613,7 +629,8 @@ class Component extends DCLogic {
       var echte = tiles.filter(function (t) { return t.isTile && t.st !== 'n'; });
       var open = echte.filter(function (t) { return t.st !== 'd'; });
       var rond = qi === WQ && kwRond(c, qi);
-      return { rond:rond, cls: qi === WQ ? (rond ? 'qb cur rond' : 'qb cur') : 'qb', l:'Q' + (qi + 1), tiles:tiles, nOpen:open.length, late: open.some(function (t) { return t.st === 'l'; }), wacht: open.some(function (t) { return t.st === 'w'; }), cur: qi === WQ };
+      var rpct = echte.length ? Math.round((echte.length - open.length) / echte.length * 100) : 0;
+      return { ringPct: rpct + '%', ringStijl: ringStijl(rpct, ringKleur(rpct)), ringT: (echte.length - open.length) + ' van ' + echte.length + ' gedaan', rond:rond, cls: qi === WQ ? (rond ? 'qb cur rond' : 'qb cur') : 'qb', l:'Q' + (qi + 1), tiles:tiles, nOpen:open.length, late: open.some(function (t) { return t.st === 'l'; }), wacht: open.some(function (t) { return t.st === 'w'; }), cur: qi === WQ };
     };
     var vorigeQ = function (c) {
       var out = [];
@@ -692,12 +709,12 @@ class Component extends DCLogic {
         if (!t.isTile || t.st === 'n') return;
         var k = t.kind; g[k][1]++; if (t.st === 'd') g[k][0]++;
       }); });
-      var regel = function (l, x) { var pct = x[1] ? Math.round(x[0] / x[1] * 100) : 100; return { l:l, tekst: (x[1] - x[0]) + ' te doen van ' + x[1], pct: pct + '%', bar:'width: ' + pct + '%', kleur:'var(--bg-ff8000)', toon: x[1] > 0 }; };
+      var regel = function (l, x) { var pct = x[1] ? Math.round(x[0] / x[1] * 100) : 100; return { l:l, tekst: (x[1] - x[0]) + ' te doen van ' + x[1], pct: pct + '%', bar:'width: ' + pct + '%', kleur:'var(--bg-ff8000)', ring: ringStijl(pct, 'var(--bg-ff8000)'), toon: x[1] > 0 }; };
       var out = [regel('Administratie', g.adm)];
       if (WQ > 0) out.push(regel('Controle Q' + WQ, g.ctrl));
       out.push(regel('Btw Q' + (WQ + 1), g.btw));
       var lk = list.filter(lopend), nr = lk.filter(function (c) { return kwRond(c, WQ); }).length;
-      if (lk.length) { var pr = Math.round(nr / lk.length * 100); out.push({ l:'Kwartaal rond', tekst: nr + ' van ' + lk.length + (lk.length === 1 ? ' klant' : ' klanten'), pct: pr + '%', bar:'width: ' + pr + '%', kleur:'var(--bg-4f8a3c)', toon:true, rond:true }); }
+      if (lk.length) { var pr = Math.round(nr / lk.length * 100); out.push({ l:'Kwartaal rond', tekst: nr + ' van ' + lk.length + (lk.length === 1 ? ' klant' : ' klanten'), pct: pr + '%', bar:'width: ' + pr + '%', kleur:'var(--bg-4f8a3c)', ring: ringStijl(pr, 'var(--bg-4f8a3c)'), toon:true, rond:true }); }
       return out.filter(function (x) { return x.toon; });
     })();
 
@@ -900,6 +917,26 @@ class Component extends DCLogic {
       var cnt = function (f) { return kl.filter(f).length; };
       return { rond:cnt(function (c) { return kwRond(c, WQ); }), ctrl:cnt(function (c) { return ctrlKeys.some(function (k) { return veldOpen(c, k); }); }), c25:cnt(function (c) { return veldOpen(c, 'c25'); }), a:a, n:kl.length, achter:cnt(isAchter), btwLaat:cnt(function (c) { return [0,1,2,3].some(function (q) { return bLate(c, q); }); }), btwNu:cnt(function (c) { return [0,1,2,3].some(function (q) { return bDue(c, q); }); }), wacht:cnt(heeftWacht), jw:cnt(function (c) { return veldOpen(c, 'jw25'); }), ib:cnt(function (c) { return veldOpen(c, 'ib25'); }) };
     });
+    var ringBlok = (function () {
+      if (!ringenAan()) return { toon:false };
+      var pc = function (a, b) { return b ? Math.round(a / b * 100) : 0; };
+      var alleL = all.filter(lopend), teamR = alleL.filter(function (c) { return kwRond(c, WQ); }).length, teamP = pc(teamR, alleL.length);
+      var dl = 'btw-deadline ' + btwDlLabel(WQ).replace('uiterlijk ', '');
+      if (wie === 'alle') {
+        return { toon:true, titel:'Q' + (WQ + 1) + ' rond', sub:'klanten waarvan het hele lopende kwartaal klaar is',
+          pct: teamP + '%', l:'team', stijl: ringStijl(teamP, ringKleur(teamP)), getal: teamR, van: 'van ' + alleL.length, regel1: 'nog ' + (alleL.length - teamR) + ' te gaan', regel2: dl,
+          klein: teamRaw.filter(function (r) { return r.n > 0; }).map(function (r) { var p = pc(r.rond, r.n); return { pct: p + '%', stijl: ringStijl(p, ringKleur(p)), l: r.a, sub: r.rond + ' van ' + r.n + ' rond' }; }),
+          hasTeam:false, team:{} };
+      }
+      var mr = mijn.filter(function (c) { return kwRond(c, WQ); }).length, mp = pc(mr, mijn.length), sw = kwSoorten(mijn, WQ);
+      var soort = function (l, x, leegTxt) { var p = pc(x[0], x[1]); return { pct: p + '%', stijl: ringStijl(p, 'var(--bg-ff8000)'), l:l, sub: x[1] ? (x[1] - x[0]) + ' te doen' : leegTxt }; };
+      var klein = [soort('Administratie', sw.adm, 'n.v.t.')];
+      if (WQ > 0) klein.push(soort('Controle Q' + WQ, sw.ctrl, 'n.v.t.'));
+      klein.push(soort('Btw Q' + (WQ + 1), sw.btw, 'n.v.t.'));
+      return { toon:true, titel: (wie === role ? 'Jouw' : 'Werkvoorraad ' + initial(wie)) + ' Q' + (WQ + 1), sub:'klanten waarvan het hele lopende kwartaal klaar is',
+        pct: mp + '%', l:'rond', stijl: ringStijl(mp, ringKleur(mp)), getal: mr, van: 'van ' + mijn.length + ' klanten', regel1: 'nog ' + (mijn.length - mr) + ' te gaan', regel2: dl,
+        klein: klein, hasTeam:true, team:{ pct: teamP + '%', stijl: ringStijl(teamP, 'var(--bg-8e8780)'), l:'Heel het team', sub: teamR + ' van ' + alleL.length + ' rond' } };
+    })();
     var teamMax = {}; teamM.forEach(function (m) { teamMax[m[0]] = Math.max(1, Math.max.apply(null, teamRaw.map(function (r) { return r[m[0]]; }))); });
     var team = teamRaw.map(function (r) { return { a:r.a, init:initial(r.a), pick:function () { self.setState({ werkWie:r.a }); }, cls: wie === r.a ? 'teamrow on' : 'teamrow', cells: teamM.map(function (m) { if (m[0] === 'rond') { var pr = r.n ? Math.round(r.rond / r.n * 100) : 0; return { v:r.rond + ' van ' + r.n, bar:'width: ' + pr + '%; background: var(--bg-4f8a3c)' }; } return { v:r[m[0]], bar:'width: ' + Math.round(r[m[0]] / teamMax[m[0]] * 100) + '%; background: ' + (m[0] === 'n' ? 'var(--bg-d9d9d9)' : m[0] === 'wacht' ? 'var(--bg-7fa3d6)' : m[0] === 'btwLaat' || m[0] === 'achter' ? 'var(--bg-c8412b)' : 'var(--bg-8e8780)') }; }) }; });
     var exportWerk = function () {
@@ -1180,6 +1217,7 @@ class Component extends DCLogic {
       werkWie: wie, onWerkWie: function (ev) { self.setState({ werkWie:ev.target.value }); },
       werkTitel: wie === 'alle' ? 'Werkvoorraad van iedereen' : (wie === role ? 'Mijn werkvoorraad' : 'Werkvoorraad van ' + wie),
       werkSub: mijn.length + ' lopende klanten · administratie telt als achterstand ' + peilLabel() + ' · ' + JAAR,
+      ringBlok: ringBlok, ringen: ringenAan(), geenRingen: !ringenAan(),
       werkSecties: werkSecties, todoTegels: werkSecties.map(function (x) { return { l:(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); })(x.titel.replace(/^\d\. /, '')), n:x.todo, cls: x.todo ? (x.id === 'wacht' ? 'tdt w' : 'tdt') : 'tdt nul' }; }), todoTotaal: werkSecties.filter(function (x) { return x.id !== 'wacht'; }).reduce(function (t, x) { return t + x.todo; }, 0), exportWerk: exportWerk, exportKlanten: exportKlanten,
       team: team, teamKop: teamM.map(function (m) { return { l:m[1] }; }), toonTeam: beheer,
       bJaarCls: bCls('jaar'), bJaar: goSub('jaar'), showJaar: s.bsub === 'jaar',
@@ -1202,7 +1240,7 @@ class Component extends DCLogic {
       scopeAllN: all.filter(function (c) { return lopend(c) && (s.bankF === 'alle' || c.bank === s.bankF); }).length, scopeMijnN: all.filter(function (c) { return lopend(c) && c.admin === role && (s.bankF === 'alle' || c.bank === s.bankF); }).length,
       scopeAll: function () { self.setState({ scope:'alle' }); }, scopeMijn: function () { self.setState({ scope:'mijn', adminF:'alle' }); },
       q:s.q, onQ:function (ev) { self.setState({ q:ev.target.value }); },
-      kpis:kpis, breakdown:breakdown, hasBreakdown: breakdown.length > 0, verloop:verloop, verloopTitel: 'Lopend kwartaal Q' + (WQ + 1) + ' voor deze ' + list.length + ' klanten',
+      verloopBalk: ringenAan() ? [] : verloop, kpis:kpis, breakdown:breakdown, hasBreakdown: breakdown.length > 0, verloop:verloop, verloopTitel: 'Lopend kwartaal Q' + (WQ + 1) + ' voor deze ' + list.length + ' klanten',
       viewTitle: viewTitleTxt,
       viewCount: list.length + (list.length === 1 ? ' klant' : ' klanten'),
       rows:rows, noRows: rows.length === 0,

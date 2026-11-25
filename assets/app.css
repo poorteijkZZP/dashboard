@@ -1,5 +1,6 @@
 /* ===== Kleuren: één centrale plek. Donkere modus overschrijft alleen deze variabelen. ===== */
 :root{
+  --ring-spoor:#eeeae5;
   --ic-ff8000:#ff8000;
   --ln-eeeae5:#eeeae5;
   /* Achtergronden */
@@ -102,6 +103,7 @@
 }
 /* ===== Donkere weergave: alleen de centrale kleuren anders ===== */
 :root[data-thema="donker"]{
+  --ring-spoor:#34302c;
   color-scheme:dark;
   --ic-ff8000:#f59e47;
   --ln-eeeae5:#5f5344;
@@ -582,3 +584,21 @@ aside.schuif{position:fixed!important;top:0;right:0;bottom:0;width:min(580px,94v
 @media (prefers-reduced-motion:reduce){.row.rondnet .cell,.row.rondnet .rondbdg{animation:none}}
 
 :root[data-thema="donker"] img[src="assets/logo.png"]{background:#fff;padding:6px 10px;border-radius:8px}
+/* Ringen (voorlopig alleen in de demo) */
+.ring{--d:7px;position:relative;flex:none;width:60px;height:60px;border-radius:50%;display:inline-grid;place-items:center;align-content:center}
+.ring::before{content:'';position:absolute;inset:var(--d);border-radius:50%;background:var(--bg-ffffff)}
+.ring b,.ring i{position:relative;line-height:1.1}
+.ring b{font-size:14px;font-weight:800;color:var(--tx-2b2b2b)}
+.ring i{font-style:normal;font-size:11px;font-weight:600;color:var(--tx-5e5e5e)}
+.ring.groot{--d:12px;width:112px;height:112px}.ring.groot b{font-size:22px}
+.ring.mini{--d:4px;width:34px;height:34px;margin-left:10px;vertical-align:middle}.ring.mini b{font-size:9.5px}
+.ringblok{padding:18px 20px;margin:16px 0}
+.rbkop{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap}.rbkop .t{font-size:15px;font-weight:800}.rbkop .s{font-size:12px;color:var(--tx-5e5e5e)}
+.rbrij{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+.rbhoofd{display:flex;align-items:center;gap:14px}
+.rbklein{display:flex;gap:22px;flex-wrap:wrap;padding-left:28px;border-left:1px solid var(--ln-e4e2df)}
+.rbteam{padding-left:28px;border-left:1px solid var(--ln-e4e2df)}
+.rbitem{display:flex;align-items:center;gap:10px}
+.rbgetal{font-size:22px;font-weight:800}.rbgetal span{font-size:14px;font-weight:600;color:var(--tx-5e5e5e)}
+.rbl{font-weight:800;font-size:13px}.rbsub{font-size:12px;color:var(--tx-5e5e5e)}
+.vringen{display:flex;gap:30px;flex-wrap:wrap;margin-top:8px}.vringen .ring{width:56px;height:56px}

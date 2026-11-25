@@ -150,6 +150,25 @@
       <div class="tdtot"><b>{{todoTotaal}}</b><span>taken nog te doen</span></div>
       <sc-for list="{{todoTegels}}" as="tg" hint-placeholder-count="7"><div class="{{tg.cls}}"><b>{{tg.n}}</b><span>{{tg.l}}</span></div></sc-for>
     </div>
+    <sc-if value="{{ringBlok.toon}}" hint-placeholder-val="{{ false }}">
+      <section class="card ringblok">
+        <div class="rbkop"><span class="t">{{ringBlok.titel}}</span><span class="s">{{ringBlok.sub}}</span></div>
+        <div class="rbrij">
+          <div class="rbhoofd">
+            <span class="ring groot" style="{{ringBlok.stijl}}"><b>{{ringBlok.pct}}</b><i>{{ringBlok.l}}</i></span>
+            <div><div class="rbgetal">{{ringBlok.getal}} <span>{{ringBlok.van}}</span></div><div class="rbsub">{{ringBlok.regel1}}</div><div class="rbsub">{{ringBlok.regel2}}</div></div>
+          </div>
+          <div class="rbklein">
+            <sc-for list="{{ringBlok.klein}}" as="rk" hint-placeholder-count="3">
+              <div class="rbitem"><span class="ring" style="{{rk.stijl}}"><b>{{rk.pct}}</b></span><div><div class="rbl">{{rk.l}}</div><div class="rbsub">{{rk.sub}}</div></div></div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ringBlok.hasTeam}}" hint-placeholder-val="{{ false }}">
+            <div class="rbitem rbteam"><span class="ring" style="{{ringBlok.team.stijl}}"><b>{{ringBlok.team.pct}}</b></span><div><div class="rbl">{{ringBlok.team.l}}</div><div class="rbsub">{{ringBlok.team.sub}}</div></div></div>
+          </sc-if>
+        </div>
+      </section>
+    </sc-if>
     <sc-if value="{{toonTeam}}" hint-placeholder-val="{{ true }}">
       <section class="card" style="overflow: hidden">
         <div style="padding: 14px 16px; border-bottom: 1px solid var(--ln-e4e2df); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap">
@@ -294,7 +313,10 @@
         </div>
         <div class="verloop">
           <span class="vtitel">{{verloopTitel}}</span>
-          <sc-for list="{{verloop}}" as="vl" hint-placeholder-count="3">
+          <sc-if value="{{ringen}}" hint-placeholder-val="{{ false }}">
+            <div class="vringen"><sc-for list="{{verloop}}" as="vl" hint-placeholder-count="3"><div class="rbitem"><span class="ring" style="{{vl.ring}}"><b>{{vl.pct}}</b></span><div><div class="rbl">{{vl.l}}</div><div class="rbsub">{{vl.tekst}}</div></div></div></sc-for></div>
+          </sc-if>
+          <sc-for list="{{verloopBalk}}" as="vl" hint-placeholder-count="3">
             <div class="vitem"><span class="vl">{{vl.l}}</span><span class="tbar"><span style="{{vl.bar}}; background: {{vl.kleur}}"></span></span><span class="vt"><b>{{vl.pct}}</b> · {{vl.tekst}}</span></div>
           </sc-for>
         </div>
@@ -317,7 +339,7 @@
                 </div>
                 <div class="cell"><sc-if value="{{r.hasAdmin}}" hint-placeholder-val="{{ true }}"><span class="av" title="{{r.admin}}">{{r.init}}</span></sc-if></div>
                 <div class="cell sep">
-                  <div class="{{r.cur.cls}}"><span class="qbl">{{r.cur.l}}</span><sc-for list="{{r.cur.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for><sc-if value="{{r.cur.rond}}" hint-placeholder-val="{{ false }}"><span class="rondbdg" title="Alles voor dit kwartaal is gedaan">✓ rond</span></sc-if></div>
+                  <div class="{{r.cur.cls}}"><span class="qbl">{{r.cur.l}}</span><sc-for list="{{r.cur.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for><sc-if value="{{r.cur.rond}}" hint-placeholder-val="{{ false }}"><span class="rondbdg" title="Alles voor dit kwartaal is gedaan">✓ rond</span></sc-if></div><sc-if value="{{ringen}}" hint-placeholder-val="{{ false }}"><span class="ring mini" style="{{r.cur.ringStijl}}" title="{{r.cur.ringT}}"><b>{{r.cur.ringPct}}</b></span></sc-if>
                 </div>
                 <div class="cell sep" style="gap: 6px; flex-wrap: wrap">
                   <sc-for list="{{r.prev}}" as="pv" hint-placeholder-count="3">
