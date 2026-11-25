@@ -140,8 +140,8 @@ function kwStappen(c, q) {
 function kwRond(c, q) { if (!lopend(c)) return false; var st = kwStappen(c, q); return st.length > 0 && st.every(function (x) { return x; }); }
 // Leest een centrale kleur (CSS-variabele) uit, voor plaatjes waar var() niet werkt (svg als data-URI)
 function kleurVar(naam, terug) { try { var v = getComputedStyle(document.documentElement).getPropertyValue(naam).trim(); return v || terug; } catch (e) { return terug; } }
-// Ringen: voorlopig alleen in de demo. Live aanzetten = deze regel op true zetten.
-function ringenAan() { return !STORE.live; }
+// Ringen op Vandaag en bovenaan het overzicht (uitzetten: false teruggeven)
+function ringenAan() { return true; }
 function ringStijl(pct, kleur) { return 'background: conic-gradient(' + kleur + ' ' + pct + '%, var(--ring-spoor) 0)'; }
 function ringKleur(pct) { return pct >= 100 ? 'var(--bg-4f8a3c)' : 'var(--bg-ff8000)'; }
 // Telt per soort (administratie, controle, btw) wat in kwartaal q van toepassing en gedaan is
