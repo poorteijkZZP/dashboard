@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125s">
-<script src="assets/thema.js?v=20261125s"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125t">
+<script src="assets/thema.js?v=20261125t"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -139,13 +139,14 @@
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 100%">
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">{{werkTitel}}</h1>
-        <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{werkSub}}</span>
       </div>
-      <sc-if value="{{geenTeam}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span class="sneltitel">Collega</span><sc-for list="{{werkChips}}" as="wc" hint-placeholder-count="5"><button type="button" class="{{wc.cls}}" style="{{wc.st}}" onClick="{{wc.pick}}">{{wc.l}} <b>{{wc.n}}</b></button></sc-for></div></sc-if>
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span class="sneltitel">Collega</span><sc-for list="{{werkChips}}" as="wc" hint-placeholder-count="5"><button type="button" class="{{wc.cls}}" style="{{wc.st}}" onClick="{{wc.pick}}">{{wc.l}} <b>{{wc.n}}</b></button></sc-for></div>
+      <sc-if value="{{geenTeam}}" hint-placeholder-val="{{ false }}">
       <button type="button" class="btn dark" onClick="{{exportWerk}}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
         Exporteer naar Excel
       </button>
+      </sc-if>
     </div>
 
     <div class="todobalk">
@@ -175,7 +176,12 @@
       <section class="card" style="overflow: hidden">
         <div style="padding: 12px 16px; border-bottom: 1px solid var(--ln-e4e2df); display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
           <span style="font-size: 15px; font-weight: 800">Team in één oogopslag</span>
-          <span style="display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-left: 10px"><span class="sneltitel">Collega</span><sc-for list="{{werkChips}}" as="wc" hint-placeholder-count="5"><button type="button" class="{{wc.cls}}" style="{{wc.st}}" onClick="{{wc.pick}}">{{wc.l}} <b>{{wc.n}}</b></button></sc-for></span>
+          <span style="flex: 1 1 auto"></span>
+      <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{exportWerk}}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+        Exporteer naar Excel
+      </button>
+
         </div>
         <div style="overflow-x: auto">
           <div class="teamgrid">
@@ -1380,9 +1386,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125s"></script>
-<script src="assets/xlsx.js?v=20261125s"></script>
-<script src="assets/store.js?v=20261125s"></script>
-<script src="assets/app.js?v=20261125s"></script>
+<script src="assets/runtime.js?v=20261125t"></script>
+<script src="assets/xlsx.js?v=20261125t"></script>
+<script src="assets/store.js?v=20261125t"></script>
+<script src="assets/app.js?v=20261125t"></script>
 </body>
 </html>

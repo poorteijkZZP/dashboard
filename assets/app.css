@@ -696,3 +696,5 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .ktxt{display:flex;flex-direction:column;gap:2px;min-width:0}
 .ring.kring2{width:62px;height:62px;--d:6px}.ring.kring2 b{font-size:13px}.ring.kring2 i{font-size:9.5px}
 .kpigrid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.ringblok{margin:0!important;padding:12px 18px!important}.ringblok .rbkop{margin-bottom:8px}
+.tt.ct.d,.qb .tt.ct.d{font-weight:500}
