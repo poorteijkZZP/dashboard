@@ -627,7 +627,8 @@ class Component extends DCLogic {
     var vis = volg.map(function (id) { return FILTERS.filter(function (f) { return f.id === id; })[0]; }).filter(function (f) { return f && (f.id !== 'ctrl' || winQ() > 0); });
     var kwS = kwSoorten(all.filter(inScope), winQ());
     var kRing = function (x, l) { var p = x[1] ? Math.round(x[0] / x[1] * 100) : 0; return { hasRing:true, ringStijl: ringStijl(p, p >= 90 ? 'var(--bg-4f8a3c)' : 'var(--bg-ff8000)'), ringPct: x[1] ? p + '%' : '–', ringL:l, ringT: x[0] + ' van ' + x[1] + ' gedaan' }; };
-    var kRingen = { achter: kRing(kwS.adm, peilLabel()), ctrl: kRing(kwS.ctrl, 'gedaan'), btw: kRing(kwS.btw, 'Q' + (winQ() + 1)) };
+    var kLop = all.filter(function (c) { return inScope(c) && lopend(c); });
+    var kRingen = { achter: kRing([kLop.filter(function (c) { return !isAchter(c); }).length, kLop.length], peilLabel()), ctrl: kRing(kwS.ctrl, 'gedaan'), btw: kRing(kwS.btw, 'Q' + (winQ() + 1)) };
     var kpis = vis.map(function (f) {
       var nOp = f.id === 'alles' ? all.filter(function (c) { return inScope(c) && c.status === 'Opgezegd'; }).length : 0;
       return Object.assign({ hasRing:false, ringStijl:'', ringPct:'', ringL:'', ringT:'' }, kRingen[f.id] || {}, { label:f.kpi, sub: nOp ? 'waarvan ' + nOp + ' opgezegd' : f.sub, value: all.filter(function (c) { return inScope(c) && f.f(c); }).length, cls: cur.id === f.id ? 'kpi on' : 'kpi', pick:function () { self.setState({ filter:f.id }); } });
@@ -953,7 +954,7 @@ class Component extends DCLogic {
     werkSecties[werkSecties.length - 1].vt = 'klanten';
     werkSecties[werkSecties.length - 1].geenBalk = true;
     werkSecties.forEach(function (x) { x.toonBalk = !x.geenBalk; });
-    var teamM = [['n','Klanten'],['rond','Q' + (WQ + 1) + ' rond'],['adm','Administratie ' + peilLabel()],['ctrlR', WQ > 0 ? 'Controle Q' + WQ : 'Controle'],['btwR', WQ > 0 ? 'Btw Q' + WQ : 'Btw'],['c25R','Controle ' + vj()],['jwR','Jaarwerk ' + vj()],['ibR','IB ' + vj()],['wacht','Wacht op klant']];
+    var teamM = [['n','Klanten'],['adm','Administratie ' + peilLabel()],['ctrlR', WQ > 0 ? 'Controle Q' + WQ : 'Controle'],['btwR','Btw Q' + (WQ + 1)],['rond','Q' + (WQ + 1) + ' rond'],['c25R','Controle ' + vj()],['jwR','Jaarwerk ' + vj()],['ibR','IB ' + vj()],['wacht','Wacht op klant']];
     var teamRaw = ADMINS.map(function (a) {
       var kl = all.filter(function (c) { return lopend(c) && c.admin === a; });
       var cnt = function (f) { return kl.filter(f).length; };
@@ -961,7 +962,7 @@ class Component extends DCLogic {
       var vk = function (k) { return deel(function (c) { return veldToep(c, k); }, function (c) { return !!c[k]; }); };
       return { adm:[kl.length - cnt(isAchter), kl.length],
         ctrlR: WQ > 0 ? vk(CTRL[WQ - 1]) : [0, 0],
-        btwR: WQ > 0 ? deel(function (c) { return !btwNa(c, WQ - 1); }, function (c) { return bOn(c, WQ - 1); }) : [0, 0],
+        btwR: deel(function (c) { return !btwNa(c, WQ); }, function (c) { return bOn(c, WQ); }),
         c25R: vk('c25'), jwR: vk('jw25'), ibR: vk('ib25'),
         rond:cnt(function (c) { return kwRond(c, WQ); }), ctrl:cnt(function (c) { return ctrlKeys.some(function (k) { return veldOpen(c, k); }); }), c25:cnt(function (c) { return veldOpen(c, 'c25'); }), a:a, n:kl.length, achter:cnt(isAchter), btwLaat:cnt(function (c) { return [0,1,2,3].some(function (q) { return bLate(c, q); }); }), btwNu:cnt(function (c) { return [0,1,2,3].some(function (q) { return bDue(c, q); }); }), wacht:cnt(heeftWacht), jw:cnt(function (c) { return veldOpen(c, 'jw25'); }), ib:cnt(function (c) { return veldOpen(c, 'ib25'); }) };
     });
@@ -977,8 +978,9 @@ class Component extends DCLogic {
           hasTeam:false, team:{} };
       }
       var mr = mijn.filter(function (c) { return kwRond(c, WQ); }).length, mp = pc(mr, mijn.length), sw = kwSoorten(mijn, WQ);
-      var soort = function (l, x, leegTxt) { var p = pc(x[0], x[1]); return { pct: p + '%', stijl: ringStijl(p, 'var(--bg-ff8000)'), l:l, sub: x[1] ? (x[1] - x[0]) + ' te doen' : leegTxt }; };
-      var klein = [soort('Administratie ' + peilLabel(), sw.adm, 'n.v.t.')];
+      var soort = function (l, x, leegTxt) { var p = pc(x[0], x[1]); return { pct: p + '%', stijl: ringStijl(p, 'var(--bg-ff8000)'), l:l, sub: x[1] ? x[0] + ' van ' + x[1] : leegTxt }; };
+      var mLop = mijn.filter(lopend);
+      var klein = [soort('Administratie ' + peilLabel(), [mLop.filter(function (c) { return !isAchter(c); }).length, mLop.length], 'n.v.t.')];
       if (WQ > 0) klein.push(soort('Controle Q' + WQ, sw.ctrl, 'n.v.t.'));
       klein.push(soort('Btw Q' + (WQ + 1), sw.btw, 'n.v.t.'));
       return { toon:true, titel: (wie === role ? 'Jouw' : 'Werkvoorraad ' + initial(wie)) + ' Q' + (WQ + 1), sub:'klanten waarvan het hele lopende kwartaal klaar is',
