@@ -19,7 +19,7 @@
     <img src="assets/logo.png" alt="PoortEijk ZZP" style="height: 40px; width: auto; align-self: flex-start">
     <div style="display: flex; flex-direction: column; gap: 4px">
       <span style="font-size: 20px; font-weight: 800">{{authTitle}}</span>
-      <span style="font-size: 13px; color: #5E5E5E">{{authSub}}</span>
+      <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{authSub}}</span>
     </div>
     <sc-if value="{{authAskEmail}}" hint-placeholder-val="{{ true }}">
       <label class="field">E-mailadres
@@ -38,8 +38,8 @@
     </sc-if>
     <sc-if value="{{authShowQr}}" hint-placeholder-val="{{ false }}">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
-        <img src="{{mfaQr}}" alt="QR-code voor de authenticator-app" style="width: 200px; height: 200px; border: 1px solid #E4E2DF; border-radius: 10px; background: #fff">
-        <span style="font-size: 12px; color: #5E5E5E; text-align: center">Lukt scannen niet? Voer in de app deze sleutel handmatig in:</span>
+        <img src="{{mfaQr}}" alt="QR-code voor de authenticator-app" style="width: 200px; height: 200px; border: 1px solid var(--ln-e4e2df); border-radius: 10px; background: var(--bg-ffffff)">
+        <span style="font-size: 12px; color: var(--tx-5e5e5e); text-align: center">Lukt scannen niet? Voer in de app deze sleutel handmatig in:</span>
         <code style="font-size: 13px; font-weight: 700; word-break: break-all; text-align: center">{{mfaSecret}}</code>
       </div>
     </sc-if>
@@ -56,14 +56,14 @@
     </sc-if>
     <button type="submit" class="btn primary" style="justify-content: center">{{authBtn}}</button>
     <sc-if value="{{authCanForgot}}" hint-placeholder-val="{{ true }}">
-      <button type="button" class="btn" style="border: 0; justify-content: center; color: #8A3F00" onClick="{{authForgot}}">{{authForgotLabel}}</button>
+      <button type="button" class="btn" style="border: 0; justify-content: center; color: var(--tx-8a3f00)" onClick="{{authForgot}}">{{authForgotLabel}}</button>
     </sc-if>
   </form>
 </div>
 </sc-if>
 
 <sc-if value="{{showLoading}}" hint-placeholder-val="{{ false }}">
-<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #5E5E5E">{{loadingText}}</div>
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--tx-5e5e5e)">{{loadingText}}</div>
 </sc-if>
 
 <sc-if value="{{showApp}}" hint-placeholder-val="{{ true }}">
@@ -81,13 +81,13 @@
   </nav>
 <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column">
 
-  <header style="background: #ffffff; border-bottom: 1px solid #E4E2DF">
+  <header style="background: var(--bg-ffffff); border-bottom: 1px solid var(--ln-e4e2df)">
     <div style="max-width: 1440px; margin: 0 auto; padding: 10px 24px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px">
       <span class="kopnaam">PoortEijk ZZP <span>Klantdashboard</span></span>
       <div style="flex: 1 1 auto"></div>
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px">
-        <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #5E5E5E">Jaar
-          <select aria-label="Kies jaar" value="{{jaarSel}}" onChange="{{onJaar}}" style="border: 1px solid #D0CCC6; border-radius: 8px; font-size: 14px; font-weight: 700; min-height: 34px; padding: 0 6px; background: #fff; color: #2B2B2B">
+        <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--tx-5e5e5e)">Jaar
+          <select aria-label="Kies jaar" value="{{jaarSel}}" onChange="{{onJaar}}" style="border: 1px solid var(--ln-d0ccc6); border-radius: 8px; font-size: 14px; font-weight: 700; min-height: 34px; padding: 0 6px; background: var(--bg-ffffff); color: var(--tx-2b2b2b)">
             <sc-for list="{{jaren}}" as="jy" hint-placeholder-count="1">
               <option value="{{jy.v}}">{{jy.l}}</option>
             </sc-for>
@@ -95,8 +95,8 @@
         </label>
         <sc-if value="{{isDemo}}" hint-placeholder-val="{{ true }}">
           <span class="mini o" style="font-size: 12px">Demo, verzonnen klanten</span>
-          <span style="font-size: 12px; font-weight: 600; color: #5E5E5E">Bekijk als</span>
-          <div style="display: inline-flex; gap: 2px; padding: 3px; background: #F1EFEC; border-radius: 8px">
+          <span style="font-size: 12px; font-weight: 600; color: var(--tx-5e5e5e)">Bekijk als</span>
+          <div style="display: inline-flex; gap: 2px; padding: 3px; background: var(--bg-f1efec); border-radius: 8px">
             <sc-for list="{{roles}}" as="ro" hint-placeholder-count="4">
               <button type="button" class="{{ro.cls}}" onClick="{{ro.pick}}">{{ro.l}}</button>
             </sc-for>
@@ -114,17 +114,17 @@
 
   <main style="max-width: 1440px; width: 100%; margin: 0 auto; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
   <sc-if value="{{hasSaveErr}}" hint-placeholder-val="{{ false }}">
-    <div role="alert" style="background: #FFF2E5; border: 1px solid #FFBF80; color: #8A3F00; border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600">{{saveErr}}</div>
+    <div role="alert" style="background: var(--bg-fff2e5); border: 1px solid var(--ln-ffbf80); color: var(--tx-8a3f00); border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600">{{saveErr}}</div>
   </sc-if>
 
   <sc-if value="{{pageWerk}}" hint-placeholder-val="{{ false }}">
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px">
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">{{werkTitel}}</h1>
-        <span style="font-size: 13px; color: #5E5E5E">{{werkSub}}</span>
+        <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{werkSub}}</span>
       </div>
-      <label style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: #5E5E5E">Werkvoorraad van
-        <select aria-label="Werkvoorraad van" value="{{werkWie}}" onChange="{{onWerkWie}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: #2B2B2B">
+      <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">Werkvoorraad van
+        <select aria-label="Werkvoorraad van" value="{{werkWie}}" onChange="{{onWerkWie}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: var(--tx-2b2b2b)">
           <option value="Jeroen">JB</option>
           <option value="Gea">GW</option>
           <option value="Marco">MK</option>
@@ -144,9 +144,9 @@
     </div>
     <sc-if value="{{toonTeam}}" hint-placeholder-val="{{ true }}">
       <section class="card" style="overflow: hidden">
-        <div style="padding: 14px 16px; border-bottom: 1px solid #E4E2DF; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap">
+        <div style="padding: 14px 16px; border-bottom: 1px solid var(--ln-e4e2df); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap">
           <span style="font-size: 15px; font-weight: 800">Team in één oogopslag</span>
-          <span style="font-size: 12px; color: #5E5E5E">aantal klanten per collega · klik op een naam voor diens werkvoorraad</span>
+          <span style="font-size: 12px; color: var(--tx-5e5e5e)">aantal klanten per collega · klik op een naam voor diens werkvoorraad</span>
         </div>
         <div style="overflow-x: auto">
           <div class="teamgrid">
@@ -179,7 +179,7 @@
               <span class="{{ws.todoCls}}"><b>{{ws.todo}}</b> te doen</span>
             </div>
             <sc-if value="{{ws.toonBalk}}" hint-placeholder-val="{{ true }}">
-              <div class="wverloop"><span class="tbar"><span style="{{ws.vbar}}; background: #FF8000"></span></span><span><b>{{ws.vpct}}</b> · {{ws.vt}}</span></div>
+              <div class="wverloop"><span class="tbar"><span style="{{ws.vbar}}; background: var(--bg-ff8000)"></span></span><span><b>{{ws.vpct}}</b> · {{ws.vt}}</span></div>
             </sc-if>
             <sc-if value="{{ws.hasActie}}" hint-placeholder-val="{{ false }}">
               <a class="btn primary" style="min-height: 34px; font-size: 13px; align-self: flex-start" href="{{ws.actie.href}}" title="{{ws.actie.t}}">{{ws.actie.l}}</a>
@@ -199,13 +199,13 @@
                   <sc-if value="{{wi.toonAdmin}}" hint-placeholder-val="{{ false }}">
                     <span class="mini">{{wi.admin}}</span>
                   </sc-if>
-                  <span style="font-size: 12px; color: #5E5E5E; text-align: right">{{wi.info}}</span>
+                  <span style="font-size: 12px; color: var(--tx-5e5e5e); text-align: right">{{wi.info}}</span>
                 </div>
               </sc-for>
             </div>
           </sc-if>
           <sc-if value="{{ws.leegTonen}}" hint-placeholder-val="{{ false }}">
-            <div style="padding: 18px 16px; font-size: 14px; color: #5E5E5E">{{ws.leeg}}</div>
+            <div style="padding: 18px 16px; font-size: 14px; color: var(--tx-5e5e5e)">{{ws.leeg}}</div>
           </sc-if>
         </section>
       </sc-for>
@@ -219,12 +219,12 @@
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Overzicht</h1>
         <span class="scopetxt">{{scopeTekst}}</span>
       </div>
-      <div style="display: inline-flex; gap: 2px; padding: 3px; background: #EAE7E2; border-radius: 9px" role="group" aria-label="Welke klanten">
+      <div style="display: inline-flex; gap: 2px; padding: 3px; background: var(--bg-eae7e2); border-radius: 9px" role="group" aria-label="Welke klanten">
         <button type="button" class="{{scopeAllCls}}" onClick="{{scopeAll}}">Alle klanten<span class="n">{{scopeAllN}}</span></button>
         <button type="button" class="{{scopeMijnCls}}" onClick="{{scopeMijn}}">Mijn klanten<span class="n">{{scopeMijnN}}</span></button>
       </div>
-      <label style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: #5E5E5E">Collega
-        <select aria-label="Filter op collega" value="{{adminF}}" onChange="{{onAdminF}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: #2B2B2B">
+      <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">Collega
+        <select aria-label="Filter op collega" value="{{adminF}}" onChange="{{onAdminF}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: var(--tx-2b2b2b)">
           <option value="alle">Iedereen</option>
           <option value="Jeroen">JB</option>
           <option value="Gea">GW</option>
@@ -237,8 +237,8 @@
           <sc-for list="{{openOpties}}" as="oo" hint-placeholder-count="5"><option value="{{oo.v}}">{{oo.l}}</option></sc-for>
         </select>
       </label>
-      <label style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 12px; min-height: 42px; flex: 0 1 260px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5E5E5E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 12px; min-height: 42px; flex: 0 1 260px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-5e5e5e)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
         <input type="search" placeholder="Zoek klant" aria-label="Zoek klant" value="{{q}}" onChange="{{onQ}}" style="border: 0; outline: none; font-size: 14px; width: 100%; background: transparent; min-height: 40px">
       </label>
     </div>
@@ -246,9 +246,9 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px">
       <sc-for list="{{kpis}}" as="k" hint-placeholder-count="7">
         <button type="button" class="{{k.cls}}" onClick="{{k.pick}}">
-          <span style="font-size: 13px; font-weight: 600; color: #5E5E5E">{{k.label}}</span>
+          <span style="font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">{{k.label}}</span>
           <span style="font-size: 28px; font-weight: 800; line-height: 1.15">{{k.value}}</span>
-          <span style="font-size: 12px; color: #5E5E5E">{{k.sub}}</span>
+          <span style="font-size: 12px; color: var(--tx-5e5e5e)">{{k.sub}}</span>
         </button>
       </sc-for>
     </div>
@@ -256,7 +256,7 @@
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
 
       <section class="card" style="flex: 999 1 620px; min-width: 0; overflow: hidden">
-        <div style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 14px 16px; border-bottom: 1px solid #E4E2DF">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--ln-e4e2df)">
           <span style="font-size: 15px; font-weight: 800">{{viewTitle}}</span>
           <span class="infowrap">
             <button type="button" class="infobtn" title="Uitleg afvinken" aria-label="Uitleg afvinken" onClick="{{toggleUitleg}}">i</button>
@@ -269,17 +269,17 @@
           <span class="hstap"><span class="muis">rechtermuisknop</span><span class="pijl">→</span><span class="tt w">nov</span>wacht op klant</span>
           <span class="hstap"><span class="tt l">nov</span>= achterstand<span class="tt u" style="margin-left: 8px">nov</span>= nu doen</span>
         </div>
-                <span style="font-size: 12px; color: #5E5E5E">Eerdere kwartalen klap je open door erop te klikken. Klik op een kolomkop met ⇅ om te sorteren.</span>
+                <span style="font-size: 12px; color: var(--tx-5e5e5e)">Eerdere kwartalen klap je open door erop te klikken. Klik op een kolomkop met ⇅ om te sorteren.</span>
               </div>
             </sc-if>
           </span>
-          <span style="font-size: 13px; color: #5E5E5E">{{viewCount}}</span>
+          <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{viewCount}}</span>
           <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{exportKlanten}}" title="Exporteert precies deze weergave, met filters en sortering">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
             Excel
           </button>
           <div style="flex: 1 1 auto"></div>
-          <span style="font-size: 12px; font-weight: 600; color: #5E5E5E">Per collega</span>
+          <span style="font-size: 12px; font-weight: 600; color: var(--tx-5e5e5e)">Per collega</span>
           <sc-for list="{{breakdown}}" as="b" hint-placeholder-count="4">
             <button type="button" class="{{b.cls}}" title="{{b.t}}" onClick="{{b.pick}}">{{b.admin}} <b>{{b.n}}</b></button>
           </sc-for>
@@ -302,7 +302,7 @@
                   <button type="button" class="name" style="flex: 1 1 auto; min-width: 0" onClick="{{r.open}}">
                     {{r.naam}}
                     <sc-if value="{{r.hasBijz}}" hint-placeholder-val="{{ false }}">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A94F00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Heeft bijzonderheden"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-a94f00)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Heeft bijzonderheden"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
                     </sc-if>
                   </button>
                   <sc-for list="{{r.tags}}" as="tg" hint-placeholder-count="1"><span class="{{tg.cls}}">{{tg.l}}</span></sc-for>
@@ -321,10 +321,10 @@
             </sc-for>
           </div>
           <sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
-            <div style="padding: 40px 16px; text-align: center; color: #5E5E5E; font-size: 14px">Niets gevonden in deze weergave.</div>
+            <div style="padding: 40px 16px; text-align: center; color: var(--tx-5e5e5e); font-size: 14px">Niets gevonden in deze weergave.</div>
           </sc-if>
         </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding: 12px 16px; border-top: 1px solid #E4E2DF; font-size: 12px; color: #5E5E5E">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--ln-e4e2df); font-size: 12px; color: var(--tx-5e5e5e)">
           <span>Eerdere kwartalen klap je open door erop te klikken. Kenmerken, jaarwerk en IB vind je op de klantkaart en onder Jaarwerk.</span>
         </div>
       </section>
@@ -340,11 +340,11 @@
 
         <sc-if value="{{showEmpty}}" hint-placeholder-val="{{ true }}">
           <div style="padding: 48px 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
-            <div style="width: 56px; height: 56px; border-radius: 14px; background: #FFF2E5; display: flex; align-items: center; justify-content: center">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#A94F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
+            <div style="width: 56px; height: 56px; border-radius: 14px; background: var(--bg-fff2e5); display: flex; align-items: center; justify-content: center">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-a94f00)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
             </div>
             <span style="font-size: 16px; font-weight: 800">Kies een klant</span>
-            <span style="font-size: 14px; color: #5E5E5E; max-width: 300px">Je ziet dan in één scherm de bijzonderheden, kenmerken, stand van de administratie en de teamnotities.</span>
+            <span style="font-size: 14px; color: var(--tx-5e5e5e); max-width: 300px">Je ziet dan in één scherm de bijzonderheden, kenmerken, stand van de administratie en de teamnotities.</span>
           </div>
         </sc-if>
 
@@ -353,14 +353,14 @@
             <div style="display: flex; align-items: flex-start; gap: 12px">
               <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 auto; min-width: 0">
                 <span style="font-size: 20px; font-weight: 800; line-height: 1.2">{{d.naam}}</span>
-                <span style="font-size: 13px; color: #5E5E5E">{{d.admin}} · klant sinds {{d.vanaf}}</span>
+                <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{d.admin}} · klant sinds {{d.vanaf}}</span>
               </div>
               <button type="button" class="btn icon" aria-label="Sluiten" onClick="{{closePanel}}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
               </button>
             </div>
             <sc-if value="{{d.hasEinde}}" hint-placeholder-val="{{ false }}">
-              <div style="background: #2B2B2B; color: #fff; border-radius: 10px; padding: 10px 14px; font-size: 13px; line-height: 1.5">
+              <div style="background: var(--bg-2b2b2b); color: var(--tx-ffffff); border-radius: 10px; padding: 10px 14px; font-size: 13px; line-height: 1.5">
                 <b>{{d.status}} per {{d.eindDatum}}</b> ({{d.eindReden}})<br>{{d.eindScope}}
               </div>
             </sc-if>
@@ -372,7 +372,7 @@
                 </button>
               </div>
             </sc-if>
-            <div style="display: flex; gap: 20px; border-bottom: 1px solid #E4E2DF">
+            <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--ln-e4e2df)">
               <button type="button" class="{{tabOverCls}}" onClick="{{tabOver}}">Klantkaart</button>
               <button type="button" class="{{tabHistCls}}" onClick="{{tabHist}}">Historie</button>
             </div>
@@ -382,10 +382,10 @@
             <div style="padding: 16px 20px 22px; display: flex; flex-direction: column; gap: 18px">
 
               <sc-if value="{{d.hasBijz}}" hint-placeholder-val="{{ true }}">
-                <div style="background: #FFF2E5; border: 1px solid #FFBF80; border-radius: 10px; padding: 12px 14px; display: flex; gap: 10px">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A94F00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
+                <div style="background: var(--bg-fff2e5); border: 1px solid var(--ln-ffbf80); border-radius: 10px; padding: 12px 14px; display: flex; gap: 10px">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--ic-a94f00); flex: none; margin-top: 1px"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
                   <div style="display: flex; flex-direction: column; gap: 3px">
-                    <span style="font-size: 13px; font-weight: 800; color: #6B3200">Bijzonderheden</span>
+                    <span style="font-size: 13px; font-weight: 800; color: var(--tx-6b3200)">Bijzonderheden</span>
                     <span style="font-size: 14px; line-height: 1.45; white-space: pre-line">{{d.bijz}}</span>
                   </div>
                 </div>
@@ -397,7 +397,7 @@
                   <div class="{{bk.cls}}"><span class="qbl">{{bk.l}}</span><sc-for list="{{bk.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isGap}}" hint-placeholder-val="{{ false }}"><span class="tt gap"></span></sc-if><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
                 </sc-for>
                 <div class="qb"><span class="qbl">{{vjLabel}}</span><sc-for list="{{d.jaarTegels}}" as="tt" hint-placeholder-count="3"><button type="button" class="{{tt.cls}} breed" title="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></div>
-                <span style="font-size: 12px; color: #5E5E5E">Klik = gedaan aan/uit · rechtermuisknop = wacht op klant of terug naar open</span>
+                <span style="font-size: 12px; color: var(--tx-5e5e5e)">Klik = gedaan aan/uit · rechtermuisknop = wacht op klant of terug naar open</span>
               </div>
 
               <div class="vpkaart">
@@ -405,7 +405,7 @@
                 <sc-for list="{{d.vpRijen}}" as="vr" hint-placeholder-count="2">
                   <div class="vpregel"><span class="av">{{vr.init}}</span><span class="vpwie">{{vr.wie}} · {{vr.wanneer}}<sc-if value="{{vr.hasGew}}" hint-placeholder-val="{{ false }}"><em> · {{vr.gewijzigd}}</em></sc-if></span><input type="text" inputmode="numeric" aria-label="Aantal" value="{{vr.aantal}}" onChange="{{vr.wijzig}}"><button type="button" class="vpweg" title="Verwijderen" onClick="{{vr.weg}}">✕</button></div>
                 </sc-for>
-                <sc-if value="{{d.vpLeeg}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: #8E8E8E">Nog geen vraagposten dit jaar.</span></sc-if>
+                <sc-if value="{{d.vpLeeg}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: var(--tx-8e8e8e)">Nog geen vraagposten dit jaar.</span></sc-if>
               </div>
 
               <div class="secties">
@@ -435,7 +435,7 @@
 
           <sc-if value="{{tGeg}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 14px">
-              <span style="font-size: 13px; color: #5E5E5E">Alle gegevens en kenmerken. Alleen de beheerder wijzigt deze via Muteren.</span>
+              <span style="font-size: 13px; color: var(--tx-5e5e5e)">Alle gegevens en kenmerken. Alleen de beheerder wijzigt deze via Muteren.</span>
               <dl class="kv">
                 <sc-for list="{{d.gegevens2}}" as="g" hint-placeholder-count="10">
                   <dt>{{g.k}}</dt>
@@ -452,11 +452,11 @@
           <sc-if value="{{tHist}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 18px 20px 22px; display: flex; flex-direction: column">
               <sc-for list="{{d.log}}" as="l" hint-placeholder-count="3">
-                <div style="display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F0EEEB">
+                <div style="display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ln-f0eeeb)">
                   <span class="av">{{l.init}}</span>
                   <div style="display: flex; flex-direction: column; gap: 2px">
                     <span style="font-size: 14px"><b>{{l.wie}}</b> · {{l.wat}}</span>
-                    <span style="font-size: 12px; color: #5E5E5E">{{l.wanneer}}</span>
+                    <span style="font-size: 12px; color: var(--tx-5e5e5e)">{{l.wanneer}}</span>
                   </div>
                 </div>
               </sc-for>
@@ -471,7 +471,7 @@
   <sc-if value="{{pageBeheer}}" hint-placeholder-val="{{ false }}">
     <div style="display: flex; flex-direction: column; gap: 4px">
       <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Beheer</h1>
-      <p style="margin: 0; font-size: 14px; color: #5E5E5E">Alleen zichtbaar voor de beheerder. Wijzigingen komen direct in het klantoverzicht van het hele team.</p>
+      <p style="margin: 0; font-size: 14px; color: var(--tx-5e5e5e)">Alleen zichtbaar voor de beheerder. Wijzigingen komen direct in het klantoverzicht van het hele team.</p>
     </div>
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
       <nav class="card" style="flex: 1 1 220px; max-width: 100%; padding: 8px; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box" aria-label="Beheer">
@@ -486,8 +486,8 @@
         <button type="button" class="{{bJaarCls}}" onClick="{{bJaar}}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Jaar en instellingen</button>
         <sc-if value="{{isDemo}}" hint-placeholder-val="{{ true }}">
-          <div style="border-top: 1px solid #E4E2DF; margin: 6px 0 2px"></div>
-          <button type="button" class="sub" style="font-size: 13px; color: #6B6B6B" onClick="{{demoReset}}">{{demoResetLabel}}</button>
+          <div style="border-top: 1px solid var(--ln-e4e2df); margin: 6px 0 2px"></div>
+          <button type="button" class="sub" style="font-size: 13px; color: var(--tx-6b6b6b)" onClick="{{demoReset}}">{{demoResetLabel}}</button>
         </sc-if>
       </nav>
 
@@ -567,7 +567,7 @@
               </label>
               <label class="field">Facturen per jaar (max.)
                 <input type="number" min="0" value="{{form.facturen}}" onChange="{{on.facturen}}" readOnly="{{factLocked}}" placeholder="Zelf invullen" style="{{factStyle}}">
-                <span style="font-size: 12px; font-weight: 500; color: #5E5E5E">{{factHint}}</span>
+                <span style="font-size: 12px; font-weight: 500; color: var(--tx-5e5e5e)">{{factHint}}</span>
               </label>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 8px">
@@ -602,7 +602,7 @@
               </label>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 8px">
-              <label class="check" style="border-color: #FFBF80; background: #FFFBF7"><input type="checkbox" checked="{{form.btwMaand}}" onChange="{{on.btwMaand}}">Btw-aangifte per maand</label>
+              <label class="check" style="border-color: var(--ln-ffbf80); background: var(--bg-fffbf7)"><input type="checkbox" checked="{{form.btwMaand}}" onChange="{{on.btwMaand}}">Btw-aangifte per maand</label>
               <label class="check"><input type="checkbox" checked="{{form.pers}}" onChange="{{on.pers}}">Personenauto</label>
               <label class="check"><input type="checkbox" checked="{{form.best}}" onChange="{{on.best}}">Bestelauto</label>
               <label class="check"><input type="checkbox" checked="{{form.km}}" onChange="{{on.km}}">KM-registratie</label>
@@ -637,11 +637,11 @@
             </label>
 
             <sc-if value="{{hasErr}}" hint-placeholder-val="{{ false }}">
-              <div role="alert" style="font-size: 14px; font-weight: 600; color: #8A3F00; background: #FFF2E5; border-radius: 8px; padding: 10px 12px">{{err}}</div>
+              <div role="alert" style="font-size: 14px; font-weight: 600; color: var(--tx-8a3f00); background: var(--bg-fff2e5); border-radius: 8px; padding: 10px 12px">{{err}}</div>
             </sc-if>
             <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
               <button type="button" class="btn primary" onClick="{{saveForm}}">Opslaan</button>
-              <span style="font-size: 12px; color: #5E5E5E; flex: 1 1 200px">{{formHint}}</span>
+              <span style="font-size: 12px; color: var(--tx-5e5e5e); flex: 1 1 200px">{{formHint}}</span>
             </div>
           </section>
         </sc-if>
@@ -649,8 +649,8 @@
         <sc-if value="{{showMut}}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
             <section class="card" style="flex: 1 1 260px; max-width: 100%; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box">
-              <label style="display: flex; align-items: center; gap: 8px; border: 1px solid #D0CCC6; border-radius: 8px; padding: 0 10px; min-height: 40px">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5E5E5E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+              <label style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 10px; min-height: 40px">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-5e5e5e)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
                 <input type="search" aria-label="Zoek klant om te muteren" placeholder="Zoek klant" value="{{mq}}" onChange="{{onMq}}" style="border: 0; outline: none; font-size: 14px; width: 100%; min-height: 38px; background: transparent">
               </label>
               <div style="display: flex; flex-direction: column; gap: 2px; max-height: 520px; overflow-y: auto">
@@ -662,13 +662,13 @@
 
             <section class="card" style="flex: 999 1 380px; min-width: 0; padding: 20px 22px; display: flex; flex-direction: column; gap: 16px">
               <sc-if value="{{noMutSel}}" hint-placeholder-val="{{ false }}">
-                <span style="font-size: 15px; color: #5E5E5E; padding: 24px 0">Kies links een klant om te muteren.</span>
+                <span style="font-size: 15px; color: var(--tx-5e5e5e); padding: 24px 0">Kies links een klant om te muteren.</span>
               </sc-if>
               <sc-if value="{{hasMutSel}}" hint-placeholder-val="{{ true }}">
                 <div style="display: flex; flex-direction: column; gap: 4px">
-                  <span style="font-size: 12px; font-weight: 700; color: #5E5E5E">Mutatie voor</span>
+                  <span style="font-size: 12px; font-weight: 700; color: var(--tx-5e5e5e)">Mutatie voor</span>
                   <span style="font-size: 22px; font-weight: 800">{{m.naam}}</span>
-                  <span style="font-size: 13px; color: #5E5E5E">{{m.info}}</span>
+                  <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{m.info}}</span>
                 </div>
 
                 <sc-if value="{{mMenu}}" hint-placeholder-val="{{ true }}">
@@ -676,7 +676,7 @@
                     <button type="button" class="mopt" onClick="{{mEdit}}"><b>Gegevens wijzigen</b><span>Kenmerken, verwerking, bank, contact, bijzonderheden</span></button>
                     <button type="button" class="mopt" onClick="{{mAdmin}}"><b>Andere administrateur</b><span>Klant overdragen aan een collega</span></button>
                     <sc-if value="{{m.kanStoppen}}" hint-placeholder-val="{{ true }}">
-                      <button type="button" class="mopt" onClick="{{mStop}}" style="border-color: #FFBF80; background: #FFFBF7"><b>Klant stopt</b><span>Vastleggen t/m welke periode wij nog administratie, btw, jaarwerk en IB doen</span></button>
+                      <button type="button" class="mopt" onClick="{{mStop}}" style="border-color: var(--ln-ffbf80); background: var(--bg-fffbf7)"><b>Klant stopt</b><span>Vastleggen t/m welke periode wij nog administratie, btw, jaarwerk en IB doen</span></button>
                     </sc-if>
                     <sc-if value="{{m.isOpgezegd}}" hint-placeholder-val="{{ false }}">
                       <button type="button" class="mopt" onClick="{{mDefinitief}}"><b>Definitief afsluiten</b><span>Al het resterende werk is klaar, klant naar archief</span></button>
@@ -752,9 +752,9 @@
                       <label class="check"><input type="checkbox" checked="{{stop.ib26}}" onChange="{{onStop.ib26}}">IB-aangifte {{jaarLabel}} door ons</label>
                     </div>
                     <sc-if value="{{m.hasOpen25}}" hint-placeholder-val="{{ false }}">
-                      <div style="font-size: 13px; background: #FFF2E5; border-radius: 8px; padding: 10px 12px; color: #6B3200"><b>Let op:</b> {{m.open25}}</div>
+                      <div style="font-size: 13px; background: var(--bg-fff2e5); border-radius: 8px; padding: 10px 12px; color: var(--tx-6b3200)"><b>Let op:</b> {{m.open25}}</div>
                     </sc-if>
-                    <span style="font-size: 12px; color: #5E5E5E">Na opslaan staat de klant op Opgezegd. Hij blijft in de dagelijkse overzichten tot het resterende werk klaar is. Alles na de gekozen periodes wordt niet van toepassing.</span>
+                    <span style="font-size: 12px; color: var(--tx-5e5e5e)">Na opslaan staat de klant op Opgezegd. Hij blijft in de dagelijkse overzichten tot het resterende werk klaar is. Alles na de gekozen periodes wordt niet van toepassing.</span>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px">
                       <button type="button" class="btn primary" onClick="{{doStop}}">Beëindiging vastleggen</button>
                       <button type="button" class="btn" onClick="{{backMenu}}">Terug</button>
@@ -763,7 +763,7 @@
                 </sc-if>
 
                 <sc-if value="{{hasMutMsg}}" hint-placeholder-val="{{ false }}">
-                  <div role="status" style="font-size: 14px; font-weight: 600; background: #F1EFEC; border-radius: 8px; padding: 10px 12px">{{mutMsg}}</div>
+                  <div role="status" style="font-size: 14px; font-weight: 600; background: var(--bg-f1efec); border-radius: 8px; padding: 10px 12px">{{mutMsg}}</div>
                 </sc-if>
               </sc-if>
             </section>
@@ -775,7 +775,7 @@
             <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
               <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 300px">
                 <span style="font-size: 20px; font-weight: 800">Vraagposten per klant</span>
-                <span style="font-size: 13px; color: #5E5E5E">Iedereen registreert vraagposten via de kolom VP in het overzicht of op de klantkaart. Exporteer na afloop van het jaar naar Excel om in AFAS te factureren.</span>
+                <span style="font-size: 13px; color: var(--tx-5e5e5e)">Iedereen registreert vraagposten via de kolom VP in het overzicht of op de klantkaart. Exporteer na afloop van het jaar naar Excel om in AFAS te factureren.</span>
               </div>
               <label class="filterbox">Jaar
                 <select aria-label="Jaar vraagposten" value="{{vpJaarSel}}" onChange="{{onVpJaar}}"><sc-for list="{{vpJaren}}" as="vj2" hint-placeholder-count="1"><option value="{{vj2.v}}">{{vj2.l}}</option></sc-for></select>
@@ -793,18 +793,18 @@
           <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 18px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <span style="font-size: 20px; font-weight: 800">Jaarovergang</span>
-              <span style="font-size: 13px; color: #5E5E5E">Huidig werkjaar: <b>{{huidigJaar}}</b>. Met de knop maak je voor alle lopende klanten een lege voortgangsregel {{volgendJaar}} aan. Jaarwerk en IB over {{huidigJaar}} komen dan als "vorig jaar" op de nieuwe regel. {{huidigJaar}} blijft bewaard en is altijd in te zien via de jaarkeuze bovenin. Gestopte klanten gaan niet mee; opgezegde klanten alleen voor het jaarwerk en de IB die wij nog doen.</span>
+              <span style="font-size: 13px; color: var(--tx-5e5e5e)">Huidig werkjaar: <b>{{huidigJaar}}</b>. Met de knop maak je voor alle lopende klanten een lege voortgangsregel {{volgendJaar}} aan. Jaarwerk en IB over {{huidigJaar}} komen dan als "vorig jaar" op de nieuwe regel. {{huidigJaar}} blijft bewaard en is altijd in te zien via de jaarkeuze bovenin. Gestopte klanten gaan niet mee; opgezegde klanten alleen voor het jaarwerk en de IB die wij nog doen.</span>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
               <button type="button" class="btn primary" onClick="{{jaarStart}}">{{jaarBtn}}</button>
-              <span style="font-size: 12px; color: #5E5E5E">Advies: begin januari, nadat Q4 is afgerond of als je Q4 voortaan in het nieuwe jaar wilt bijhouden.</span>
+              <span style="font-size: 12px; color: var(--tx-5e5e5e)">Advies: begin januari, nadat Q4 is afgerond of als je Q4 voortaan in het nieuwe jaar wilt bijhouden.</span>
             </div>
             <sc-if value="{{hasJaarMsg}}" hint-placeholder-val="{{ false }}">
-              <div role="status" style="background: #F1EFEC; border-radius: 8px; padding: 10px 12px; font-size: 13px; font-weight: 600">{{jaarMsg}}</div>
+              <div role="status" style="background: var(--bg-f1efec); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-weight: 600">{{jaarMsg}}</div>
             </sc-if>
-            <div style="border-top: 1px solid #E4E2DF; padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
+            <div style="border-top: 1px solid var(--ln-e4e2df); padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
               <span style="font-size: 16px; font-weight: 800">Wanneer telt iets als achterstand?</span>
-              <span style="font-size: 13px; color: #5E5E5E">Automatisch: administratie moet bij zijn tot en met de vorige maand (in november dus t/m oktober). Btw telt als achterstand zodra de wettelijke deadline voorbij is. Nu: administratie <b>{{peilNu}}</b>.</span>
+              <span style="font-size: 13px; color: var(--tx-5e5e5e)">Automatisch: administratie moet bij zijn tot en met de vorige maand (in november dus t/m oktober). Btw telt als achterstand zodra de wettelijke deadline voorbij is. Nu: administratie <b>{{peilNu}}</b>.</span>
               <label class="field" style="max-width: 320px">Peilmaand administratie
                 <select value="{{peilSel}}" onChange="{{onPeil}}">
                   <option value="auto">Automatisch op datum (aanbevolen)</option>
@@ -823,7 +823,7 @@
                   <option value="12">t/m december</option>
                 </select>
               </label>
-              <span style="font-size: 12px; color: #5E5E5E">Een handmatige keuze geldt voor het hele team tot je hem terugzet op automatisch.</span>
+              <span style="font-size: 12px; color: var(--tx-5e5e5e)">Een handmatige keuze geldt voor het hele team tot je hem terugzet op automatisch.</span>
             </div>
           </section>
         </sc-if>
@@ -832,11 +832,11 @@
           <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 14px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <span style="font-size: 20px; font-weight: 800">Actieve klanten per pakket</span>
-              <span style="font-size: 13px; color: #5E5E5E">{{pakTotaal}} lopende klanten (actief en opgezegd).</span>
+              <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{pakTotaal}} lopende klanten (actief en opgezegd).</span>
             </div>
             <div class="paklijst">
               <sc-for list="{{pakketten}}" as="pk" hint-placeholder-count="5">
-                <div class="pakrij"><b>{{pk.l}}</b><span class="tbar"><span style="{{pk.bar}}; background: #FF8000"></span></span><span class="pakn"><b>{{pk.n}}</b> · {{pk.pct}}</span><span class="pakper">{{pk.per}}</span></div>
+                <div class="pakrij"><b>{{pk.l}}</b><span class="tbar"><span style="{{pk.bar}}; background: var(--bg-ff8000)"></span></span><span class="pakn"><b>{{pk.n}}</b> · {{pk.pct}}</span><span class="pakper">{{pk.per}}</span></div>
               </sc-for>
             </div>
           </section>
@@ -845,13 +845,13 @@
             <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
               <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px">
                 <span style="font-size: 20px; font-weight: 800">Afgevinkt per maand</span>
-                <span style="font-size: 13px; color: #5E5E5E">Hoeveel kwartaalcontroles, jaarcontroles, jaarrekeningen en IB-aangiften er per maand zijn afgevinkt (min wat weer op open is gezet). Telt vanaf het moment dat in het dashboard wordt afgevinkt; wat in de Excel is gedaan, telt niet mee.</span>
+                <span style="font-size: 13px; color: var(--tx-5e5e5e)">Hoeveel kwartaalcontroles, jaarcontroles, jaarrekeningen en IB-aangiften er per maand zijn afgevinkt (min wat weer op open is gezet). Telt vanaf het moment dat in het dashboard wordt afgevinkt; wat in de Excel is gedaan, telt niet mee.</span>
               </div>
               <label class="filterbox">Jaar
                 <select aria-label="Jaar rapport" value="{{rapJaarSel}}" onChange="{{onRapJaar}}"><sc-for list="{{rapJaren}}" as="rj" hint-placeholder-count="2"><option value="{{rj.v}}">{{rj.l}}</option></sc-for></select>
               </label>
             </div>
-            <sc-if value="{{afvinkLaden}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #5E5E5E">Gegevens worden geladen...</span></sc-if>
+            <sc-if value="{{afvinkLaden}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: var(--tx-5e5e5e)">Gegevens worden geladen...</span></sc-if>
             <div class="afvtab">
               <span class="kh">Maand</span>
               <sc-for list="{{afvinkKop}}" as="ak" hint-placeholder-count="6"><span class="kh">{{ak.l}}</span></sc-for>
@@ -862,7 +862,7 @@
                 <span><b>{{ar.tot}}</b></span>
               </sc-for>
               <span class="kh">Totaal</span>
-              <sc-for list="{{afvinkTot}}" as="at" hint-placeholder-count="6"><span class="kh" style="color: #2B2B2B">{{at.v}}</span></sc-for>
+              <sc-for list="{{afvinkTot}}" as="at" hint-placeholder-count="6"><span class="kh" style="color: var(--tx-2b2b2b)">{{at.v}}</span></sc-for>
               <span class="kh"></span>
             </div>
           </section>
@@ -870,12 +870,12 @@
           <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 18px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <span style="font-size: 20px; font-weight: 800">In- en uitstroom van klanten</span>
-              <span style="font-size: 13px; color: #5E5E5E">Jaartotalen uit het klantenbestand ({{jaarLabel}}* = tot nu toe). Omdat start en einde voortaan per kwartaal worden vastgelegd, kan dit overzicht vanaf nu ook per kwartaal.</span>
+              <span style="font-size: 13px; color: var(--tx-5e5e5e)">Jaartotalen uit het klantenbestand ({{jaarLabel}}* = tot nu toe). Omdat start en einde voortaan per kwartaal worden vastgelegd, kan dit overzicht vanaf nu ook per kwartaal.</span>
             </div>
             <sc-if value="{{hasLijn}}" hint-placeholder-val="{{ true }}">
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <span style="font-size: 15px; font-weight: 800">Aantal actieve klanten</span>
-                <span style="font-size: 12px; color: #5E5E5E">T/m 2025 per jaareinde, vanaf 2026 per kwartaaleinde (lopend kwartaal: stand van vandaag). Gestopte klanten zonder einddatum tellen tot het einde van hun stopjaar.</span>
+                <span style="font-size: 12px; color: var(--tx-5e5e5e)">T/m 2025 per jaareinde, vanaf 2026 per kwartaaleinde (lopend kwartaal: stand van vandaag). Gestopte klanten zonder einddatum tellen tot het einde van hun stopjaar.</span>
                 <img src="{{lijnSvg}}" alt="Lijngrafiek met het aantal actieve klanten" style="width: 100%; max-width: 980px; height: auto">
               </div>
             </sc-if>
@@ -885,20 +885,20 @@
                 <div class="kwtab">
                   <span class="kh">Kwartaal</span><span class="kh">Nieuw</span><span class="kh">Gestopt</span><span class="kh">Saldo</span><span class="kh">Actief einde kwartaal</span>
                   <sc-for list="{{kwRijen}}" as="kr" hint-placeholder-count="4">
-                    <span><b>{{kr.p}}</b></span><span style="color: #B35A00; font-weight: 700">{{kr.n}}</span><span style="color: #4A4A4A; font-weight: 700">{{kr.s}}</span><span style="font-weight: 800">{{kr.net}}</span><span style="font-weight: 800">{{kr.a}}</span>
+                    <span><b>{{kr.p}}</b></span><span style="color: var(--tx-b35a00); font-weight: 700">{{kr.n}}</span><span style="color: var(--tx-4a4a4a); font-weight: 700">{{kr.s}}</span><span style="font-weight: 800">{{kr.net}}</span><span style="font-weight: 800">{{kr.a}}</span>
                   </sc-for>
                 </div>
-                <span style="font-size: 12px; color: #5E5E5E">* lopend kwartaal, stand van vandaag. Gestopt telt mee in het kwartaal van de einddatum.</span>
+                <span style="font-size: 12px; color: var(--tx-5e5e5e)">* lopend kwartaal, stand van vandaag. Gestopt telt mee in het kwartaal van de einddatum.</span>
               </div>
             </sc-if>
             <div style="display: flex; flex-direction: column; gap: 10px">
               <span style="font-size: 15px; font-weight: 800">Aantal actieve klanten per jaareinde</span>
-              <span style="font-size: 12px; color: #5E5E5E">Teruggerekend vanaf het huidige aantal actieve klanten, met de nieuwe en gestopte klanten per jaar. Boven elke staaf de groei ten opzichte van het jaar ervoor.</span>
+              <span style="font-size: 12px; color: var(--tx-5e5e5e)">Teruggerekend vanaf het huidige aantal actieve klanten, met de nieuwe en gestopte klanten per jaar. Boven elke staaf de groei ten opzichte van het jaar ervoor.</span>
               <div style="overflow-x: auto">
-                <div style="display: flex; align-items: flex-end; gap: 20px; min-width: 520px; height: 250px; border-bottom: 1px solid #D0CCC6; padding: 0 8px">
+                <div style="display: flex; align-items: flex-end; gap: 20px; min-width: 520px; height: 250px; border-bottom: 1px solid var(--ln-d0ccc6); padding: 0 8px">
                   <sc-for list="{{act}}" as="ac" hint-placeholder-count="6">
                     <div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%" title="{{ac.t}}">
-                      <span style="font-size: 12px; font-weight: 700; color: #8A3F00">{{ac.g}}</span>
+                      <span style="font-size: 12px; font-weight: 700; color: var(--tx-8a3f00)">{{ac.g}}</span>
                       <span style="font-size: 13px; font-weight: 800">{{ac.v}}</span>
                       <div class="bar" style="{{ac.h}}; width: 40px"></div>
                     </div>
@@ -906,7 +906,7 @@
                 </div>
                 <div style="display: flex; gap: 20px; min-width: 520px; padding: 8px 8px 0">
                   <sc-for list="{{act}}" as="ac2" hint-placeholder-count="6">
-                    <span style="flex: 1 1 0; text-align: center; font-size: 13px; font-weight: 700; color: #3A3A3A">{{ac2.y}}</span>
+                    <span style="flex: 1 1 0; text-align: center; font-size: 13px; font-weight: 700; color: var(--tx-3a3a3a)">{{ac2.y}}</span>
                   </sc-for>
                 </div>
               </div>
@@ -914,18 +914,18 @@
             <span style="font-size: 15px; font-weight: 800; margin-top: 6px">Nieuw en gestopt per jaar</span>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px">
               <sc-for list="{{anaKpi}}" as="ak" hint-placeholder-count="3">
-                <div style="border: 1px solid #E4E2DF; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px">
-                  <span style="font-size: 13px; font-weight: 600; color: #5E5E5E">{{ak.l}}</span>
+                <div style="border: 1px solid var(--ln-e4e2df); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px">
+                  <span style="font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">{{ak.l}}</span>
                   <span style="font-size: 28px; font-weight: 800">{{ak.v}}</span>
                 </div>
               </sc-for>
             </div>
             <div style="display: flex; gap: 18px; align-items: center; font-size: 13px; font-weight: 600">
-              <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #FF8000; display: inline-block"></span>Nieuwe klanten</span>
-              <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #6B6B6B; display: inline-block"></span>Gestopte klanten</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: var(--bg-ff8000); display: inline-block"></span>Nieuwe klanten</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: var(--bg-6b6b6b); display: inline-block"></span>Gestopte klanten</span>
             </div>
             <div style="overflow-x: auto">
-              <div style="display: flex; align-items: flex-end; gap: 28px; min-width: 520px; height: 250px; border-bottom: 1px solid #D0CCC6; padding: 0 8px">
+              <div style="display: flex; align-items: flex-end; gap: 28px; min-width: 520px; height: 250px; border-bottom: 1px solid var(--ln-d0ccc6); padding: 0 8px">
                 <sc-for list="{{ana}}" as="an" hint-placeholder-count="5">
                   <div style="flex: 1 1 0; display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 100%">
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 4px" title="{{an.tN}}">
@@ -933,7 +933,7 @@
                       <div class="bar" style="{{an.hN}}"></div>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 4px" title="{{an.tS}}">
-                      <span style="font-size: 12px; font-weight: 700; color: #4A4A4A">{{an.s}}</span>
+                      <span style="font-size: 12px; font-weight: 700; color: var(--tx-4a4a4a)">{{an.s}}</span>
                       <div class="bar" style="{{an.hS}}"></div>
                     </div>
                   </div>
@@ -941,11 +941,11 @@
               </div>
               <div style="display: flex; gap: 28px; min-width: 520px; padding: 8px 8px 0">
                 <sc-for list="{{ana}}" as="an2" hint-placeholder-count="5">
-                  <span style="flex: 1 1 0; text-align: center; font-size: 13px; font-weight: 700; color: #3A3A3A">{{an2.y}}</span>
+                  <span style="flex: 1 1 0; text-align: center; font-size: 13px; font-weight: 700; color: var(--tx-3a3a3a)">{{an2.y}}</span>
                 </sc-for>
               </div>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(4, minmax(80px, 1fr)); font-size: 14px; border: 1px solid #E4E2DF; border-radius: 10px; overflow: hidden">
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(80px, 1fr)); font-size: 14px; border: 1px solid var(--ln-e4e2df); border-radius: 10px; overflow: hidden">
               <div class="hcell">Jaar</div><div class="hcell">Nieuw</div><div class="hcell">Gestopt</div><div class="hcell">Netto</div>
               <sc-for list="{{ana}}" as="at" hint-placeholder-count="5">
                 <div class="cell" style="min-height: 40px; font-weight: 700">{{at.y}}</div>
@@ -965,16 +965,16 @@
   <sc-if value="{{pageSel}}" hint-placeholder-val="{{ false }}">
     <div style="display: flex; flex-direction: column; gap: 4px">
       <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Selecties</h1>
-      <p style="margin: 0; font-size: 14px; color: #5E5E5E">Maak een selectie, mail de klanten in BCC of exporteer naar Excel.</p>
+      <p style="margin: 0; font-size: 14px; color: var(--tx-5e5e5e)">Maak een selectie, mail de klanten in BCC of exporteer naar Excel.</p>
     </div>
         <sc-if value="{{showSel}}" hint-placeholder-val="{{ true }}">
           <section class="card" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 16px">
             <div style="display: flex; flex-direction: column; gap: 4px">
               <span style="font-size: 20px; font-weight: 800">Selectie maken</span>
-              <span style="font-size: 13px; color: #5E5E5E">Combineer filters. Daarna mail je de selectie, kopieer je de e-mailadressen, exporteer je naar Excel of bewaar je hem als vaste weergave.</span>
+              <span style="font-size: 13px; color: var(--tx-5e5e5e)">Combineer filters. Daarna mail je de selectie, kopieer je de e-mailadressen, exporteer je naar Excel of bewaar je hem als vaste weergave.</span>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
-              <span style="font-size: 12px; font-weight: 700; color: #5E5E5E">Snel kiezen</span>
+              <span style="font-size: 12px; font-weight: 700; color: var(--tx-5e5e5e)">Snel kiezen</span>
               <sc-for list="{{presets}}" as="ps" hint-placeholder-count="4">
                 <button type="button" class="preset" onClick="{{ps.pick}}">{{ps.l}}</button>
               </sc-for>
@@ -1098,7 +1098,7 @@
                     <div class="mselpop" onClick="{{noop}}">
                       <sc-for list="{{sfKenm}}" as="kc" hint-placeholder-count="6"><label class="mselitem"><input type="checkbox" checked="{{kc.on}}" onChange="{{kc.pick}}">{{kc.l}}</label></sc-for>
                       <div class="mselvoet">
-                        <div style="display: inline-flex; gap: 2px; padding: 3px; background: #F1EFEC; border-radius: 8px">
+                        <div style="display: inline-flex; gap: 2px; padding: 3px; background: var(--bg-f1efec); border-radius: 8px">
                           <button type="button" class="{{kenmAlleCls}}" onClick="{{kenmAlle}}">Alle gekozen</button>
                           <button type="button" class="{{kenmEenCls}}" onClick="{{kenmEen}}">Minstens één</button>
                         </div>
@@ -1109,7 +1109,7 @@
                 </span>
               </div>
             </div>
-            <div style="border-top: 1px solid #E4E2DF; padding-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+            <div style="border-top: 1px solid var(--ln-e4e2df); padding-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
               <span style="font-size: 18px; font-weight: 800">{{selCount}}</span>
               <div style="flex: 1 1 auto"></div>
               <a class="{{mailCls}}" href="{{mailHref}}">
@@ -1125,7 +1125,7 @@
                 Exporteer naar Excel
               </button>
             </div>
-            <div style="border: 1px solid #E4E2DF; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #FBFAF8">
+            <div style="border: 1px solid var(--ln-e4e2df); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--bg-fbfaf8)">
               <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end">
                 <label class="field" style="flex: 1 1 220px">Standaardmail
                   <select value="{{mailT}}" onChange="{{onMailT}}">
@@ -1153,10 +1153,10 @@
               </label>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
                 <button type="button" class="btn" onClick="{{copyTxt}}">{{copyTxtLabel}}</button>
-                <span style="font-size: 12px; color: #5E5E5E">Mail selectie (BCC) opent Outlook met deze tekst in je standaardlettertype. Wil je Manrope 10: klik op Kopieer tekst en plak die in de mail over de tekst heen.</span>
+                <span style="font-size: 12px; color: var(--tx-5e5e5e)">Mail selectie (BCC) opent Outlook met deze tekst in je standaardlettertype. Wil je Manrope 10: klik op Kopieer tekst en plak die in de mail over de tekst heen.</span>
               </div>
               <sc-if value="{{mailTeLang}}" hint-placeholder-val="{{ false }}">
-                <div role="alert" style="background: #FFF2E5; color: #8A3F00; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600">Veel adressen: Outlook kapt lange mail-links soms af. Gebruik dan "Kopieer e-mailadressen" en "Kopieer tekst" en plak ze zelf in een nieuwe mail.</div>
+                <div role="alert" style="background: var(--bg-fff2e5); color: var(--tx-8a3f00); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600">Veel adressen: Outlook kapt lange mail-links soms af. Gebruik dan "Kopieer e-mailadressen" en "Kopieer tekst" en plak ze zelf in een nieuwe mail.</div>
               </sc-if>
             </div>
             <div class="kolkeuze">
@@ -1167,14 +1167,14 @@
                 </sc-for>
               </div>
             </div>
-            <div style="overflow-x: auto; border: 1px solid #E4E2DF; border-radius: 10px">
+            <div style="overflow-x: auto; border: 1px solid var(--ln-e4e2df); border-radius: 10px">
               <div style="{{prevGrid}}">
                 <sc-for list="{{prevCells}}" as="pc" hint-placeholder-count="12">
                   <div class="{{pc.cls}}" style="min-height: 40px">{{pc.v}}</div>
                 </sc-for>
               </div>
               <sc-if value="{{selEmpty}}" hint-placeholder-val="{{ false }}">
-                <div style="padding: 20px 14px; font-size: 14px; color: #5E5E5E">Geen klanten met deze combinatie.</div>
+                <div style="padding: 20px 14px; font-size: 14px; color: var(--tx-5e5e5e)">Geen klanten met deze combinatie.</div>
               </sc-if>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end">
@@ -1185,7 +1185,7 @@
             </div>
             <sc-if value="{{hasSaved}}" hint-placeholder-val="{{ true }}">
               <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
-                <span style="font-size: 12px; font-weight: 700; color: #5E5E5E">Bewaarde weergaven</span>
+                <span style="font-size: 12px; font-weight: 700; color: var(--tx-5e5e5e)">Bewaarde weergaven</span>
                 <sc-for list="{{saved}}" as="sv" hint-placeholder-count="2">
                   <button type="button" class="preset" style="border-style: solid" onClick="{{sv.pick}}">{{sv.l}}</button>
                 </sc-for>
@@ -1200,7 +1200,7 @@
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px">
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">{{jwTitel}}</h1>
-        <span style="font-size: 13px; color: #5E5E5E">Klik = gedaan aan/uit, rechtsklik = meer. Klik op een naam voor het klantscherm.</span>
+        <span style="font-size: 13px; color: var(--tx-5e5e5e)">Klik = gedaan aan/uit, rechtsklik = meer. Klik op een naam voor het klantscherm.</span>
       </div>
       <label class="filterbox">Van
         <select aria-label="Jaarwerk van" value="{{jwWie}}" onChange="{{onJwWie}}">
@@ -1218,14 +1218,14 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
       <sc-for list="{{jwStat}}" as="js" hint-placeholder-count="3">
         <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
-          <span style="font-size: 13px; font-weight: 700; color: #5E5E5E">{{js.l}}</span>
-          <span style="display: flex; align-items: baseline; gap: 8px"><b style="font-size: 26px; font-weight: 800">{{js.pct}}</b><span style="font-size: 13px; color: #5E5E5E">{{js.v}} klaar</span></span>
-          <span class="tbar" style="height: 8px"><span style="{{js.bar}}; background: #FF8000"></span></span>
+          <span style="font-size: 13px; font-weight: 700; color: var(--tx-5e5e5e)">{{js.l}}</span>
+          <span style="display: flex; align-items: baseline; gap: 8px"><b style="font-size: 26px; font-weight: 800">{{js.pct}}</b><span style="font-size: 13px; color: var(--tx-5e5e5e)">{{js.v}} klaar</span></span>
+          <span class="tbar" style="height: 8px"><span style="{{js.bar}}; background: var(--bg-ff8000)"></span></span>
         </div>
       </sc-for>
     </div>
     <section class="card" style="overflow: hidden">
-      <div style="padding: 10px 16px; border-bottom: 1px solid #E4E2DF; font-size: 13px; color: #5E5E5E; display: flex; align-items: center; gap: 12px">{{jwCount}}
+      <div style="padding: 10px 16px; border-bottom: 1px solid var(--ln-e4e2df); font-size: 13px; color: var(--tx-5e5e5e); display: flex; align-items: center; gap: 12px">{{jwCount}}
         <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{jwExport}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>Excel</button>
       </div>
       <sc-for list="{{jwRows}}" as="jr" hint-placeholder-count="5">
@@ -1237,7 +1237,7 @@
           </div>
         </div>
       </sc-for>
-      <sc-if value="{{jwLeeg}}" hint-placeholder-val="{{ false }}"><div style="padding: 30px 16px; text-align: center; color: #5E5E5E; font-size: 14px">Niets in deze weergave.</div></sc-if>
+      <sc-if value="{{jwLeeg}}" hint-placeholder-val="{{ false }}"><div style="padding: 30px 16px; text-align: center; color: var(--tx-5e5e5e); font-size: 14px">Niets in deze weergave.</div></sc-if>
     </section>
   </sc-if>
   </main>
@@ -1251,7 +1251,7 @@
       <button type="button" class="vpst" onClick="{{vpPlus}}" aria-label="Eén meer">+</button>
       <button type="submit" class="btn primary" style="min-height: 38px">Opslaan</button>
     </div>
-    <span style="font-size: 11.5px; color: #8E8E8E">Enter = opslaan · Esc = annuleren</span>
+    <span style="font-size: 11.5px; color: var(--tx-8e8e8e)">Enter = opslaan · Esc = annuleren</span>
   </form>
 </sc-if>
 <sc-if value="{{hasMenu}}" hint-placeholder-val="{{ false }}">

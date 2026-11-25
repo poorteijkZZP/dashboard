@@ -138,6 +138,8 @@ function kwStappen(c, q) {
   return st;
 }
 function kwRond(c, q) { if (!lopend(c)) return false; var st = kwStappen(c, q); return st.length > 0 && st.every(function (x) { return x; }); }
+// Leest een centrale kleur (CSS-variabele) uit, voor plaatjes waar var() niet werkt (svg als data-URI)
+function kleurVar(naam, terug) { try { var v = getComputedStyle(document.documentElement).getPropertyValue(naam).trim(); return v || terug; } catch (e) { return terug; } }
 function isAchter(c) {
   if (!lopend(c)) return false;
   for (var i = 0; i < 12; i++) if (mLate(c, i)) return true;
@@ -689,12 +691,12 @@ class Component extends DCLogic {
         if (!t.isTile || t.st === 'n') return;
         var k = t.kind; g[k][1]++; if (t.st === 'd') g[k][0]++;
       }); });
-      var regel = function (l, x) { var pct = x[1] ? Math.round(x[0] / x[1] * 100) : 100; return { l:l, tekst: (x[1] - x[0]) + ' te doen van ' + x[1], pct: pct + '%', bar:'width: ' + pct + '%', kleur:'#FF8000', toon: x[1] > 0 }; };
+      var regel = function (l, x) { var pct = x[1] ? Math.round(x[0] / x[1] * 100) : 100; return { l:l, tekst: (x[1] - x[0]) + ' te doen van ' + x[1], pct: pct + '%', bar:'width: ' + pct + '%', kleur:'var(--bg-ff8000)', toon: x[1] > 0 }; };
       var out = [regel('Administratie', g.adm)];
       if (WQ > 0) out.push(regel('Controle Q' + WQ, g.ctrl));
       out.push(regel('Btw Q' + (WQ + 1), g.btw));
       var lk = list.filter(lopend), nr = lk.filter(function (c) { return kwRond(c, WQ); }).length;
-      if (lk.length) { var pr = Math.round(nr / lk.length * 100); out.push({ l:'Kwartaal rond', tekst: nr + ' van ' + lk.length + (lk.length === 1 ? ' klant' : ' klanten'), pct: pr + '%', bar:'width: ' + pr + '%', kleur:'#4F8A3C', toon:true, rond:true }); }
+      if (lk.length) { var pr = Math.round(nr / lk.length * 100); out.push({ l:'Kwartaal rond', tekst: nr + ' van ' + lk.length + (lk.length === 1 ? ' klant' : ' klanten'), pct: pr + '%', bar:'width: ' + pr + '%', kleur:'var(--bg-4f8a3c)', toon:true, rond:true }); }
       return out.filter(function (x) { return x.toon; });
     })();
 
@@ -898,7 +900,7 @@ class Component extends DCLogic {
       return { rond:cnt(function (c) { return kwRond(c, WQ); }), ctrl:cnt(function (c) { return ctrlKeys.some(function (k) { return veldOpen(c, k); }); }), c25:cnt(function (c) { return veldOpen(c, 'c25'); }), a:a, n:kl.length, achter:cnt(isAchter), btwLaat:cnt(function (c) { return [0,1,2,3].some(function (q) { return bLate(c, q); }); }), btwNu:cnt(function (c) { return [0,1,2,3].some(function (q) { return bDue(c, q); }); }), wacht:cnt(heeftWacht), jw:cnt(function (c) { return veldOpen(c, 'jw25'); }), ib:cnt(function (c) { return veldOpen(c, 'ib25'); }) };
     });
     var teamMax = {}; teamM.forEach(function (m) { teamMax[m[0]] = Math.max(1, Math.max.apply(null, teamRaw.map(function (r) { return r[m[0]]; }))); });
-    var team = teamRaw.map(function (r) { return { a:r.a, init:initial(r.a), pick:function () { self.setState({ werkWie:r.a }); }, cls: wie === r.a ? 'teamrow on' : 'teamrow', cells: teamM.map(function (m) { if (m[0] === 'rond') { var pr = r.n ? Math.round(r.rond / r.n * 100) : 0; return { v:r.rond + ' van ' + r.n, bar:'width: ' + pr + '%; background: #4F8A3C' }; } return { v:r[m[0]], bar:'width: ' + Math.round(r[m[0]] / teamMax[m[0]] * 100) + '%; background: ' + (m[0] === 'n' ? '#D9D9D9' : m[0] === 'wacht' ? '#7FA3D6' : m[0] === 'btwLaat' || m[0] === 'achter' ? '#C8412B' : '#8E8780') }; }) }; });
+    var team = teamRaw.map(function (r) { return { a:r.a, init:initial(r.a), pick:function () { self.setState({ werkWie:r.a }); }, cls: wie === r.a ? 'teamrow on' : 'teamrow', cells: teamM.map(function (m) { if (m[0] === 'rond') { var pr = r.n ? Math.round(r.rond / r.n * 100) : 0; return { v:r.rond + ' van ' + r.n, bar:'width: ' + pr + '%; background: var(--bg-4f8a3c)' }; } return { v:r[m[0]], bar:'width: ' + Math.round(r[m[0]] / teamMax[m[0]] * 100) + '%; background: ' + (m[0] === 'n' ? 'var(--bg-d9d9d9)' : m[0] === 'wacht' ? 'var(--bg-7fa3d6)' : m[0] === 'btwLaat' || m[0] === 'achter' ? 'var(--bg-c8412b)' : 'var(--bg-8e8780)') }; }) }; });
     var exportWerk = function () {
       var sh = werkSecties.map(function (sc) { return { name:sc.titel, rows:[['Klant','Administrateur','Wat']].concat(sc.items.map(function (x) { return [x.naam, x.admin, (x.pillL ? x.pillL + ': ' : '') + x.info]; })) }; });
       if (beheer) sh.unshift({ name:'Team', rows:[['Collega'].concat(teamM.map(function (m) { return m[1]; }))].concat(teamRaw.map(function (r) { return [r.a].concat(teamM.map(function (m) { return r[m[0]]; })); })) });
@@ -998,11 +1000,11 @@ class Component extends DCLogic {
     var ana = ANA.map(function (a) {
       var net = a.n - a.s;
       return { y:a.y, n:a.n, s:a.s, net:(net > 0 ? '+' : '') + net,
-        hN:'height: ' + Math.round(a.n / maxV * 200) + 'px; background: #FF8000', hS:'height: ' + Math.max(2, Math.round(a.s / maxV * 200)) + 'px; background: #6B6B6B',
+        hN:'height: ' + Math.round(a.n / maxV * 200) + 'px; background: var(--bg-ff8000)', hS:'height: ' + Math.max(2, Math.round(a.s / maxV * 200)) + 'px; background: var(--bg-6b6b6b)',
         tN: a.y + ': ' + a.n + ' nieuwe klanten', tS: a.y + ': ' + a.s + ' gestopt' };
     });
     var maxA = Math.max(5, Math.max.apply(null, ACTIEF.map(function (a) { return a.v; }))) * 1.1;
-    var act = ACTIEF.map(function (a, i) { var g = i ? a.v - ACTIEF[i - 1].v : null; return { y:a.y, v:a.v, g: g === null ? '' : (g >= 0 ? '+' : '') + g, h:'height: ' + Math.round(a.v / maxA * 200) + 'px; background: #2B2B2B', t: a.y + ': ' + a.v + ' actieve klanten' }; });
+    var act = ACTIEF.map(function (a, i) { var g = i ? a.v - ACTIEF[i - 1].v : null; return { y:a.y, v:a.v, g: g === null ? '' : (g >= 0 ? '+' : '') + g, h:'height: ' + Math.round(a.v / maxA * 200) + 'px; background: var(--bg-2b2b2b)', t: a.y + ': ' + a.v + ' actieve klanten' }; });
     // ---- Rapport: actieve klanten per pakket
     var pakAct = {}; all.filter(lopend).forEach(function (c) { var p = c.pakket || 'Onbekend'; pakAct[p] = (pakAct[p] || 0) + 1; });
     var pakTot = all.filter(lopend).length || 1;
@@ -1067,12 +1069,12 @@ class Component extends DCLogic {
       var lo = Math.max(0, Math.floor(mn / stap) * stap - (mn - Math.floor(mn / stap) * stap < stap / 2 ? stap : 0)), hi = Math.ceil(mx / stap) * stap + stap;
       var x = function (i) { return L + i * (W - L - R) / (punten.length - 1); }, y = function (v) { return T + (hi - v) / (hi - lo) * (H - T - B); };
       var g = '';
-      for (var gv = lo; gv <= hi + 0.001; gv += stap) { var gy = y(gv); g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + gy + '" y2="' + gy + '" stroke="#EEEAE5"/><text x="' + (L - 8) + '" y="' + (gy + 4) + '" text-anchor="end" font-size="11" fill="#8E8E8E">' + Math.round(gv) + '</text>'; }
+      for (var gv = lo; gv <= hi + 0.001; gv += stap) { var gy = y(gv); g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + gy + '" y2="' + gy + '" stroke="' + kleurVar('--ln-eeeae5', '#eeeae5') + '"/><text x="' + (L - 8) + '" y="' + (gy + 4) + '" text-anchor="end" font-size="11" fill="' + kleurVar('--tx-8e8e8e', '#8e8e8e') + '">' + Math.round(gv) + '</text>'; }
       var splits = punten.findIndex(function (p) { return p.l.charAt(0) === 'Q'; });
-      if (splits > 0) { var sx = (x(splits - 1) + x(splits)) / 2; g += '<line x1="' + sx + '" x2="' + sx + '" y1="' + T + '" y2="' + (H - B) + '" stroke="#D0CCC6" stroke-dasharray="4 4"/><text x="' + (sx + 6) + '" y="' + (T - 14) + '" font-size="11" fill="#8E8E8E">vanaf 2026 per kwartaal</text><text x="' + (sx - 6) + '" y="' + (T - 14) + '" font-size="11" fill="#8E8E8E" text-anchor="end">per jaareinde</text>'; }
+      if (splits > 0) { var sx = (x(splits - 1) + x(splits)) / 2; g += '<line x1="' + sx + '" x2="' + sx + '" y1="' + T + '" y2="' + (H - B) + '" stroke="' + kleurVar('--ln-d0ccc6', '#d0ccc6') + '" stroke-dasharray="4 4"/><text x="' + (sx + 6) + '" y="' + (T - 14) + '" font-size="11" fill="' + kleurVar('--tx-8e8e8e', '#8e8e8e') + '">vanaf 2026 per kwartaal</text><text x="' + (sx - 6) + '" y="' + (T - 14) + '" font-size="11" fill="' + kleurVar('--tx-8e8e8e', '#8e8e8e') + '" text-anchor="end">per jaareinde</text>'; }
       var pts = punten.map(function (p, i) { return x(i) + ',' + y(p.v); }).join(' ');
-      g += '<polyline points="' + pts + '" fill="none" stroke="#FF8000" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>';
-      punten.forEach(function (p, i) { g += '<circle cx="' + x(i) + '" cy="' + y(p.v) + '" r="4.5" fill="#fff" stroke="#FF8000" stroke-width="2.5"/><text x="' + x(i) + '" y="' + (y(p.v) - 11) + '" text-anchor="middle" font-size="12" font-weight="700" fill="#2B2B2B">' + p.v + '</text><text x="' + x(i) + '" y="' + (H - B + 20) + '" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5E5E5E">' + p.l + '</text>'; });
+      g += '<polyline points="' + pts + '" fill="none" stroke="' + kleurVar('--ic-ff8000', '#ff8000') + '" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>';
+      punten.forEach(function (p, i) { g += '<circle cx="' + x(i) + '" cy="' + y(p.v) + '" r="4.5" fill="' + kleurVar('--bg-ffffff', '#ffffff') + '" stroke="' + kleurVar('--ic-ff8000', '#ff8000') + '" stroke-width="2.5"/><text x="' + x(i) + '" y="' + (y(p.v) - 11) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + kleurVar('--tx-2b2b2b', '#2b2b2b') + '">' + p.v + '</text><text x="' + x(i) + '" y="' + (H - B + 20) + '" text-anchor="middle" font-size="11.5" font-weight="600" fill="' + kleurVar('--tx-5e5e5e', '#5e5e5e') + '">' + p.l + '</text>'; });
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" font-family="Plus Jakarta Sans, Arial, sans-serif">' + g + '</svg>';
       return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     })();
@@ -1098,7 +1100,7 @@ class Component extends DCLogic {
       authShowQr: s.authMode === 'enroll' && !!s.mfa, mfaQr: s.mfa && s.mfa.qr ? s.mfa.qr : '', mfaSecret: s.mfa && s.mfa.secret ? s.mfa.secret : '',
       authPwLabel: s.authMode === 'newpw' ? 'Nieuw wachtwoord' : 'Wachtwoord', authPwAuto: s.authMode === 'newpw' ? 'new-password' : 'current-password',
       authBtn: s.authMode === 'newpw' ? 'Wachtwoord opslaan' : s.authMode === 'forgot' ? 'Stuur mail' : s.authMode === 'mfa' ? 'Bevestigen' : s.authMode === 'enroll' ? 'Koppelen en inloggen' : 'Inloggen',
-      hasAuthMsg: !!s.authMsg, authMsg: s.authMsg, authMsgStyle: s.authOk ? 'background: #F1EFEC; color: #2B2B2B' : 'background: #FFF2E5; color: #8A3F00',
+      hasAuthMsg: !!s.authMsg, authMsg: s.authMsg, authMsgStyle: s.authOk ? 'background: var(--bg-f1efec); color: var(--tx-2b2b2b)' : 'background: var(--bg-fff2e5); color: var(--tx-8a3f00)',
       authCanForgot: s.authMode !== 'newpw', authForgotLabel: s.authMode === 'forgot' ? 'Terug naar inloggen' : (s.authMode === 'mfa' || s.authMode === 'enroll') ? 'Uitloggen' : 'Wachtwoord vergeten?',
       authForgot: function () { if (s.authMode === 'mfa' || s.authMode === 'enroll') { STORE.signOut(); return; } self.setState({ authMode: s.authMode === 'forgot' ? 'login' : 'forgot', authMsg:'' }); },
       authSubmit: function (ev) {
@@ -1228,7 +1230,7 @@ class Component extends DCLogic {
       bNieuwCls:bCls('nieuw'), bMutCls:bCls('muteren'), bSelCls:bCls('sel'), bAnaCls:bCls('ana'),
       bNieuw:goSub('nieuw'), bMut:goSub('muteren'), bSel:goSub('sel'), bAna:function () { goSub('ana')(); if (STORE.live) STORE.loadAfvinkLog().then(function (r) { self.setState({ afvinkLog:r }); }).catch(function () { self.setState({ afvinkLog:[] }); }); },
       showForm: s.bsub === 'nieuw' || isEdit, isEdit:isEdit,
-      factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: #F1EFEC' : '',
+      factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: var(--bg-f1efec)' : '',
       factHint: FACT[s.form.pakket] ? 'Vast bij pakket ' + s.form.pakket : 'Zelf invullen bij ' + s.form.pakket.toLowerCase(),
       formTitle: isEdit ? 'Gegevens wijzigen: ' + (mC ? mC.naam : '') : 'Nieuwe klant toevoegen',
       formHint: isEdit ? 'De wijziging wordt met jouw naam in de historie vastgelegd.' : 'Na opslaan staat de klant direct in Voortgang ' + JAAR + ' bij de gekozen administrateur. Perioden vóór het startkwartaal worden niet van toepassing.',
