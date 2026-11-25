@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125b">
-<script src="assets/thema.js?v=20261125b"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125c">
+<script src="assets/thema.js?v=20261125c"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -121,7 +121,7 @@
             <div class="mijnpop" onClick="{{noop}}">
               <span class="mpt">Mijn instellingen · {{mijnNaam}}</span>
               <span class="mps">Mijn kleur, voor iedereen zichtbaar bij mijn initialen</span>
-              <div class="kswatches"><sc-for list="{{kleurKeuzes}}" as="kk" hint-placeholder-count="8"><button type="button" class="{{kk.cls}}" style="{{kk.stijl}}" title="{{kk.l}}" aria-label="{{kk.l}}" onClick="{{kk.pick}}"></button></sc-for></div>
+              <div class="kswatches"><sc-for list="{{kleurKeuzes}}" as="kk" hint-placeholder-count="8"><button type="button" class="{{kk.cls}}" style="{{kk.stijl}}" title="{{kk.l}}" aria-label="{{kk.l}}" onClick="{{kk.pick}}">{{roleInitial}}</button></sc-for></div>
               <span class="mps">Nog een keer klikken op je kleur zet hem weer uit.</span>
             </div>
           </sc-if>
@@ -1325,9 +1325,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125b"></script>
-<script src="assets/xlsx.js?v=20261125b"></script>
-<script src="assets/store.js?v=20261125b"></script>
-<script src="assets/app.js?v=20261125b"></script>
+<script src="assets/runtime.js?v=20261125c"></script>
+<script src="assets/xlsx.js?v=20261125c"></script>
+<script src="assets/store.js?v=20261125c"></script>
+<script src="assets/app.js?v=20261125c"></script>
 </body>
 </html>

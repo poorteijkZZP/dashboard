@@ -655,3 +655,4 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 :root[data-thema="donker"] input::placeholder,:root[data-thema="donker"] textarea::placeholder{color:#9A948D}
 .ring.klein b{font-size:10px;letter-spacing:-.03em}
 .chipbtn .av{margin-right:2px}
+.kswatch{font:800 12px inherit;font-family:inherit}

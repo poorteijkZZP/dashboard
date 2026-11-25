@@ -159,10 +159,10 @@ function kwSoorten(list, q) {
   return t;
 }
 // Eigen kleur per collega (8 tinten), zichtbaar voor iedereen
-var KLEUR_OPTIES = [['oranje','#D9730D'],['rood','#C0392B'],['roze','#C2185B'],['paars','#7B4BB7'],['blauw','#2F6DB5'],['turquoise','#138D90'],['groen','#3E8E41'],['antraciet','#5E5A55']];
+var KLEUR_OPTIES = [['oranje','#FFD4AE','#7A3B00'],['rood','#F8C4C0','#7E1F17'],['roze','#F6C6DA','#7A1846'],['paars','#DCCDF4','#4B2A85'],['blauw','#C6DBF5','#173F73'],['turquoise','#BFE8E6','#0D5654'],['groen','#CDE8C6','#23561F'],['grijs','#DEDAD5','#3F3B37']];
 var KLEUREN = {};
-function kleurVan(naam) { var k = KLEUREN[naam]; for (var i = 0; i < KLEUR_OPTIES.length; i++) if (KLEUR_OPTIES[i][0] === k) return KLEUR_OPTIES[i][1]; return null; }
-function avS(naam) { var k = kleurVan(naam); return k ? 'background: ' + k + ' !important; color: #fff !important' : ''; }
+function kleurVan(naam) { var k = KLEUREN[naam] === 'antraciet' ? 'grijs' : KLEUREN[naam]; for (var i = 0; i < KLEUR_OPTIES.length; i++) if (KLEUR_OPTIES[i][0] === k) return KLEUR_OPTIES[i]; return null; }
+function avS(naam) { var k = kleurVan(naam); return k ? 'background: ' + k[1] + ' !important; color: ' + k[2] + ' !important' : ''; }
 function laadDemoKleuren() { try { KLEUREN = JSON.parse(localStorage.getItem('pz-kleuren') || '{}') || {}; } catch (e) { KLEUREN = {}; } }
 // Telt een administratietegel al mee? Alleen perioden t/m de vorige maand; een kwartaaladministratie pas als het kwartaal voorbij is
 function admTelt(c, i) { return c.freq === 'kwartaal' ? Math.floor(i / 3) * 3 + 3 <= peil() : i < peil(); }
@@ -1208,7 +1208,7 @@ class Component extends DCLogic {
       isBeheer: beheer,
       roleInitial: initial(role), roleAvS: avS(role) + '; width: 34px; height: 34px; font-size: 14px', mijnOpen: !!s.mijnOpen,
       toggleMijn: function (ev) { ev.stopPropagation(); self.setState({ mijnOpen: !s.mijnOpen }); },
-      mijnNaam: role, kleurKeuzes: KLEUR_OPTIES.map(function (k) { var on = KLEUREN[role] === k[0]; return { l:k[0], stijl:'background: ' + k[1], cls: on ? 'kswatch on' : 'kswatch', pick:function (ev) { ev.stopPropagation(); self.zetKleur(on ? null : k[0]); } }; }),
+      mijnNaam: role, kleurKeuzes: KLEUR_OPTIES.map(function (k) { var on = (KLEUREN[role] === 'antraciet' ? 'grijs' : KLEUREN[role]) === k[0]; return { l:k[0], stijl:'background: ' + k[1] + '; color: ' + k[2], cls: on ? 'kswatch on' : 'kswatch', pick:function (ev) { ev.stopPropagation(); self.zetKleur(on ? null : k[0]); } }; }),
       jaarLabel: String(JAAR), vjLabel: String(vj()),
       jaren: s.jaren.map(function (y) { return { v:String(y), l:String(y) }; }), jaarSel: String(s.jaar), onJaar: function (ev) { self.kiesJaar(ev.target.value); },
       noop: function (ev) { ev.stopPropagation(); },
