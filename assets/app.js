@@ -1291,11 +1291,15 @@ class Component extends DCLogic {
       kmGedaan: function () { self.setState({ klikMode:'gedaan' }); }, kmWacht: function () { self.setState({ klikMode:'wacht' }); },
       navWerkCls: s.page === 'werk' ? 'ri on' : 'ri', goWerk: function () { self.setState({ page:'werk', sel:null }); }, pageWerk: s.page === 'werk',
       werkWie: wie, onWerkWie: function (ev) { self.setState({ werkWie:ev.target.value }); },
-      werkTitel: wie === 'alle' ? 'Werkvoorraad van iedereen' : (wie === role ? 'Mijn werkvoorraad' : 'Werkvoorraad van ' + wie),
+      werkChips: [{ v:'alle', l:'Iedereen', st:'' }].concat(ADMINS.map(function (a) { return { v:a, l:initial(a), st:avS(a) }; })).map(function (x) {
+        var n = all.filter(function (c) { return lopend(c) && (x.v === 'alle' || c.admin === x.v); }).length, on = wie === x.v;
+        return { l:x.l, n:n, st:x.st, cls: 'chip chipbtn kleurchip' + (x.v === 'alle' ? ' iedereen' : '') + (on ? ' on' : ''), pick:function () { self.setState({ werkWie:x.v }); } };
+      }),
+      werkTitel: wie === 'alle' ? 'Werkvoorraad' : (wie === role ? 'Mijn werkvoorraad' : 'Werkvoorraad van ' + wie),
       werkSub: mijn.length + ' lopende klanten · administratie telt als achterstand ' + peilLabel() + ' · ' + JAAR,
       ringBlok: ringBlok, ringen: false, geenRingen: false,
       werkSecties: werkSecties, todoTegels: werkSecties.map(function (x) { return { spring: function () { var el = document.getElementById('sec-' + x.id); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }, l:(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); })(x.titel.replace(/^\d\. /, '')), n:x.todo, cls: x.todo ? (x.id === 'wacht' ? 'tdt w' : 'tdt') : 'tdt nul' }; }), todoTotaal: werkSecties.filter(function (x) { return x.id !== 'wacht'; }).reduce(function (t, x) { return t + x.todo; }, 0), exportWerk: exportWerk, exportKlanten: exportKlanten,
-      team: team, teamKop: teamM.map(function (m) { return { l:m[1] }; }), toonTeam: beheer,
+      team: team, teamKop: teamM.map(function (m) { return { l:m[1] }; }), toonTeam: beheer, geenTeam: !beheer,
       bJaarCls: bCls('jaar'), bJaar: goSub('jaar'), showJaar: s.bsub === 'jaar',
       volgendJaar: String(s.jaar + 1), huidigJaar: String(s.jaar),
       tmOpties: [{ v:String(JAAR - 2), l:'Niet meer' + (JAAR - 1 > 0 ? ' (ook ' + (JAAR - 1) + ' niet)' : '') }, { v:String(JAAR - 1), l:'t/m ' + (JAAR - 1) }, { v:String(JAAR), l:'t/m ' + JAAR }, { v:String(JAAR + 1), l:'t/m ' + (JAAR + 1) }],
