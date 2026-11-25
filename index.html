@@ -708,6 +708,9 @@
                     <sc-if value="{{m.kanStoppen}}" hint-placeholder-val="{{ true }}">
                       <button type="button" class="mopt" onClick="{{mStop}}" style="border-color: var(--ln-ffbf80); background: var(--bg-fffbf7)"><b>Klant stopt</b><span>Vastleggen t/m welke periode wij nog administratie, btw, jaarwerk en IB doen</span></button>
                     </sc-if>
+                    <sc-if value="{{m.heeftEinde}}" hint-placeholder-val="{{ false }}">
+                      <button type="button" class="mopt" onClick="{{mNazorg}}"><b>Afspraken na opzegging</b><span>{{m.nazorg}}</span></button>
+                    </sc-if>
                     <sc-if value="{{m.isOpgezegd}}" hint-placeholder-val="{{ false }}">
                       <button type="button" class="mopt" onClick="{{mDefinitief}}"><b>Definitief afsluiten</b><span>Al het resterende werk is klaar, klant naar archief</span></button>
                     </sc-if>
@@ -734,6 +737,7 @@
 
                 <sc-if value="{{mStopOpen}}" hint-placeholder-val="{{ false }}">
                   <div style="display: flex; flex-direction: column; gap: 14px">
+                    <sc-if value="{{stopPeriodes}}" hint-placeholder-val="{{ true }}">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
                       <label class="field">Opzegdatum
                         <input type="date" value="{{stop.datum}}" onChange="{{onStop.datum}}">
@@ -748,7 +752,9 @@
                         </select>
                       </label>
                     </div>
+                    </sc-if>
                     <p class="sec">Wat doen wij nog?</p>
+                    <sc-if value="{{stopPeriodes}}" hint-placeholder-val="{{ true }}">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
                       <label class="field">Administratie verwerken t/m
                         <select value="{{stop.adm}}" onChange="{{onStop.adm}}">
@@ -777,16 +783,26 @@
                         </select>
                       </label>
                     </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px">
-                      <label class="check"><input type="checkbox" checked="{{stop.jw26}}" onChange="{{onStop.jw26}}">Jaarwerk {{jaarLabel}} door ons</label>
-                      <label class="check"><input type="checkbox" checked="{{stop.ib26}}" onChange="{{onStop.ib26}}">IB-aangifte {{jaarLabel}} door ons</label>
+                    </sc-if>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
+                      <label class="field">Jaarwerk (jaarcijfers) door ons
+                        <select value="{{stop.jwTm}}" onChange="{{onStop.jwTm}}">
+                          <sc-for list="{{tmOpties}}" as="to" hint-placeholder-count="4"><option value="{{to.v}}">{{to.l}}</option></sc-for>
+                        </select>
+                      </label>
+                      <label class="field">IB-aangifte door ons
+                        <select value="{{stop.ibTm}}" onChange="{{onStop.ibTm}}">
+                          <sc-for list="{{tmOpties}}" as="to" hint-placeholder-count="4"><option value="{{to.v}}">{{to.l}}</option></sc-for>
+                        </select>
+                      </label>
                     </div>
+                    <span style="font-size: 12px; color: var(--tx-5e5e5e)">Voorbeeld: stopt de klant in mei {{jaarLabel}} en maken wij de jaarcijfers en de IB over {{jaarLabel}} nog, kies dan bij allebei t/m {{jaarLabel}}. De klant gaat dan mee naar het volgende jaar, alleen voor jaarwerk en IB. Daarna gaat hij bij de jaarovergang automatisch naar Gestopt.</span>
                     <sc-if value="{{m.hasOpen25}}" hint-placeholder-val="{{ false }}">
                       <div style="font-size: 13px; background: var(--bg-fff2e5); border-radius: 8px; padding: 10px 12px; color: var(--tx-6b3200)"><b>Let op:</b> {{m.open25}}</div>
                     </sc-if>
                     <span style="font-size: 12px; color: var(--tx-5e5e5e)">Na opslaan staat de klant op Opgezegd. Hij blijft in de dagelijkse overzichten tot het resterende werk klaar is. Alles na de gekozen periodes wordt niet van toepassing.</span>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px">
-                      <button type="button" class="btn primary" onClick="{{doStop}}">Beëindiging vastleggen</button>
+                      <button type="button" class="btn primary" onClick="{{doStop}}">{{stopKnop}}</button>
                       <button type="button" class="btn" onClick="{{backMenu}}">Terug</button>
                     </div>
                   </div>
@@ -829,6 +845,9 @@
               <button type="button" class="btn primary" onClick="{{jaarStart}}">{{jaarBtn}}</button>
               <span style="font-size: 12px; color: var(--tx-5e5e5e)">Advies: begin januari, nadat Q4 is afgerond of als je Q4 voortaan in het nieuwe jaar wilt bijhouden.</span>
             </div>
+            <sc-if value="{{jaarMee.hasOp}}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 13px; background: var(--bg-fff2e5); border-radius: 8px; padding: 10px 12px; color: var(--tx-6b3200)">{{jaarMee.txt}}</div>
+            </sc-if>
             <sc-if value="{{hasJaarMsg}}" hint-placeholder-val="{{ false }}">
               <div role="status" style="background: var(--bg-f1efec); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-weight: 600">{{jaarMsg}}</div>
             </sc-if>

@@ -73,6 +73,20 @@
     return { kl: kl, vg: vg };
   }
 
+  // Bij een opgezegde klant: t/m welk jaar doen wij nog jaarwerk ('jw') of IB ('ib')?
+  // Nieuwe vastlegging: einde.jwTm / einde.ibTm. Oude vastlegging: vinkje jw26/ib26 bij het opzegjaar.
+  function tmJaar(c, k) {
+    var e = c.einde || {};
+    if (e[k + 'Tm'] !== undefined && e[k + 'Tm'] !== null) return e[k + 'Tm'];
+    var y = e.jaar || parseInt(String(e.datum || '').slice(-4), 10) || (c.stopY || new Date().getFullYear());
+    return e[k === 'jw' ? 'jw26' : 'ib26'] ? y : y - 1;
+  }
+  // Gaat de klant mee naar het nieuwe jaar? Actief en opgezegd met nog jaarwerk of IB over het vorige jaar.
+  function gaatMee(c, jaar) {
+    if (c.status === 'Gestopt') return false;
+    if (c.status !== 'Opgezegd') return true;
+    return jaar - 1 <= Math.max(tmJaar(c, 'jw'), tmJaar(c, 'ib'));
+  }
   // Lege voortgangsregel voor een nieuw jaar
   function nieuwJaarRij(c, jaar) {
     var row = { klant_id: c.id, jaar: jaar, wacht: {}, btw_maand: {}, notities: c.notities || null };
@@ -82,14 +96,14 @@
     row.controle_q1 = stopt ? null : false;
     row.controle_q2 = stopt ? null : false;
     row.controle_q3 = stopt ? null : false;
-    var e = c.einde || {};
-    row.controle_vj = stopt && !e.jw26 ? null : false;
-    row.jaarwerk_vj = stopt && !e.jw26 ? null : false;
-    row.ib_vj = stopt && !e.ib26 ? null : false;
+    var jwMee = !stopt || jaar - 1 <= tmJaar(c, 'jw'), ibMee = !stopt || jaar - 1 <= tmJaar(c, 'ib');
+    row.controle_vj = jwMee ? false : null;
+    row.jaarwerk_vj = jwMee ? false : null;
+    row.ib_vj = ibMee ? false : null;
     return row;
   }
 
-  var S = { live: LIVE, me: null, conn: 'offline', toClient: toClient, nieuwJaarRij: nieuwJaarRij };
+  var S = { live: LIVE, me: null, conn: 'offline', toClient: toClient, nieuwJaarRij: nieuwJaarRij, tmJaar: tmJaar, gaatMee: gaatMee };
   window.STORE = S;
   if (!LIVE) return;
 
@@ -280,12 +294,19 @@
 
   // Nieuw jaar: voortgangsregels aanmaken voor alle lopende klanten (bestaande regels blijven staan)
   S.startYear = function (clients, jaar) {
-    var rows = clients.filter(function (c) { return c.status !== 'Gestopt'; }).map(function (c) { return nieuwJaarRij(c, jaar); });
+    var rows = clients.filter(function (c) { return gaatMee(c, jaar); }).map(function (c) { return nieuwJaarRij(c, jaar); });
     var parts = [];
     for (var i = 0; i < rows.length; i += 200) parts.push(rows.slice(i, i + 200));
     return parts.reduce(function (p, part) {
       return p.then(function () { return sb.from('voortgang').upsert(part, { onConflict: 'klant_id,jaar', ignoreDuplicates: true }).then(must); });
-    }, Promise.resolve()).then(function () { return S.setSetting('huidig_jaar', jaar); }).then(function () { return rows.length; });
+    }, Promise.resolve()).then(function () {
+      // Opgezegde klanten zonder werk meer in het nieuwe jaar gaan naar Gestopt
+      var weg = clients.filter(function (c) { return c.status === 'Opgezegd' && !gaatMee(c, jaar); });
+      return weg.reduce(function (p, c) {
+        return p.then(function () { return sb.from('klanten').update({ status: 'Gestopt', gestopt_jaar: jaar - 1 }).eq('id', c.id).then(must); })
+          .then(function () { return log(c.id, 'Bij jaarovergang ' + jaar + ' naar Gestopt: geen jaarwerk of IB meer door ons'); });
+      }, Promise.resolve());
+    }).then(function () { return S.setSetting('huidig_jaar', jaar); }).then(function () { return rows.length; });
   };
 
   S.loadAfvinkLog = function () {

@@ -254,7 +254,7 @@ class Component extends DCLogic {
       thema: window.THEMA ? THEMA.get() : 'licht', role:'Jeroen', page:'werk', afvinkLog:null, rapJaar:new Date().getFullYear(), vp:[], vpPop:null, vpVal:'1', vpJaar:new Date().getFullYear(), openF:'', menu:null, ownNotes:{}, ownDraft:{}, openQ:{}, jwF:'open', jwWie:null, jaar:JAAR, jaren:[JAAR], klikMode:'gedaan', werkWie:null, code:'', onth:true, mfa:null, jaarAsk:false, jaarMsg:'', mailT:'vrij', mailS:'', mailB:'', mailPeriode:standaardPeriode(), mailUiterlijk:standaardUiterlijk(), copiedTxt:false, scope:'alle', bankF:'alle', adminF:'alle', sort:{ k:'naam', d:1 }, filter:'alles', q:'', sel:null, tab:'over', clients:STORE.live ? [] : demoLoad(), notes:{},
       bsub:'nieuw', form:emptyForm(), editId:null, err:'',
       mq:'', mutSel:null, mutMode:'menu', mut:{ admin:'Jeroen' }, mutMsg:'',
-      stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true },
+      stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jwTm:String(JAAR), ibTm:String(JAAR), wijzig:false },
       sf:emptySf(), cols:colSet(['naam','voornaam','email','admin']), saveName:'', saved:[{ l:'Herinnering IB', f:Object.assign(emptySf(), { status:'Actief', ib:'open' }) }], copied:false
     };
     var ui = uiLaden(), st = this.state;
@@ -493,7 +493,7 @@ class Component extends DCLogic {
       return;
     }
     var cl = this.state.clients.map(function (c) {
-      if (c.status === 'Gestopt') return c;
+      if (!STORE.gaatMee(c, next)) return c.status === 'Gestopt' ? c : Object.assign({}, c, { status:'Gestopt', stopY: c.stopY || next - 1 });
       var row = STORE.nieuwJaarRij(c, next), n = Object.assign({}, c);
       n.months = []; n.mna = []; for (var i = 1; i <= 12; i++) { n.months.push(!!row['m' + i]); n.mna.push(row['m' + i] === null); }
       n.btw = []; n.bna = []; for (var q = 1; q <= 4; q++) { n.btw.push(!!row['btw' + q]); n.bna.push(row['btw' + q] === null); }
@@ -803,7 +803,7 @@ class Component extends DCLogic {
       if (!bezit.length) bezit.push({ k:'Bezittingen', v:'Geen auto, motor, fiets of pand' });
       var vul = function (v) { return v === null || v === undefined || v === '' ? 'onbekend' : String(v); };
       var secties = [
-        { t:'Algemeen', r:[{ k:'Rechtsvorm', v:vul(c.rechtsvorm) }, { k:'Contactpersoon', v:vul((c.voornaam + ' ' + c.achternaam).trim()) }, { k:'E-mailadres', v:vul(c.email) }, { k:'Administrateur', v:vul(c.admin) }, { k:'Klant sinds', v:vanLabel(c) }, { k:'Status', v: e ? c.status + ' per ' + e.datum + ' (' + e.reden + ')' : c.status }] },
+        { t:'Algemeen', r:[{ k:'Rechtsvorm', v:vul(c.rechtsvorm) }, { k:'Contactpersoon', v:vul((c.voornaam + ' ' + c.achternaam).trim()) }, { k:'E-mailadres', v:vul(c.email) }, { k:'Administrateur', v:vul(c.admin) }, { k:'Klant sinds', v:vanLabel(c) }, { k:'Status', v: e ? c.status + ' per ' + e.datum + ' (' + e.reden + ')' : c.status }].concat(e && c.status === 'Opgezegd' ? [{ k:'Jaarwerk door ons', v: STORE.tmJaar(c, 'jw') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'jw') }, { k:'IB door ons', v: STORE.tmJaar(c, 'ib') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'ib') }] : []) },
         { t:'Pakket en facturatie', r:[{ k:'Pakket', v:vul(c.pakket) }, { k:'Facturen per jaar', v:vul(c.facturen) }, { k:'Google review', v: c.review ? 'Geplaatst' : 'Nog niet' }] },
         { t:'Fiscaal', r:[{ k:'Btw-regime', v:vul(c.regime) }, { k:'Btw-aangifte', v: c.regime === 'Normaal' ? (c.btwMaand ? 'Per maand' : 'Per kwartaal') : 'Geen' }, { k:'Btw-nummer', v:vul(c.btwnr) }, { k:'Btw-ID', v:vul(c.btwid) }] },
         { t:'Administratie', r:[{ k:'Verwerking', v: c.freq === 'maand' ? 'Per maand' : 'Per kwartaal' }, { k:'Bank', v: c.bank === 'BK' ? 'Bankkoppeling (BK)' : c.bank === 'geen' ? 'Geen koppeling' : vul(c.bank) }, { k:'Boekhoudpakket', v:vul(c.software) }, { k:'Altijd up2date', v: c.up ? 'Ja, levert minimaal 1x per maand aan' : 'Nee' }] },
@@ -1000,7 +1000,7 @@ class Component extends DCLogic {
     on.pakket = function (ev) { var v = ev.target.value; self.setState(function (st) { var f = Object.assign({}, st.form); f.pakket = v; f.facturen = FACT[v] ? String(FACT[v]) : ''; return { form:f }; }); };
     var setSub = function (obj, k, chk) { return function (ev) { var v = chk ? ev.target.checked : ev.target.value; self.setState(function (st) { var o = Object.assign({}, st[obj]); o[k] = v; var r = {}; r[obj] = o; if (obj === 'sf') r.copied = false; return r; }); }; };
     var onMut = { admin:setSub('mut', 'admin') };
-    var onStop = { datum:setSub('stop', 'datum'), reden:setSub('stop', 'reden'), adm:setSub('stop', 'adm'), btw:setSub('stop', 'btw'), jw26:setSub('stop', 'jw26', true), ib26:setSub('stop', 'ib26', true) };
+    var onStop = { datum:setSub('stop', 'datum'), reden:setSub('stop', 'reden'), adm:setSub('stop', 'adm'), btw:setSub('stop', 'btw'), jwTm:setSub('stop', 'jwTm'), ibTm:setSub('stop', 'ibTm') };
     var onSf = {}; Object.keys(emptySf()).forEach(function (k) { onSf[k] = setSub('sf', k); });
 
     var mq = s.mq.trim().toLowerCase();
@@ -1013,7 +1013,8 @@ class Component extends DCLogic {
       if (!mC.j25na && mC.jw25 === false) open25.push('jaarwerk ' + vj());
       if (!mC.j25na && mC.ib25 === false) open25.push('IB-aangifte ' + vj());
       m = { naam:mC.naam, info:mC.admin + ' · ' + mC.rechtsvorm + ' · ' + mC.status + ' · klant sinds ' + vanLabel(mC) + (mC.einde ? ' · einde ' + mC.einde.datum : ''),
-        kanStoppen: mC.status === 'Actief', isOpgezegd: mC.status === 'Opgezegd', kanTerug: mC.status !== 'Actief',
+        kanStoppen: mC.status === 'Actief', isOpgezegd: mC.status === 'Opgezegd', heeftEinde: mC.status === 'Opgezegd' && !!mC.einde,
+        nazorg: mC.status === 'Opgezegd' && mC.einde ? 'Jaarwerk ' + (STORE.tmJaar(mC, 'jw') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(mC, 'jw')) + ' · IB ' + (STORE.tmJaar(mC, 'ib') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(mC, 'ib')) + ' · ' + (STORE.gaatMee(mC, JAAR + 1) ? 'gaat mee naar ' + (JAAR + 1) : 'gaat niet mee naar ' + (JAAR + 1)) : '', kanTerug: mC.status !== 'Actief',
         hasOpen25: open25.length > 0, open25: open25.join(' en ') + ' staat nog open en blijft gewoon in de overzichten staan tot het is afgevinkt.' };
     }
     var isEdit = s.bsub === 'muteren' && s.mutMode === 'edit';
@@ -1221,6 +1222,9 @@ class Component extends DCLogic {
       team: team, teamKop: teamM.map(function (m) { return { l:m[1] }; }), toonTeam: beheer,
       bJaarCls: bCls('jaar'), bJaar: goSub('jaar'), showJaar: s.bsub === 'jaar',
       volgendJaar: String(s.jaar + 1), huidigJaar: String(s.jaar),
+      tmOpties: [{ v:String(JAAR - 2), l:'Niet meer' + (JAAR - 1 > 0 ? ' (ook ' + (JAAR - 1) + ' niet)' : '') }, { v:String(JAAR - 1), l:'t/m ' + (JAAR - 1) }, { v:String(JAAR), l:'t/m ' + JAAR }, { v:String(JAAR + 1), l:'t/m ' + (JAAR + 1) }],
+      stopPeriodes: !(s.stop && s.stop.wijzig && s.stop.jaar && s.stop.jaar !== JAAR), stopKnop: s.stop && s.stop.wijzig ? 'Wijziging opslaan' : 'Beëindiging vastleggen', stopNieuw: !(s.stop && s.stop.wijzig),
+      jaarMee: (function () { var nx = s.jaar + 1, op = all.filter(function (c) { return c.status === 'Opgezegd'; }), mee = op.filter(function (c) { return STORE.gaatMee(c, nx); }).length; return { hasOp: op.length > 0, txt: op.length ? 'Opgezegde klanten: ' + mee + ' gaan mee naar ' + nx + ' (jaarwerk of IB ' + s.jaar + ' nog door ons), ' + (op.length - mee) + ' niet. Die gaan bij de jaarovergang naar Gestopt.' : '' }; })(),
       jaarBtn: s.jaarAsk ? 'Klik nogmaals om ' + (s.jaar + 1) + ' echt te starten' : 'Jaar ' + (s.jaar + 1) + ' starten',
       jaarStart: function () { if (!s.jaarAsk) { self.setState({ jaarAsk:true, jaarMsg:'' }); return; } self.startJaar(); },
       hasJaarMsg: !!s.jaarMsg, jaarMsg: s.jaarMsg,
@@ -1287,7 +1291,12 @@ class Component extends DCLogic {
         self.setState({ mutMode:'edit', form:f, editId:mC.id, err:'', mutMsg:'' });
       },
       mAdmin:function () { if (mC) self.setState({ mutMode:'admin', mut:{ admin:mC.admin }, mutMsg:'' }); },
-      mStop:function () { self.setState({ mutMode:'stop', mutMsg:'', stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jw26:true, ib26:true } }); },
+      mNazorg:function () {
+        if (!mC || !mC.einde) return;
+        var e = mC.einde, iso = (function () { var a = String(e.datum || '').split(' '); var mi = MONTHS.indexOf(a[1]); return a.length === 3 && mi >= 0 ? a[2] + '-' + ('0' + (mi + 1)).slice(-2) + '-' + ('0' + a[0]).slice(-2) : JAAR + '-12-31'; })();
+        self.setState({ mutMode:'stop', mutMsg:'', stop:{ datum:iso, datumNl:e.datum, reden:e.reden || 'Bedrijf gestopt', adm:String(e.adm === undefined ? 11 : e.adm), btw:String(e.btw === undefined ? 3 : e.btw), jaar:e.jaar, jwTm:String(STORE.tmJaar(mC, 'jw')), ibTm:String(STORE.tmJaar(mC, 'ib')), wijzig:true } });
+      },
+      mStop:function () { self.setState({ mutMode:'stop', mutMsg:'', stop:{ datum:JAAR + '-12-31', reden:'Bedrijf gestopt', adm:'11', btw:'3', jwTm:String(JAAR), ibTm:String(JAAR), wijzig:false } }); },
       mut:s.mut, onMut:onMut, stop:s.stop, onStop:onStop,
       doAdmin:function () {
         if (!mC || s.mut.admin === mC.admin) { self.setState({ mutMode:'menu' }); return; }
@@ -1297,9 +1306,16 @@ class Component extends DCLogic {
       },
       doStop:function () {
         if (!mC) return;
-        var st = s.stop, e = { datum:nlDate(st.datum), reden:st.reden, adm:parseInt(st.adm, 10), btw:parseInt(st.btw, 10), jw26:st.jw26, ib26:st.ib26 };
-        self.upd(mC.id, function (n) { n.status = 'Opgezegd'; n.einde = e; }, 'Opgezegd per ' + e.datum + ' (' + e.reden + ')');
-        self.setState({ mutMode:'menu', mutMsg:'Vastgelegd. De klant staat nu op Opgezegd tot het resterende werk klaar is.' });
+        var st = s.stop, jwTm = parseInt(st.jwTm, 10), ibTm = parseInt(st.ibTm, 10);
+        var e = { datum: nlDate(st.datum), reden:st.reden, adm:parseInt(st.adm, 10), btw:parseInt(st.btw, 10), jaar: st.jaar || JAAR, jwTm:jwTm, ibTm:ibTm, jw26: jwTm >= (st.jaar || JAAR), ib26: ibTm >= (st.jaar || JAAR) };
+        var tmTxt = 'jaarwerk ' + (jwTm < JAAR - 1 ? 'niet meer' : 't/m ' + jwTm) + ', IB ' + (ibTm < JAAR - 1 ? 'niet meer' : 't/m ' + ibTm);
+        self.upd(mC.id, function (n) {
+          n.status = 'Opgezegd'; n.einde = e;
+          // Kiest men "niet meer", dan vervalt het nog openstaande jaarwerk of IB over het vorige jaar
+          if (jwTm < JAAR - 1) { if (!n.jw25) n.jw25 = null; if (!n.c25) n.c25 = null; }
+          if (ibTm < JAAR - 1) { if (!n.ib25) n.ib25 = null; }
+        }, (st.wijzig ? 'Afspraken na opzegging gewijzigd: ' : 'Opgezegd per ' + e.datum + ' (' + e.reden + '), ') + tmTxt);
+        self.setState({ mutMode:'menu', mutMsg: st.wijzig ? 'Gewijzigd: ' + tmTxt + '.' : 'Vastgelegd. De klant staat nu op Opgezegd tot het resterende werk klaar is (' + tmTxt + ').' });
       },
       mDefinitief:function () { if (mC) { self.upd(mC.id, function (n) { n.status = 'Gestopt'; n.stopY = new Date().getFullYear(); }, 'Definitief afgesloten'); self.setState({ mutMsg:'Klant staat nu in het archief (Gestopt).' }); } },
       mTerug:function () { if (mC) { self.upd(mC.id, function (n) { n.status = 'Actief'; n.einde = null; n.stopY = null; }, 'Opnieuw geactiveerd'); self.setState({ mutMsg:'Klant is weer actief.' }); } },
