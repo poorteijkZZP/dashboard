@@ -692,3 +692,7 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .chipbtn.iedereen.on{outline:2.5px solid var(--tx-2b2b2b);outline-offset:2px}
 .chipbtn.iedereen.on::before{content:'✓';font-weight:900;margin-right:2px}
 .chipbtn.iedereen b{background:var(--bg-f1efec)!important;color:var(--tx-2b2b2b)!important;padding:0 5px;border-radius:999px}
+.kpi.kmet{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+.ktxt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ring.kring2{width:62px;height:62px;--d:6px}.ring.kring2 b{font-size:13px}.ring.kring2 i{font-size:9.5px}
+.kpigrid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}

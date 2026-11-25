@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125o">
-<script src="assets/thema.js?v=20261125o"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125q">
+<script src="assets/thema.js?v=20261125q"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -265,10 +265,13 @@
 
     <div class="kpigrid">
       <sc-for list="{{kpis}}" as="k" hint-placeholder-count="7">
-        <button type="button" class="{{k.cls}}" onClick="{{k.pick}}">
-          <span style="font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">{{k.label}}</span>
-          <span style="font-size: 28px; font-weight: 800; line-height: 1.15">{{k.value}}</span>
-          <span style="font-size: 12px; color: var(--tx-5e5e5e)">{{k.sub}}</span>
+        <button type="button" class="{{k.cls}} kmet" onClick="{{k.pick}}">
+          <span class="ktxt">
+            <span style="font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">{{k.label}}</span>
+            <span style="font-size: 28px; font-weight: 800; line-height: 1.15">{{k.value}}</span>
+            <span style="font-size: 12px; color: var(--tx-5e5e5e)">{{k.sub}}</span>
+          </span>
+          <sc-if value="{{k.hasRing}}" hint-placeholder-val="{{ false }}"><span class="ring kring2" style="{{k.ringStijl}}" title="{{k.ringT}}"><b>{{k.ringPct}}</b><i>{{k.ringL}}</i></span></sc-if>
         </button>
       </sc-for>
       <sc-if value="{{ringen}}" hint-placeholder-val="{{ false }}">
@@ -1385,9 +1388,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125o"></script>
-<script src="assets/xlsx.js?v=20261125o"></script>
-<script src="assets/store.js?v=20261125o"></script>
-<script src="assets/app.js?v=20261125o"></script>
+<script src="assets/runtime.js?v=20261125q"></script>
+<script src="assets/xlsx.js?v=20261125q"></script>
+<script src="assets/store.js?v=20261125q"></script>
+<script src="assets/app.js?v=20261125q"></script>
 </body>
 </html>

@@ -185,6 +185,7 @@ function getFilters() { return [
   { id:'alles', label:'Alle lopende klanten', kpi:'Klanten', sub:'actieve klanten', f:lopend },
   { id:'btw', label:'Btw-aangifte open', kpi:'Btw open', sub:'periode voorbij, nog niet gedaan', f:btwOpenNu },
   { id:'achter', label:'Achterstand', kpi:'Achterstand', sub:'administratie niet bij ' + peilLabel(), f:isAchter },
+  { id:'ctrl', label:'Controle Q' + winQ() + ' open', kpi:'Controle Q' + winQ(), sub:'kwartaalcontrole nog niet gedaan', f:function (c) { return lopend(c) && winQ() > 0 && onderdeelOpen(c, 'cq' + winQ()); } },
   { id:'wacht', label:'Wacht op klant', kpi:'Wacht op klant', sub:'stukken nog niet binnen', f:heeftWacht },
   { id:'jw', label:'Jaarwerk ' + vj() + ' nog open', kpi:'Jaarwerk ' + vj() + ' open', sub:'jaarrekening', f:jwOpen },
   { id:'ib', label:'IB-aangifte ' + vj() + ' nog open', kpi:'IB ' + vj() + ' open', sub:'aangifte IB', f:ibOpen },
@@ -582,7 +583,7 @@ class Component extends DCLogic {
     var inBase = function (c) { return (s.scope === 'alle' || c.admin === role) && (s.bankF === 'alle' || c.bank === s.bankF); };
     var inScope = function (c) { return inBase(c) && (s.adminF === 'alle' || c.admin === s.adminF); };
     var cur = FILTERS.filter(function (f) { return f.id === s.filter; })[0];
-    if (['alles', 'btw', 'achter', 'wacht'].indexOf(cur.id) < 0) cur = FILTERS[0];
+    if (['alles', 'btw', 'achter', 'ctrl', 'wacht'].indexOf(cur.id) < 0) cur = FILTERS[0];
     var q = s.q.trim().toLowerCase();
     var BANKORD = { 'BK':0, 'camt.053':1, 'MT940':2, 'geen':3, 'overig':4 };
     var progress = function (c) { var n = 0; for (var i = 0; i < 12; i++) { if (mNa(c, i)) continue; if (!c.months[i]) break; n = i + 1; } return n; };
@@ -622,10 +623,14 @@ class Component extends DCLogic {
       arrow[k] = s.sort.k === k ? (s.sort.d === 1 ? '↑' : '↓') : '⇅';
     });
     var viewTitleTxt = (s.scope === 'mijn' ? 'Mijn klanten: ' : (s.adminF !== 'alle' ? s.adminF + ': ' : 'Alle klanten: ')) + cur.label.charAt(0).toLowerCase() + cur.label.slice(1) + (s.bankF !== 'alle' ? ' (bank ' + s.bankF + ')' : '');
-    var vis = FILTERS.filter(function (f) { return ['alles', 'btw', 'achter', 'wacht'].indexOf(f.id) >= 0; });
+    var volg = ['alles', 'achter', 'ctrl', 'btw', 'wacht'];
+    var vis = volg.map(function (id) { return FILTERS.filter(function (f) { return f.id === id; })[0]; }).filter(function (f) { return f && (f.id !== 'ctrl' || winQ() > 0); });
+    var kwS = kwSoorten(all.filter(inScope), winQ());
+    var kRing = function (x, l) { var p = x[1] ? Math.round(x[0] / x[1] * 100) : 0; return { hasRing:true, ringStijl: ringStijl(p, p >= 90 ? 'var(--bg-4f8a3c)' : 'var(--bg-ff8000)'), ringPct: x[1] ? p + '%' : '–', ringL:l, ringT: x[0] + ' van ' + x[1] + ' gedaan' }; };
+    var kRingen = { achter: kRing(kwS.adm, peilLabel()), ctrl: kRing(kwS.ctrl, 'gedaan'), btw: kRing(kwS.btw, 'Q' + (winQ() + 1)) };
     var kpis = vis.map(function (f) {
       var nOp = f.id === 'alles' ? all.filter(function (c) { return inScope(c) && c.status === 'Opgezegd'; }).length : 0;
-      return { label:f.kpi, sub: nOp ? 'waarvan ' + nOp + ' opgezegd' : f.sub, value: all.filter(function (c) { return inScope(c) && f.f(c); }).length, cls: cur.id === f.id ? 'kpi on' : 'kpi', pick:function () { self.setState({ filter:f.id }); } };
+      return Object.assign({ hasRing:false, ringStijl:'', ringPct:'', ringL:'', ringT:'' }, kRingen[f.id] || {}, { label:f.kpi, sub: nOp ? 'waarvan ' + nOp + ' opgezegd' : f.sub, value: all.filter(function (c) { return inScope(c) && f.f(c); }).length, cls: cur.id === f.id ? 'kpi on' : 'kpi', pick:function () { self.setState({ filter:f.id }); } });
     });
     var baseList = all.filter(function (c) { return inBase(c) && cur.f(c) && (!q || c.naam.toLowerCase().indexOf(q) >= 0); });
     var breakdown = s.scope === 'alle' ? ADMINS.map(function (a) { var on = s.adminF === a; return { admin:initial(a), avS:avS(a), n: baseList.filter(function (c) { return c.admin === a; }).length, cls: on ? 'chip chipbtn on' : 'chip chipbtn', t: on ? 'Klik om weer iedereen te tonen' : 'Alleen klanten van ' + a, pick: function () { self.setState({ scope:'alle', adminF: on ? 'alle' : a }); } }; }).filter(function (b) { return b.n > 0 || s.adminF === b.admin; }) : [];
@@ -1288,7 +1293,7 @@ class Component extends DCLogic {
       werkWie: wie, onWerkWie: function (ev) { self.setState({ werkWie:ev.target.value }); },
       werkTitel: wie === 'alle' ? 'Werkvoorraad van iedereen' : (wie === role ? 'Mijn werkvoorraad' : 'Werkvoorraad van ' + wie),
       werkSub: mijn.length + ' lopende klanten · administratie telt als achterstand ' + peilLabel() + ' · ' + JAAR,
-      ringBlok: ringBlok, ringen: ringenAan(), geenRingen: !ringenAan(),
+      ringBlok: ringBlok, ringen: false, geenRingen: false,
       werkSecties: werkSecties, todoTegels: werkSecties.map(function (x) { return { spring: function () { var el = document.getElementById('sec-' + x.id); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }, l:(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); })(x.titel.replace(/^\d\. /, '')), n:x.todo, cls: x.todo ? (x.id === 'wacht' ? 'tdt w' : 'tdt') : 'tdt nul' }; }), todoTotaal: werkSecties.filter(function (x) { return x.id !== 'wacht'; }).reduce(function (t, x) { return t + x.todo; }, 0), exportWerk: exportWerk, exportKlanten: exportKlanten,
       team: team, teamKop: teamM.map(function (m) { return { l:m[1] }; }), toonTeam: beheer,
       bJaarCls: bCls('jaar'), bJaar: goSub('jaar'), showJaar: s.bsub === 'jaar',
