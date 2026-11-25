@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125k">
-<script src="assets/thema.js?v=20261125k"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125m">
+<script src="assets/thema.js?v=20261125m"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -415,6 +415,52 @@
                   <div style="display: flex; flex-direction: column; gap: 3px">
                     <span style="font-size: 13px; font-weight: 800; color: var(--tx-6b3200)">Bijzonderheden</span>
                     <span style="font-size: 14px; line-height: 1.45; white-space: pre-line">{{d.bijz}}</span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{kenDicht}}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; align-items: center; gap: 10px">
+                  <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{kenStart}}">Kenmerken wijzigen</button>
+                  <span style="font-size: 12px; color: var(--tx-5e5e5e)">bank, pand, auto's, km, UZGB, motor, fiets en e-mailadres</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{kenOpen}}" hint-placeholder-val="{{ false }}">
+                <div class="kenedit">
+                  <p class="sec">Kenmerken wijzigen</p>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px">
+                    <label class="field" style="grid-column: 1 / -1">E-mailadres
+                      <input type="email" value="{{ken.email}}" onChange="{{onKen.email}}" placeholder="naam@bedrijf.nl">
+                    </label>
+                    <label class="field">Bankkoppeling
+                      <select value="{{ken.bank}}" onChange="{{onKen.bank}}">
+                        <option value="BK">Bankkoppeling (BK)</option>
+                        <option value="camt.053">camt.053</option>
+                        <option value="MT940">MT940</option>
+                        <option value="geen">geen</option>
+                        <option value="overig">overig</option>
+                      </select>
+                    </label>
+                    <label class="field">Pand
+                      <select value="{{ken.pand}}" onChange="{{onKen.pand}}">
+                        <option value="">Geen pand</option>
+                        <option value="Koop">Koop</option>
+                        <option value="Huur">Huur</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                    <label class="check"><input type="checkbox" checked="{{ken.pers}}" onChange="{{onKen.pers}}">Personenauto</label>
+                    <label class="check"><input type="checkbox" checked="{{ken.best}}" onChange="{{onKen.best}}">Bestelauto</label>
+                    <label class="check"><input type="checkbox" checked="{{ken.km}}" onChange="{{onKen.km}}">KM-registratie</label>
+                    <label class="check"><input type="checkbox" checked="{{ken.uzgb}}" onChange="{{onKen.uzgb}}">Verklaring UZGB</label>
+                    <label class="check"><input type="checkbox" checked="{{ken.motor}}" onChange="{{onKen.motor}}">Motor</label>
+                    <label class="check"><input type="checkbox" checked="{{ken.fiets}}" onChange="{{onKen.fiets}}">Fiets</label>
+                  </div>
+                  <sc-if value="{{hasKenErr}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: var(--tx-c8412b); font-weight: 700">{{kenErr}}</span></sc-if>
+                  <div style="display: flex; gap: 8px">
+                    <button type="button" class="btn primary" onClick="{{kenSave}}">Opslaan</button>
+                    <button type="button" class="btn" onClick="{{kenStop}}">Annuleren</button>
                   </div>
                 </div>
               </sc-if>
@@ -1329,9 +1375,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125k"></script>
-<script src="assets/xlsx.js?v=20261125k"></script>
-<script src="assets/store.js?v=20261125k"></script>
-<script src="assets/app.js?v=20261125k"></script>
+<script src="assets/runtime.js?v=20261125m"></script>
+<script src="assets/xlsx.js?v=20261125m"></script>
+<script src="assets/store.js?v=20261125m"></script>
+<script src="assets/app.js?v=20261125m"></script>
 </body>
 </html>

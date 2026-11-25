@@ -271,7 +271,11 @@
 
   S.persist = function (o, n, text, jaar) {
     var d = diff(o, n), jobs = [];
-    if (Object.keys(d.kl).length) jobs.push(sb.from('klanten').update(d.kl).eq('id', n.id).then(must));
+    if (Object.keys(d.kl).length) {
+      // Beheer wijzigt direct; een collega alleen de vrijgegeven kenmerken, via een beveiligde databasefunctie
+      if (S.me && S.me.rol === 'beheer') jobs.push(sb.from('klanten').update(d.kl).eq('id', n.id).then(must));
+      else jobs.push(sb.rpc('klant_kenmerken_wijzigen', { p_id: n.id, p_velden: d.kl }).then(must));
+    }
     if (Object.keys(d.vg).length) {
       var row = Object.assign({ klant_id: n.id, jaar: jaar }, d.vg);
       jobs.push(sb.from('voortgang').upsert(row, { onConflict: 'klant_id,jaar' }).then(must));

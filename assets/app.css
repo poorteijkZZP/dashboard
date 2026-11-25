@@ -679,3 +679,5 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .winfo{font-size:12px;color:var(--tx-5e5e5e);text-align:right;white-space:nowrap;flex:none}
 .witem .mini,.witem > span.mini:last-child{flex:none!important;min-width:26px!important;width:auto!important;text-align:center}
 .witem > span.winfo:last-child{flex:none;min-width:0}
+.kenedit{display:flex;flex-direction:column;gap:12px;padding:14px;border:1px solid var(--ln-d0ccc6);border-radius:12px;background:var(--bg-fbfaf8)}
+.sregel span{white-space:nowrap;flex:none}.sregel b{min-width:0;overflow-wrap:anywhere;word-break:break-word}

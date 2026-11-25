@@ -352,7 +352,7 @@ class Component extends DCLogic {
   }
 
   openClient(id) {
-    this.setState({ sel:id, tab:'over' });
+    this.setState({ sel:id, tab:'over', kenEdit:null });
     this.loadLog(id);
   }
 
@@ -840,7 +840,7 @@ class Component extends DCLogic {
       if (!bezit.length) bezit.push({ k:'Bezittingen', v:'Geen auto, motor, fiets of pand' });
       var vul = function (v) { return v === null || v === undefined || v === '' ? 'onbekend' : String(v); };
       var secties = [
-        { t:'Algemeen', r:[{ k:'Rechtsvorm', v:vul(c.rechtsvorm) }, { k:'Contactpersoon', v:vul((c.voornaam + ' ' + c.achternaam).trim()) }, { k:'E-mailadres', v:vul(c.email) }, { k:'Administrateur', v:vul(c.admin) }, { k:'Klant sinds', v:vanLabel(c) }, { k:'Status', v: e ? c.status + ' per ' + e.datum + ' (' + e.reden + ')' : c.status }].concat(e && c.status === 'Opgezegd' ? [{ k:'Jaarwerk door ons', v: STORE.tmJaar(c, 'jw') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'jw') }, { k:'IB door ons', v: STORE.tmJaar(c, 'ib') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'ib') }] : []) },
+        { t:'Algemeen', r:[{ k:'Rechtsvorm', v:vul(c.rechtsvorm) }, { k:'Contactpersoon', v:vul((c.voornaam + ' ' + c.achternaam).trim()) }, { k:'E-mail', v:vul(c.email) }, { k:'Administrateur', v:vul(c.admin) }, { k:'Klant sinds', v:vanLabel(c) }, { k:'Status', v: e ? c.status + ' per ' + e.datum + ' (' + e.reden + ')' : c.status }].concat(e && c.status === 'Opgezegd' ? [{ k:'Jaarwerk door ons', v: STORE.tmJaar(c, 'jw') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'jw') }, { k:'IB door ons', v: STORE.tmJaar(c, 'ib') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'ib') }] : []) },
         { t:'Pakket en facturatie', r:[{ k:'Pakket', v:vul(c.pakket) }, { k:'Facturen per jaar', v:vul(c.facturen) }, { k:'Google review', v: c.review ? 'Geplaatst' : 'Nog niet' }] },
         { t:'Fiscaal', r:[{ k:'Btw-regime', v:vul(c.regime) }, { k:'Btw-aangifte', v: c.regime === 'Normaal' ? (c.btwMaand ? 'Per maand' : 'Per kwartaal') : 'Geen' }, { k:'Btw-nummer', v:vul(c.btwnr) }, { k:'Btw-ID', v:vul(c.btwid) }] },
         { t:'Administratie', r:[{ k:'Verwerking', v: c.freq === 'maand' ? 'Per maand' : 'Per kwartaal' }, { k:'Bank', v: c.bank === 'BK' ? 'Bankkoppeling (BK)' : c.bank === 'geen' ? 'Geen koppeling' : vul(c.bank) }, { k:'Boekhoudpakket', v:vul(c.software) }, { k:'Altijd up2date', v: c.up ? 'Ja, levert minimaal 1x per maand aan' : 'Nee' }] },
@@ -1053,6 +1053,21 @@ class Component extends DCLogic {
     var onMut = { admin:setSub('mut', 'admin') };
     var onStop = { datum:setSub('stop', 'datum'), reden:setSub('stop', 'reden'), adm:setSub('stop', 'adm'), btw:setSub('stop', 'btw'), jwTm:setSub('stop', 'jwTm'), ibTm:setSub('stop', 'ibTm') };
     var onSf = {}; Object.keys(emptySf()).forEach(function (k) { onSf[k] = setSub('sf', k); });
+    // Kenmerken die iedere collega op de klantkaart mag wijzigen
+    var KEN_VELDEN = ['email', 'bank', 'pand', 'pers', 'best', 'km', 'uzgb', 'motor', 'fiets'];
+    var onKen = {}; KEN_VELDEN.forEach(function (k) { onKen[k] = setSub('kenEdit', k, ['email', 'bank', 'pand'].indexOf(k) < 0); });
+    var kenC = selC;
+    var kenStart = function () { if (!kenC) return; var o = {}; KEN_VELDEN.forEach(function (k) { o[k] = ['email', 'bank', 'pand'].indexOf(k) >= 0 ? (kenC[k] || '') : !!kenC[k]; }); if (!o.bank) o.bank = 'BK'; self.setState({ kenEdit:o, kenErr:'' }); };
+    var kenSave = function () {
+      var e = s.kenEdit; if (!e || !kenC) return;
+      var mail = String(e.email || '').trim();
+      if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { self.setState({ kenErr:'Dat e-mailadres klopt niet.' }); return; }
+      var namen = { email:'e-mailadres', bank:'bank', pand:'pand', pers:'personenauto', best:'bestelauto', km:'km-registratie', uzgb:'verklaring UZGB', motor:'motor', fiets:'fiets' };
+      var gew = KEN_VELDEN.filter(function (k) { var oud = k === 'email' ? (kenC.email || '') : kenC[k]; var nw = k === 'email' ? mail : e[k]; return typeof nw === 'boolean' ? !!oud !== nw : String(oud || '') !== String(nw || ''); });
+      if (!gew.length) { self.setState({ kenEdit:null }); return; }
+      self.upd(kenC.id, function (n) { gew.forEach(function (k) { n[k] = k === 'email' ? mail : e[k]; }); }, 'Kenmerken gewijzigd: ' + gew.map(function (k) { return namen[k]; }).join(', '));
+      self.setState({ kenEdit:null, kenErr:'' });
+    };
 
     var mq = s.mq.trim().toLowerCase();
     var mlist = all.filter(function (c) { return !mq || c.naam.toLowerCase().indexOf(mq) >= 0; }).sort(function (a, b) { return a.naam.localeCompare(b.naam); })
@@ -1303,6 +1318,7 @@ class Component extends DCLogic {
       viewCount: list.length + (list.length === 1 ? ' klant' : ' klanten'),
       rows:rows, noRows: rows.length === 0,
       showEmpty: !selC, showDetail: !!selC, hasSel: !!selC, d:d,
+      kenOpen: !!s.kenEdit, kenDicht: !s.kenEdit, ken: s.kenEdit || {}, onKen: onKen, kenStart: kenStart, kenSave: kenSave, kenStop: function () { self.setState({ kenEdit:null, kenErr:'' }); }, kenErr: s.kenErr || '', hasKenErr: !!s.kenErr,
       tOver: s.tab === 'over', tGeg: s.tab === 'geg', tHist: s.tab === 'hist', tVg: s.tab === 'vg', tVp: s.tab === 'vp',
       tabVgCls: s.tab === 'vg' ? 'ptab on' : 'ptab', tabVpCls: s.tab === 'vp' ? 'ptab on' : 'ptab',
       tabVg:function () { self.setState({ tab:'vg' }); }, tabVp:function () { self.setState({ tab:'vp' }); },

@@ -166,6 +166,34 @@ create policy "klanten lezen" on public.klanten for select to authenticated usin
 drop policy if exists "klanten beheren" on public.klanten;
 create policy "klanten beheren" on public.klanten for all to authenticated using (public.is_beheer()) with check (public.is_beheer());
 
+-- Collega's (geen beheer) mogen alleen deze kenmerken wijzigen: bank, pand, auto's, km, UZGB, motor, fiets, e-mail
+create or replace function public.klant_kenmerken_wijzigen(p_id bigint, p_velden jsonb) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  k text;
+  toegestaan text[] := array['bank','pand','personenauto','bestelauto','km_registratie','verklaring_uzgb','km_uzgb_splitsen','motor','fiets','email'];
+begin
+  if not public.is_medewerker() then raise exception 'Geen toegang'; end if;
+  for k in select jsonb_object_keys(p_velden) loop
+    if not (k = any(toegestaan)) then raise exception 'Het veld % mag alleen de beheerder wijzigen', k; end if;
+  end loop;
+  update public.klanten set
+    bank             = case when p_velden ? 'bank' then p_velden->>'bank' else bank end,
+    pand             = case when p_velden ? 'pand' then nullif(p_velden->>'pand', '') else pand end,
+    personenauto     = case when p_velden ? 'personenauto' then (p_velden->>'personenauto')::boolean else personenauto end,
+    bestelauto       = case when p_velden ? 'bestelauto' then (p_velden->>'bestelauto')::boolean else bestelauto end,
+    km_registratie   = case when p_velden ? 'km_registratie' then (p_velden->>'km_registratie')::boolean else km_registratie end,
+    verklaring_uzgb  = case when p_velden ? 'verklaring_uzgb' then (p_velden->>'verklaring_uzgb')::boolean else verklaring_uzgb end,
+    km_uzgb_splitsen = case when p_velden ? 'km_uzgb_splitsen' then (p_velden->>'km_uzgb_splitsen')::boolean else km_uzgb_splitsen end,
+    motor            = case when p_velden ? 'motor' then (p_velden->>'motor')::boolean else motor end,
+    fiets            = case when p_velden ? 'fiets' then (p_velden->>'fiets')::boolean else fiets end,
+    email            = case when p_velden ? 'email' then nullif(p_velden->>'email', '') else email end
+  where id = p_id;
+  if not found then raise exception 'Klant niet gevonden'; end if;
+end $$;
+revoke all on function public.klant_kenmerken_wijzigen(bigint, jsonb) from public, anon;
+grant execute on function public.klant_kenmerken_wijzigen(bigint, jsonb) to authenticated;
+
 drop policy if exists "voortgang lezen" on public.voortgang;
 create policy "voortgang lezen" on public.voortgang for select to authenticated using (public.is_medewerker());
 drop policy if exists "voortgang toevoegen" on public.voortgang;
