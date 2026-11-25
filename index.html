@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125g">
-<script src="assets/thema.js?v=20261125g"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125i">
+<script src="assets/thema.js?v=20261125i"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -254,30 +254,7 @@
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 100%">
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Overzicht</h1>
-        <span class="scopetxt">{{scopeTekst}}</span>
       </div>
-      <div style="display: inline-flex; gap: 2px; padding: 3px; background: var(--bg-eae7e2); border-radius: 9px" role="group" aria-label="Welke klanten">
-        <button type="button" class="{{scopeAllCls}}" onClick="{{scopeAll}}">Alle klanten<span class="n">{{scopeAllN}}</span></button>
-        <button type="button" class="{{scopeMijnCls}}" onClick="{{scopeMijn}}">Mijn klanten<span class="n">{{scopeMijnN}}</span></button>
-      </div>
-      <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 4px 0 12px; min-height: 42px; font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">Collega
-        <select aria-label="Filter op collega" value="{{adminF}}" onChange="{{onAdminF}}" style="border: 0; outline: none; font-size: 14px; font-weight: 600; min-height: 40px; background: transparent; color: var(--tx-2b2b2b)">
-          <option value="alle">Iedereen</option>
-          <option value="Jeroen">JB</option>
-          <option value="Gea">GW</option>
-          <option value="Marco">MK</option>
-          <option value="Yassir">YO</option>
-        </select>
-      </label>
-      <label class="filterbox">Nog open
-        <select aria-label="Filter op wat nog open staat" value="{{openF}}" onChange="{{onOpenF}}">
-          <sc-for list="{{openOpties}}" as="oo" hint-placeholder-count="5"><option value="{{oo.v}}">{{oo.l}}</option></sc-for>
-        </select>
-      </label>
-      <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 12px; min-height: 42px; flex: 0 1 260px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-5e5e5e)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
-        <input type="search" placeholder="Zoek klant" aria-label="Zoek klant" value="{{q}}" onChange="{{onQ}}" style="border: 0; outline: none; font-size: 14px; width: 100%; background: transparent; min-height: 40px">
-      </label>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px">
@@ -311,15 +288,6 @@
             </sc-if>
           </span>
           <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{viewCount}}</span>
-          <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{exportKlanten}}" title="Exporteert precies deze weergave, met filters en sortering">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
-            Excel
-          </button>
-          <sc-if value="{{hasBreakdown}}" hint-placeholder-val="{{ true }}"><span style="width: 1px; height: 24px; background: var(--ln-e4e2df); margin: 0 6px"></span></sc-if>
-          <sc-if value="{{hasBreakdown}}" hint-placeholder-val="{{ true }}"><span style="font-size: 12px; font-weight: 600; color: var(--tx-5e5e5e)">Per collega</span></sc-if>
-          <sc-for list="{{breakdown}}" as="b" hint-placeholder-count="4">
-            <button type="button" class="{{b.cls}} kleurchip" title="{{b.t}}" style="{{b.avS}}" onClick="{{b.pick}}">{{b.admin}} <b>{{b.n}}</b></button>
-          </sc-for>
         </div>
         <div class="verloop">
           <span class="vtitel">{{verloopTitel}}</span>
@@ -331,8 +299,22 @@
           </sc-for>
         </div>
         <div class="snelrij">
-          <span class="sneltitel">Snel filteren op wat nog open staat</span>
+          <span class="sneltitel">Collega</span>
+                              <sc-for list="{{breakdown}}" as="b" hint-placeholder-count="4">
+            <button type="button" class="{{b.cls}} kleurchip" title="{{b.t}}" style="{{b.avS}}" onClick="{{b.pick}}">{{b.admin}} <b>{{b.n}}</b></button>
+          </sc-for>
+          <span class="snelsep"></span>
+          <span class="sneltitel">Nog open</span>
           <sc-for list="{{snelF}}" as="sf" hint-placeholder-count="6"><button type="button" class="{{sf.cls}}" title="{{sf.t}}" onClick="{{sf.pick}}">{{sf.l}}<b>{{sf.n}}</b></button></sc-for>
+          <span class="snelsep"></span>
+          <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 12px; min-height: 42px; flex: 0 1 260px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-5e5e5e)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input type="search" placeholder="Zoek klant" aria-label="Zoek klant" value="{{q}}" onChange="{{onQ}}" style="border: 0; outline: none; font-size: 14px; width: 100%; background: transparent; min-height: 40px">
+      </label>
+          <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{exportKlanten}}" title="Exporteert precies deze weergave, met filters en sortering">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+            Excel
+          </button>
         </div>
         <div class="tablebox">
           <div class="grid">
@@ -418,6 +400,8 @@
             </sc-if>
             <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--ln-e4e2df)">
               <button type="button" class="{{tabOverCls}}" onClick="{{tabOver}}">Klantkaart</button>
+              <button type="button" class="{{tabVgCls}}" onClick="{{tabVg}}">Voortgang</button>
+              <button type="button" class="{{tabVpCls}}" onClick="{{tabVp}}">Vraagposten<sc-if value="{{d.vpHeeft}}" hint-placeholder-val="{{ false }}"><span class="tabn">{{d.vpSom}}</span></sc-if></button>
               <button type="button" class="{{tabHistCls}}" onClick="{{tabHist}}">Historie</button>
             </div>
           </div>
@@ -434,23 +418,6 @@
                   </div>
                 </div>
               </sc-if>
-
-              <div style="display: flex; flex-direction: column; gap: 8px">
-                <p class="sec">Voortgang {{jaarLabel}}</p>
-                <sc-for list="{{d.blokken}}" as="bk" hint-placeholder-count="4">
-                  <div class="{{bk.cls}}"><span class="qbl">{{bk.l}}</span><sc-for list="{{bk.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isGap}}" hint-placeholder-val="{{ false }}"><span class="tt gap"></span></sc-if><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
-                </sc-for>
-                <div class="qb"><span class="qbl">{{vjLabel}}</span><sc-for list="{{d.jaarTegels}}" as="tt" hint-placeholder-count="3"><button type="button" class="{{tt.cls}} breed" title="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></div>
-                <span style="font-size: 12px; color: var(--tx-5e5e5e)">Klik = gedaan aan/uit · rechtermuisknop = wacht op klant of terug naar open</span>
-              </div>
-
-              <div class="vpkaart">
-                <div class="vpkop"><p class="sec">Vraagposten {{d.vpJaar}}</p><span class="vptot"><b>{{d.vpSom}}</b> in {{d.vpAantalMails}} mails</span><button type="button" class="btn primary" style="min-height: 34px; font-size: 13px" onClick="{{d.vpSnel}}">+ Vraagposten</button></div>
-                <sc-for list="{{d.vpRijen}}" as="vr" hint-placeholder-count="2">
-                  <div class="vpregel"><span class="av" style="{{vr.avS}}">{{vr.init}}</span><span class="vpwie">{{vr.wie}} · {{vr.wanneer}}<sc-if value="{{vr.hasGew}}" hint-placeholder-val="{{ false }}"><em> · {{vr.gewijzigd}}</em></sc-if></span><input type="text" inputmode="numeric" aria-label="Aantal" value="{{vr.aantal}}" onChange="{{vr.wijzig}}"><button type="button" class="vpweg" title="Verwijderen" onClick="{{vr.weg}}">✕</button></div>
-                </sc-for>
-                <sc-if value="{{d.vpLeeg}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: var(--tx-8e8e8e)">Nog geen vraagposten dit jaar.</span></sc-if>
-              </div>
 
               <div class="secties">
                 <sc-for list="{{d.secties}}" as="sc" hint-placeholder-count="5">
@@ -474,6 +441,43 @@
                   <div class="nact"><button type="button" class="{{d.ownBtnCls}}" onClick="{{saveOwn}}">Opslaan</button><span>{{d.ownInfo}}</span></div>
                 </div>
               </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{tVg}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 16px 20px 22px; display: flex; flex-direction: column; gap: 18px">
+              <sc-if value="{{d.hasBijz}}" hint-placeholder-val="{{ true }}">
+                <div style="background: var(--bg-fff2e5); border: 1px solid var(--ln-ffbf80); border-radius: 10px; padding: 12px 14px; display: flex; gap: 10px">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--ic-a94f00); flex: none; margin-top: 1px"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
+                  <div style="display: flex; flex-direction: column; gap: 3px">
+                    <span style="font-size: 13px; font-weight: 800; color: var(--tx-6b3200)">Bijzonderheden</span>
+                    <span style="font-size: 14px; line-height: 1.45; white-space: pre-line">{{d.bijz}}</span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <p class="sec">Voortgang {{jaarLabel}}</p>
+                <sc-for list="{{d.blokken}}" as="bk" hint-placeholder-count="4">
+                  <div class="{{bk.cls}}"><span class="qbl">{{bk.l}}</span><sc-for list="{{bk.tiles}}" as="tt" hint-placeholder-count="5"><sc-if value="{{tt.isGap}}" hint-placeholder-val="{{ false }}"><span class="tt gap"></span></sc-if><sc-if value="{{tt.isSep}}" hint-placeholder-val="{{ false }}"><i class="qsep"></i></sc-if><sc-if value="{{tt.isTile}}" hint-placeholder-val="{{ true }}"><button type="button" class="{{tt.cls}}" title="{{tt.t}}" aria-label="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-if></sc-for></div>
+                </sc-for>
+                <div class="qb"><span class="qbl">{{vjLabel}}</span><sc-for list="{{d.jaarTegels}}" as="tt" hint-placeholder-count="3"><button type="button" class="{{tt.cls}} breed" title="{{tt.t}}" disabled="{{tt.na}}" onClick="{{tt.click}}" onContextMenu="{{tt.menu}}">{{tt.l}}</button></sc-for></div>
+                <span style="font-size: 12px; color: var(--tx-5e5e5e)">Klik = gedaan aan/uit · rechtermuisknop = wacht op klant of terug naar open</span>
+              </div>
+
+            </div>
+          </sc-if>
+
+          <sc-if value="{{tVp}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 16px 20px 22px; display: flex; flex-direction: column; gap: 18px">
+              <div class="vpkaart">
+                <div class="vpkop"><p class="sec">Vraagposten {{d.vpJaar}}</p><span class="vptot"><b>{{d.vpSom}}</b> in {{d.vpAantalMails}} mails</span><button type="button" class="btn primary" style="min-height: 34px; font-size: 13px" onClick="{{d.vpSnel}}">+ Vraagposten</button></div>
+                <sc-for list="{{d.vpRijen}}" as="vr" hint-placeholder-count="2">
+                  <div class="vpregel"><span class="av" style="{{vr.avS}}">{{vr.init}}</span><span class="vpwie">{{vr.wie}} · {{vr.wanneer}}<sc-if value="{{vr.hasGew}}" hint-placeholder-val="{{ false }}"><em> · {{vr.gewijzigd}}</em></sc-if></span><input type="text" inputmode="numeric" aria-label="Aantal" value="{{vr.aantal}}" onChange="{{vr.wijzig}}"><button type="button" class="vpweg" title="Verwijderen" onClick="{{vr.weg}}">✕</button></div>
+                </sc-for>
+                <sc-if value="{{d.vpLeeg}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: var(--tx-8e8e8e)">Nog geen vraagposten dit jaar.</span></sc-if>
+              </div>
+
             </div>
           </sc-if>
 
@@ -1325,9 +1329,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125g"></script>
-<script src="assets/xlsx.js?v=20261125g"></script>
-<script src="assets/store.js?v=20261125g"></script>
-<script src="assets/app.js?v=20261125g"></script>
+<script src="assets/runtime.js?v=20261125i"></script>
+<script src="assets/xlsx.js?v=20261125i"></script>
+<script src="assets/store.js?v=20261125i"></script>
+<script src="assets/app.js?v=20261125i"></script>
 </body>
 </html>

@@ -660,3 +660,18 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .kleurchip.on,.wiek.on[style*="background"]{box-shadow:0 0 0 2px var(--bg-ffffff),0 0 0 4px var(--ln-2b2b2b)}
 .kleurchip b,.wiek[style*="background"] b{background:rgba(255,255,255,.55)!important;color:inherit!important}
 .wiek[style*="background"]{border-color:transparent!important}
+.tabn{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--bg-ff8000);color:var(--tx-ffffff);font-size:11px;font-weight:800;box-sizing:border-box}
+/* ===== 25 nov middag ===== */
+.snelsep{width:1px;height:24px;background:var(--ln-e4e2df);margin:0 6px}
+.snelrij label{min-height:34px!important;flex:0 0 190px!important;width:190px!important;box-sizing:border-box}.snelrij label input{width:130px!important}
+.snelrij .btn{min-height:34px}
+/* Actief filter duidelijk zichtbaar, ook in donker */
+.snel.on{background:var(--bg-ff8000);border-color:var(--ln-ff8000);color:#fff}.snel.on b{background:rgba(255,255,255,.3);color:#fff}
+.snel.on::before,.kleurchip.on::before,.wiek.on::before{content:'✓';font-weight:900;margin-right:2px}
+.kleurchip.on,.wiek.on[style*="background"]{box-shadow:none;outline:2.5px solid var(--tx-2b2b2b);outline-offset:2px}
+/* Teamtabel */
+.teamgrid{grid-template-columns:150px 120px 130px repeat(6,minmax(128px,1fr)) 120px!important;min-width:1340px!important}
+.teamrow.totaal .cell{border-top:2px solid var(--ln-d0ccc6);background:var(--bg-f7f5f2);font-weight:800}
+.teamrow.totaal .av{background:var(--bg-2b2b2b)!important;color:var(--tx-ffffff)!important}
+/* Vandaag: tegels iets smaller */
+.witem .tt,.witem .pill{width:64px}
