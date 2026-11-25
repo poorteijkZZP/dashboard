@@ -601,3 +601,57 @@ aside.schuif{position:fixed!important;top:0;right:0;bottom:0;width:min(580px,94v
 .rbgetal{font-size:22px;font-weight:800}.rbgetal span{font-size:14px;font-weight:600;color:var(--tx-5e5e5e)}
 .rbl{font-weight:800;font-size:13px}.rbsub{font-size:12px;color:var(--tx-5e5e5e)}
 .vringen{display:flex;gap:30px;flex-wrap:wrap;margin-top:8px}.vringen .ring{width:56px;height:56px}
+/* ===== Aanpassingen 25 nov ===== */
+/* Controle-tegel op twee regels: Controle / Q3 */
+.tt{white-space:pre-line;line-height:1.05;text-align:center}
+.qb .tt.ct{width:62px;font-size:9.5px;letter-spacing:0}
+.witem .tt{font-size:10px}
+/* Kwartaalaanduiding duidelijk als label, niet als knop */
+.qbl,.qb .qbl{color:var(--tx-b35a00)!important;font-size:14px;font-weight:800;letter-spacing:.01em;border-right:2px solid var(--ln-ffbf80)!important;background:none!important;box-shadow:none!important;border-radius:0!important}
+.qbl.knop{color:var(--tx-b35a00)!important;opacity:.85}.qbl.knop:hover{opacity:1;text-decoration:underline}
+/* Snelfilters boven de tabel */
+.snelrij{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--ln-e4e2df)}
+.sneltitel{font-size:12px;font-weight:700;color:var(--tx-5e5e5e);margin-right:4px}
+.snel{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 6px 0 11px;border-radius:999px;border:1px solid var(--ln-d0ccc6);background:var(--bg-ffffff);color:var(--tx-2b2b2b);font:700 13px inherit;font-family:inherit;cursor:pointer}
+.snel b{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--bg-f1efec);display:inline-grid;place-items:center;font-size:12px;box-sizing:border-box}
+.snel:hover{border-color:var(--ln-8e8e8e)}
+.snel.on{background:var(--bg-2b2b2b);border-color:var(--ln-2b2b2b);color:var(--tx-ffffff)}.snel.on b{background:var(--bg-ff8000);color:var(--tx-ffffff)}
+.snel.wacht b{color:var(--tx-1f4e8c)}.snel.wacht.on b{color:var(--tx-ffffff)}
+.snel.leeg{opacity:.55}
+/* Ringen in de verloopregel zijn klikbaar */
+button.rbitem{background:none;border:1px solid transparent;border-radius:12px;padding:6px 10px 6px 6px;font-family:inherit;color:inherit;cursor:pointer}
+button.rbitem:hover{border-color:var(--ln-d0ccc6);background:var(--bg-fbfaf8)}
+button.rbitem.on{border-color:var(--ln-2b2b2b);background:var(--bg-f7f5f2)}
+button.rbitem.geen{cursor:default}button.rbitem.geen:hover{border-color:transparent;background:none}
+/* Teamtabel met ringen */
+.ring.klein{--d:5px;width:42px;height:42px}.ring.klein b{font-size:11px}
+.cell.tring{flex-direction:row!important;align-items:center;gap:8px}
+.trtxt{font-size:12px;color:var(--tx-5e5e5e);white-space:nowrap}.trget{font-size:18px;font-weight:800}
+.teamgrid{grid-template-columns:150px 90px repeat(7,minmax(120px,1fr)) 110px!important;min-width:1260px!important}
+/* Vandaag: tegels bovenaan zijn knoppen die naar het overzicht springen */
+button.tdt{font-family:inherit;text-align:left;cursor:pointer;color:inherit}
+button.tdt:hover{border-color:var(--ln-8e8e8e)}
+/* Eigen instellingen en kleur */
+.avknop{border:0;background:none;padding:0;cursor:pointer;border-radius:50%}
+.avknop:hover .av{outline:2px solid var(--ln-d0ccc6)}
+.mijnpop{position:absolute;right:0;top:42px;z-index:80;width:270px;background:var(--bg-ffffff);border:1px solid var(--ln-e4e2df);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:14px;display:flex;flex-direction:column;gap:8px}
+.mpt{font-size:14px;font-weight:800}.mps{font-size:12px;color:var(--tx-5e5e5e)}
+.kswatches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kswatch{height:34px;border-radius:9px;border:2px solid transparent;cursor:pointer}
+.kswatch.on{border-color:var(--ln-2b2b2b);box-shadow:inset 0 0 0 2px var(--bg-ffffff)}
+/* Jaarwerk: collega kiezen en de drie stappen */
+.wierij{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.wiek{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 8px 0 6px;border-radius:999px;border:1px solid var(--ln-d0ccc6);background:var(--bg-ffffff);color:var(--tx-2b2b2b);font:700 14px inherit;font-family:inherit;cursor:pointer}
+.wiek:first-of-type{padding-left:14px}
+.wiek .av{width:26px;height:26px;font-size:10.5px}
+.wiek b{min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--bg-f1efec);display:inline-grid;place-items:center;font-size:12px;box-sizing:border-box}
+.wiek.on{background:var(--bg-2b2b2b);border-color:var(--ln-2b2b2b);color:var(--tx-ffffff)}.wiek.on b{background:var(--bg-ff8000);color:var(--tx-ffffff)}
+.stappen{display:flex;flex-wrap:wrap;gap:10px}
+.stappen div{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:10px;background:var(--bg-f7f5f2);border:1px solid var(--ln-e4e2df)}
+.stappen b{font-size:13px}.stappen span{font-size:12px;color:var(--tx-5e5e5e)}
+/* Donkere weergave: keuzelijsten goed leesbaar */
+:root[data-thema="donker"] select{color:#EDE9E4!important}
+:root[data-thema="donker"] option{color:#EDE9E4;background:#2A2725}
+:root[data-thema="donker"] input::placeholder,:root[data-thema="donker"] textarea::placeholder{color:#9A948D}
+.ring.klein b{font-size:10px;letter-spacing:-.03em}
+.chipbtn .av{margin-right:2px}
