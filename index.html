@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125d">
-<script src="assets/thema.js?v=20261125d"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125e">
+<script src="assets/thema.js?v=20261125e"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -137,7 +137,7 @@
 
   <sc-if value="{{pageWerk}}" hint-placeholder-val="{{ false }}">
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
-      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 100%">
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">{{werkTitel}}</h1>
         <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{werkSub}}</span>
       </div>
@@ -252,7 +252,7 @@
   <sc-if value="{{pageKlanten}}" hint-placeholder-val="{{ true }}">
 
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
-      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 100%">
         <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Overzicht</h1>
         <span class="scopetxt">{{scopeTekst}}</span>
       </div>
@@ -315,7 +315,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
             Excel
           </button>
-          <div style="flex: 1 1 auto"></div>
+          <sc-if value="{{hasBreakdown}}" hint-placeholder-val="{{ true }}"><span style="width: 1px; height: 24px; background: var(--ln-e4e2df); margin: 0 6px"></span></sc-if>
           <sc-if value="{{hasBreakdown}}" hint-placeholder-val="{{ true }}"><span style="font-size: 12px; font-weight: 600; color: var(--tx-5e5e5e)">Per collega</span></sc-if>
           <sc-for list="{{breakdown}}" as="b" hint-placeholder-count="4">
             <button type="button" class="{{b.cls}}" title="{{b.t}}" onClick="{{b.pick}}"><span class="av" style="{{b.avS}}; width: 22px; height: 22px; font-size: 9.5px">{{b.admin}}</span><b>{{b.n}}</b></button>
@@ -1325,9 +1325,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125d"></script>
-<script src="assets/xlsx.js?v=20261125d"></script>
-<script src="assets/store.js?v=20261125d"></script>
-<script src="assets/app.js?v=20261125d"></script>
+<script src="assets/runtime.js?v=20261125e"></script>
+<script src="assets/xlsx.js?v=20261125e"></script>
+<script src="assets/store.js?v=20261125e"></script>
+<script src="assets/app.js?v=20261125e"></script>
 </body>
 </html>
