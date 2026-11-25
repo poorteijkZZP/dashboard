@@ -629,8 +629,7 @@ class Component extends DCLogic {
       var echte = tiles.filter(function (t) { return t.isTile && t.st !== 'n'; });
       var open = echte.filter(function (t) { return t.st !== 'd'; });
       var rond = qi === WQ && kwRond(c, qi);
-      var rpct = echte.length ? Math.round((echte.length - open.length) / echte.length * 100) : 0;
-      return { ringPct: rpct + '%', ringStijl: ringStijl(rpct, ringKleur(rpct)), ringT: (echte.length - open.length) + ' van ' + echte.length + ' gedaan', rond:rond, cls: qi === WQ ? (rond ? 'qb cur rond' : 'qb cur') : 'qb', l:'Q' + (qi + 1), tiles:tiles, nOpen:open.length, late: open.some(function (t) { return t.st === 'l'; }), wacht: open.some(function (t) { return t.st === 'w'; }), cur: qi === WQ };
+      return { rond:rond, cls: qi === WQ ? (rond ? 'qb cur rond' : 'qb cur') : 'qb', l:'Q' + (qi + 1), tiles:tiles, nOpen:open.length, late: open.some(function (t) { return t.st === 'l'; }), wacht: open.some(function (t) { return t.st === 'w'; }), cur: qi === WQ };
     };
     var vorigeQ = function (c) {
       var out = [];

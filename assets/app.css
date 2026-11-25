@@ -591,7 +591,6 @@ aside.schuif{position:fixed!important;top:0;right:0;bottom:0;width:min(580px,94v
 .ring b{font-size:14px;font-weight:800;color:var(--tx-2b2b2b)}
 .ring i{font-style:normal;font-size:11px;font-weight:600;color:var(--tx-5e5e5e)}
 .ring.groot{--d:12px;width:112px;height:112px}.ring.groot b{font-size:22px}
-.ring.mini{--d:4px;width:34px;height:34px;margin-left:10px;vertical-align:middle}.ring.mini b{font-size:9.5px}
 .ringblok{padding:18px 20px;margin:16px 0}
 .rbkop{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap}.rbkop .t{font-size:15px;font-weight:800}.rbkop .s{font-size:12px;color:var(--tx-5e5e5e)}
 .rbrij{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
