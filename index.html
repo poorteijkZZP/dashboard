@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125e">
-<script src="assets/thema.js?v=20261125e"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125f">
+<script src="assets/thema.js?v=20261125f"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -346,7 +346,7 @@
                   <button type="button" class="name" style="flex: 1 1 auto; min-width: 0" onClick="{{r.open}}">
                     {{r.naam}}
                     <sc-if value="{{r.hasBijz}}" hint-placeholder-val="{{ false }}">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-a94f00)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Heeft bijzonderheden"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
+                      <span class="bijzico" title="{{r.bijzT}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-a94f00)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="{{r.bijzT}}"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg></span>
                     </sc-if>
                   </button>
                   <sc-for list="{{r.tags}}" as="tg" hint-placeholder-count="1"><span class="{{tg.cls}}">{{tg.l}}</span></sc-for>
@@ -1325,9 +1325,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125e"></script>
-<script src="assets/xlsx.js?v=20261125e"></script>
-<script src="assets/store.js?v=20261125e"></script>
-<script src="assets/app.js?v=20261125e"></script>
+<script src="assets/runtime.js?v=20261125f"></script>
+<script src="assets/xlsx.js?v=20261125f"></script>
+<script src="assets/store.js?v=20261125f"></script>
+<script src="assets/app.js?v=20261125f"></script>
 </body>
 </html>

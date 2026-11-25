@@ -703,7 +703,7 @@ class Component extends DCLogic {
         tags:tags, tmL:ti.lbl, tmB:ti.bdg, tmCls:ti.bcls, hasTmB: !!ti.bdg,
         cur: blok(c, WQ), prev: vorigeQ(c), hasPrev: WQ > 0,
         naam:c.naam, admin:c.admin, init:initial(c.admin), avS:avS(c.admin), bank:c.bank,
-        hasBijz: !!c.bijz, hasStatus: c.status !== 'Actief', status:c.status,
+        hasBijz: !!c.bijz, bijzT: c.bijz ? 'Bijzonderheden: ' + c.bijz : '', hasStatus: c.status !== 'Actief', status:c.status,
         cls: (s.sel === c.id ? 'row sel' : 'row') + (self.__rond === c.id ? ' rondnet' : ''),
         isKw: c.freq === 'kwartaal',
         dots: c.months.map(function (d, i) {
@@ -862,7 +862,7 @@ class Component extends DCLogic {
         freqUitleg: c.freq === 'maand' ? 'per maand verwerken' : 'per kwartaal: alleen jan, apr, jul en okt afvinken',
         vanaf: vanLabel(c),
         hasEinde: !!e, status:c.status, eindDatum: e ? e.datum : '', eindReden: e ? e.reden : '', eindScope:eindScope,
-        hasBijz: !!c.bijz, bijz:c.bijz, kenm:kenm,
+        hasBijz: !!c.bijz, bijzT: c.bijz ? 'Bijzonderheden: ' + c.bijz : '', bijz:c.bijz, kenm:kenm,
         werk: 'Bank: ' + c.bank + ' · ' + c.software + ' · ' + (c.up ? 'Altijd up2date (levert minimaal 1x per maand aan)' : 'Niet altijd up2date') + ' · Pakket ' + c.pakket,
         bij:bijLabel(c), quarters:quarters, year:year,
         noteDraft: draft, noteInfo: s.notes[c.id] !== undefined && s.notes[c.id] !== c.notities ? 'Niet opgeslagen' : (c.notities ? 'Zichtbaar voor het hele team' : ''),
