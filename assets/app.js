@@ -918,7 +918,7 @@ class Component extends DCLogic {
     var veldOpen = function (c, k) { var v = c[k]; return v !== null && v !== undefined && !v && !(c.j25na && (k === 'c25' || k === 'jw25' || k === 'ib25')); };
     var veldToep = function (c, k) { var v = c[k]; return v !== null && v !== undefined && !(c.j25na && (k === 'c25' || k === 'jw25' || k === 'ib25')); };
     var lijstVeld = function (k, l, info) {
-      return mijn.filter(function (c) { return veldOpen(c, k); }).map(function (c) { var t = tegel(c, k, 0, l, info); return item(c, wk(c, k) ? 'wacht op klant' : info + ' open', { l:t.l, cls:t.cls, t:t.t, click:t.click, menu:t.menu }); });
+      return mijn.filter(function (c) { return veldOpen(c, k); }).map(function (c) { var t = tegel(c, k, 0, l, info); return item(c, wk(c, k) ? 'wacht op klant' : 'open', { l:t.l, cls:t.cls, t:t.t, click:t.click, menu:t.menu }); });
     };
     var ctrlKeys = []; for (var cq = 1; cq <= WQ; cq++) ctrlKeys.push(CTRL[cq - 1]);
     var wCtrl = [];

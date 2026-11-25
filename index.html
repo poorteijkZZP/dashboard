@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125i">
-<script src="assets/thema.js?v=20261125i"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125k">
+<script src="assets/thema.js?v=20261125k"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -232,11 +232,11 @@
                   <sc-if value="{{wi.hasPill}}" hint-placeholder-val="{{ false }}">
                     <span class="tlist"><button type="button" class="{{wi.pillCls}}" title="{{wi.pillT}}" onClick="{{wi.toggle}}" onContextMenu="{{wi.menu}}">{{wi.pillL}}</button></span>
                   </sc-if>
-                  <button type="button" class="name" style="flex: 1 1 auto; min-width: 0; text-align: left" onClick="{{wi.open}}">{{wi.naam}}</button>
+                  <button type="button" class="name wnaam" title="{{wi.naam}}" onClick="{{wi.open}}">{{wi.naam}}</button>
+                  <span class="winfo">{{wi.info}}</span>
                   <sc-if value="{{wi.toonAdmin}}" hint-placeholder-val="{{ false }}">
                     <span class="mini" style="{{wi.adS}}">{{wi.admin}}</span>
                   </sc-if>
-                  <span style="font-size: 12px; color: var(--tx-5e5e5e); text-align: right">{{wi.info}}</span>
                 </div>
               </sc-for>
             </div>
@@ -1329,9 +1329,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125i"></script>
-<script src="assets/xlsx.js?v=20261125i"></script>
-<script src="assets/store.js?v=20261125i"></script>
-<script src="assets/app.js?v=20261125i"></script>
+<script src="assets/runtime.js?v=20261125k"></script>
+<script src="assets/xlsx.js?v=20261125k"></script>
+<script src="assets/store.js?v=20261125k"></script>
+<script src="assets/app.js?v=20261125k"></script>
 </body>
 </html>
