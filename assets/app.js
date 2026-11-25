@@ -629,6 +629,7 @@ class Component extends DCLogic {
     });
     var baseList = all.filter(function (c) { return inBase(c) && cur.f(c) && (!q || c.naam.toLowerCase().indexOf(q) >= 0); });
     var breakdown = s.scope === 'alle' ? ADMINS.map(function (a) { var on = s.adminF === a; return { admin:initial(a), avS:avS(a), n: baseList.filter(function (c) { return c.admin === a; }).length, cls: on ? 'chip chipbtn on' : 'chip chipbtn', t: on ? 'Klik om weer iedereen te tonen' : 'Alleen klanten van ' + a, pick: function () { self.setState({ scope:'alle', adminF: on ? 'alle' : a }); } }; }).filter(function (b) { return b.n > 0 || s.adminF === b.admin; }) : [];
+    breakdown.unshift({ admin:'Iedereen', avS:'', n: baseList.length, cls: s.adminF === 'alle' ? 'chip chipbtn on iedereen' : 'chip chipbtn iedereen', t:'Klanten van iedereen', pick: function () { self.setState({ scope:'alle', adminF:'alle' }); } });
 
     var pillCls = function (on, na, late, due, w) { return na ? 'pill na' : on ? 'pill done' : w ? 'pill wacht' : late ? 'pill late' : due ? 'pill due' : 'pill'; };
     var kenmList = function (c) {
@@ -750,7 +751,7 @@ class Component extends DCLogic {
       out.push(Object.assign(regel('Btw Q' + (WQ + 1), g.btw), { code:'btw' + WQ }));
       var lk = list.filter(lopend), nr = lk.filter(function (c) { return kwRond(c, WQ); }).length;
       if (lk.length) { var pr = Math.round(nr / lk.length * 100); out.push({ l:'Kwartaal rond', tekst: nr + ' van ' + lk.length + (lk.length === 1 ? ' klant' : ' klanten'), pct: pr + '%', bar:'width: ' + pr + '%', kleur:'var(--bg-4f8a3c)', ring: ringStijl(pr, 'var(--bg-4f8a3c)'), toon:true, rond:true, code:'nietrond' }); }
-      out.forEach(function (x) { x.pick = x.code ? zetOpen(x.code) : function () {}; x.cls = 'rbitem klik' + (x.code && s.openF === x.code ? ' on' : '') + (x.code ? '' : ' geen'); x.t = x.code ? (s.openF === x.code ? 'Klik om het filter uit te zetten' : 'Klik: toon alleen klanten waarbij dit nog open staat') : ''; });
+      out.forEach(function (x) { x.pick = x.code ? zetOpen(x.code) : function () {}; x.cls = 'rbitem klik' + (x.code && s.openF === x.code ? ' on' : '') + (x.code ? '' : ' geen'); x.kcls = 'kpi kring' + (x.code && s.openF === x.code ? ' on' : '') + (x.code ? '' : ' geen'); x.t = x.code ? (s.openF === x.code ? 'Klik om het filter uit te zetten' : 'Klik: toon alleen klanten waarbij dit nog open staat') : ''; });
       return out.filter(function (x) { return x.toon; });
     })();
 

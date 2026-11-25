@@ -681,3 +681,14 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .witem > span.winfo:last-child{flex:none;min-width:0}
 .kenedit{display:flex;flex-direction:column;gap:12px;padding:14px;border:1px solid var(--ln-d0ccc6);border-radius:12px;background:var(--bg-fbfaf8)}
 .sregel span{white-space:nowrap;flex:none}.sregel b{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.kpigrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:10px}
+.kpi.kring{flex-direction:row;align-items:center;gap:12px}
+.kpi.kring .ring{width:54px;height:54px;--d:6px}.kpi.kring .ring b{font-size:13px}
+.kringtxt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi.kring.geen{cursor:default}
+.zoektitel{min-height:40px!important;width:280px!important;flex:0 0 280px!important;box-sizing:border-box}
+.zoektitel input{width:100%!important}
+.chipbtn.iedereen{background:var(--bg-ffffff);border:1px solid var(--ln-d0ccc6);color:var(--tx-2b2b2b)}
+.chipbtn.iedereen.on{outline:2.5px solid var(--tx-2b2b2b);outline-offset:2px}
+.chipbtn.iedereen.on::before{content:'✓';font-weight:900;margin-right:2px}
+.chipbtn.iedereen b{background:var(--bg-f1efec)!important;color:var(--tx-2b2b2b)!important;padding:0 5px;border-radius:999px}

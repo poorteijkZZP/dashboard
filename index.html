@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261125m">
-<script src="assets/thema.js?v=20261125m"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261125o">
+<script src="assets/thema.js?v=20261125o"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -253,11 +253,17 @@
 
     <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 16px">
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 100%">
-        <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Overzicht</h1>
+        <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Overzicht</h1>
+          <label class="zoektitel" style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 12px; min-height: 42px; flex: 0 1 260px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-5e5e5e)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input type="search" placeholder="Zoek klant" aria-label="Zoek klant" value="{{q}}" onChange="{{onQ}}" style="border: 0; outline: none; font-size: 14px; width: 100%; background: transparent; min-height: 40px">
+      </label>
+        </div>
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px">
+    <div class="kpigrid">
       <sc-for list="{{kpis}}" as="k" hint-placeholder-count="7">
         <button type="button" class="{{k.cls}}" onClick="{{k.pick}}">
           <span style="font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">{{k.label}}</span>
@@ -265,6 +271,14 @@
           <span style="font-size: 12px; color: var(--tx-5e5e5e)">{{k.sub}}</span>
         </button>
       </sc-for>
+      <sc-if value="{{ringen}}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{verloop}}" as="vl" hint-placeholder-count="4">
+          <button type="button" class="{{vl.kcls}}" title="{{vl.t}}" onClick="{{vl.pick}}">
+            <span class="ring" style="{{vl.ring}}"><b>{{vl.pct}}</b></span>
+            <span class="kringtxt"><span style="font-size: 13px; font-weight: 600; color: var(--tx-5e5e5e)">{{vl.l}}</span><span style="font-size: 12px; color: var(--tx-5e5e5e)">{{vl.tekst}}</span></span>
+          </button>
+        </sc-for>
+      </sc-if>
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
@@ -289,15 +303,15 @@
           </span>
           <span style="font-size: 13px; color: var(--tx-5e5e5e)">{{viewCount}}</span>
         </div>
-        <div class="verloop">
+        <sc-if value="{{geenRingen}}" hint-placeholder-val="{{ false }}"><div class="verloop">
           <span class="vtitel">{{verloopTitel}}</span>
-          <sc-if value="{{ringen}}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{geenRingen}}" hint-placeholder-val="{{ false }}">
             <div class="vringen"><sc-for list="{{verloop}}" as="vl" hint-placeholder-count="3"><button type="button" class="{{vl.cls}}" title="{{vl.t}}" onClick="{{vl.pick}}"><span class="ring" style="{{vl.ring}}"><b>{{vl.pct}}</b></span><span style="text-align: left"><span class="rbl" style="display: block">{{vl.l}}</span><span class="rbsub" style="display: block">{{vl.tekst}}</span></span></button></sc-for></div>
           </sc-if>
           <sc-for list="{{verloopBalk}}" as="vl" hint-placeholder-count="3">
             <div class="vitem"><span class="vl">{{vl.l}}</span><span class="tbar"><span style="{{vl.bar}}; background: {{vl.kleur}}"></span></span><span class="vt"><b>{{vl.pct}}</b> · {{vl.tekst}}</span></div>
           </sc-for>
-        </div>
+        </div></sc-if>
         <div class="snelrij">
           <span class="sneltitel">Collega</span>
                               <sc-for list="{{breakdown}}" as="b" hint-placeholder-count="4">
@@ -307,10 +321,6 @@
           <span class="sneltitel">Nog open</span>
           <sc-for list="{{snelF}}" as="sf" hint-placeholder-count="6"><button type="button" class="{{sf.cls}}" title="{{sf.t}}" onClick="{{sf.pick}}">{{sf.l}}<b>{{sf.n}}</b></button></sc-for>
           <span class="snelsep"></span>
-          <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-ffffff); border: 1px solid var(--ln-d0ccc6); border-radius: 8px; padding: 0 12px; min-height: 42px; flex: 0 1 260px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke: var(--ic-5e5e5e)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
-        <input type="search" placeholder="Zoek klant" aria-label="Zoek klant" value="{{q}}" onChange="{{onQ}}" style="border: 0; outline: none; font-size: 14px; width: 100%; background: transparent; min-height: 40px">
-      </label>
           <button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{exportKlanten}}" title="Exporteert precies deze weergave, met filters en sortering">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
             Excel
@@ -1375,9 +1385,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261125m"></script>
-<script src="assets/xlsx.js?v=20261125m"></script>
-<script src="assets/store.js?v=20261125m"></script>
-<script src="assets/app.js?v=20261125m"></script>
+<script src="assets/runtime.js?v=20261125o"></script>
+<script src="assets/xlsx.js?v=20261125o"></script>
+<script src="assets/store.js?v=20261125o"></script>
+<script src="assets/app.js?v=20261125o"></script>
 </body>
 </html>
