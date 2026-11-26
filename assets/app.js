@@ -38,10 +38,10 @@ var BTWM = false; // btw per maand: alleen als label bij de klant, geen aparte a
 function winQ() { var n = (VANDAAG.getFullYear() - JAAR) * 12 + VANDAAG.getMonth() - 1; return Math.max(0, Math.min(3, Math.floor(n / 3))); }
 var CTRL = ['cq1', 'cq2', 'cq3'];
 function emptyForm() {
-  return { naam:'', admin:'Jeroen', pakket:'ZZP basis', facturen:'250', vanY:String(new Date().getFullYear()), vanQ:String(Math.floor(new Date().getMonth() / 3)), freq:'maand', bank:'BK', software:'AFAS SB', up:true, rechtsvorm:'Eenmanszaak', regime:'Normaal', pand:'', btwMaand:false, pers:false, best:false, km:false, uzgb:false, motor:false, fiets:false, review:false, voornaam:'', achternaam:'', email:'', btwnr:'', btwid:'', bijz:'' };
+  return { dCtrl:true, dJw:true, dIb:true, naam:'', admin:'Jeroen', pakket:'ZZP basis', facturen:'250', vanY:String(new Date().getFullYear()), vanQ:String(Math.floor(new Date().getMonth() / 3)), freq:'maand', bank:'BK', software:'AFAS SB', up:true, rechtsvorm:'Eenmanszaak', regime:'Normaal', pand:'', btwMaand:false, pers:false, best:false, km:false, uzgb:false, motor:false, fiets:false, review:false, voornaam:'', achternaam:'', email:'', btwnr:'', btwid:'', bijz:'' };
 }
 function C(o) {
-  var c = Object.assign({ status:'Actief', freq:'maand', software:'AFAS SB', up:true, rechtsvorm:'Eenmanszaak', regime:'Normaal', pand:'', btwMaand:false, pers:false, best:false, km:false, uzgb:false, motor:false, fiets:false, bijz:'', notities:'', m:9, btw:[1,1,0,0], cq1:1, cq2:1, cq3:0, c25:1, jw25:1, ib25:0, j25na:false, pakket:'ZZP plus', facturen:'', review:false, btwnr:'', btwid:'', vanY:2022, vanQ:0, einde:null, log:[] }, o);
+  var c = Object.assign({ dCtrl:true, dJw:true, dIb:true, status:'Actief', freq:'maand', software:'AFAS SB', up:true, rechtsvorm:'Eenmanszaak', regime:'Normaal', pand:'', btwMaand:false, pers:false, best:false, km:false, uzgb:false, motor:false, fiets:false, bijz:'', notities:'', m:9, btw:[1,1,0,0], cq1:1, cq2:1, cq3:0, c25:1, jw25:1, ib25:0, j25na:false, pakket:'ZZP plus', facturen:'', review:false, btwnr:'', btwid:'', vanY:2022, vanQ:0, einde:null, log:[] }, o);
   var ms = [];
   for (var i = 0; i < 12; i++) ms.push(i < c.m);
   c.months = ms;
@@ -548,12 +548,19 @@ class Component extends DCLogic {
     var role = this.state.role;
     if (this.state.editId) {
       var id = this.state.editId;
-      this.upd(id, function (n) { Object.keys(f).forEach(function (k) { n[k] = f[k]; }); n.vanY = parseInt(f.vanY, 10); n.vanQ = parseInt(f.vanQ, 10); }, 'Klantgegevens gewijzigd');
+      this.upd(id, function (n) {
+        Object.keys(f).forEach(function (k) { n[k] = f[k]; }); n.vanY = parseInt(f.vanY, 10); n.vanQ = parseInt(f.vanQ, 10);
+        // Diensten aan of uit: het jaarwerk over vorig jaar meteen laten meebewegen (wat al gedaan is blijft staan)
+        [['dCtrl', 'c25'], ['dJw', 'jw25'], ['dIb', 'ib25']].forEach(function (x) {
+          if (f[x[0]] === false && n[x[1]] !== true && n[x[1]] !== 1) n[x[1]] = null;
+          if (f[x[0]] !== false && (n[x[1]] === null || n[x[1]] === undefined) && !n.j25na && n.vanY < JAAR) n[x[1]] = false;
+        });
+      }, 'Klantgegevens gewijzigd');
       this.setState({ mutMode:'menu', editId:null, err:'', mutMsg:'Gegevens opgeslagen.' });
       return;
     }
     var nid = this.state.clients.reduce(function (m, c) { return Math.max(m, c.id); }, 0) + 1;
-    var nc = C(Object.assign({}, f, { id:nid, m:0, btw:[0,0,0,0], cq2:0, cq3:0, c25:0, jw25:0, ib25:0, j25na:parseInt(f.vanY, 10) >= JAAR,
+    var nc = C(Object.assign({}, f, { id:nid, m:0, btw:[0,0,0,0], cq2:0, cq3:0, c25: f.dCtrl === false ? null : 0, jw25: f.dJw === false ? null : 0, ib25: f.dIb === false ? null : 0, j25na:parseInt(f.vanY, 10) >= JAAR,
       log:[{ wie:role, wat:'Klant aangemaakt (klant vanaf ' + f.vanY + ' Q' + (parseInt(f.vanQ, 10) + 1) + '). Voortgangsregel ' + JAAR + ' automatisch toegevoegd.', wanneer:nowLabel() }] }));
     if (STORE.live) {
       var self = this;
@@ -849,7 +856,7 @@ class Component extends DCLogic {
       var secties = [
         { t:'Algemeen', r:[{ k:'Rechtsvorm', v:vul(c.rechtsvorm) }, { k:'Contactpersoon', v:vul((c.voornaam + ' ' + c.achternaam).trim()) }, { k:'E-mail', v:vul(c.email) }, { k:'Administrateur', v:vul(c.admin) }, { k:'Klant sinds', v:vanLabel(c) }, { k:'Status', v: e ? c.status + ' per ' + e.datum + ' (' + e.reden + ')' : c.status }].concat(e && c.status === 'Opgezegd' ? [{ k:'Jaarwerk door ons', v: STORE.tmJaar(c, 'jw') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'jw') }, { k:'IB door ons', v: STORE.tmJaar(c, 'ib') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'ib') }] : []) },
         { t:'Pakket en facturatie', r:[{ k:'Pakket', v:vul(c.pakket) }, { k:'Facturen per jaar', v:vul(c.facturen) }, { k:'Google review', v: c.review ? 'Geplaatst' : 'Nog niet' }] },
-        { t:'Fiscaal', r:[{ k:'Btw-regime', v:vul(c.regime) }, { k:'Btw-aangifte', v: c.regime === 'Normaal' ? (c.btwMaand ? 'Per maand' : 'Per kwartaal') : 'Geen' }, { k:'Btw-nummer', v:vul(c.btwnr) }, { k:'Btw-ID', v:vul(c.btwid) }] },
+        { t:'Fiscaal', r:[{ k:'Btw-regime', v:vul(c.regime) }, { k:'Btw-aangifte', v: c.regime === 'Normaal' ? (c.btwMaand ? 'Per maand' : 'Per kwartaal') : 'Geen' }, { k:'Btw-nummer', v:vul(c.btwnr) }, { k:'Btw-ID', v:vul(c.btwid) }, { k:'Jaarwerk door ons', v: [c.dCtrl !== false ? 'controle' : '', c.dJw !== false ? 'jaarwerk' : '', c.dIb !== false ? (/BV/.test(c.rechtsvorm) ? 'IB dga' : 'IB') : ''].filter(Boolean).join(' · ') || 'geen' }] },
         { t:'Administratie', r:[{ k:'Verwerking', v: c.freq === 'maand' ? 'Per maand' : 'Per kwartaal' }, { k:'Bank', v: c.bank === 'BK' ? 'Bankkoppeling (BK)' : c.bank === 'geen' ? 'Geen koppeling' : vul(c.bank) }, { k:'Boekhoudpakket', v:vul(c.software) }, { k:'Altijd up2date', v: c.up ? 'Ja, levert minimaal 1x per maand aan' : 'Nee' }] },
         { t:'Bezittingen', r:bezit }
       ];
@@ -860,7 +867,7 @@ class Component extends DCLogic {
       var ownSaved = s.ownNotes[c.id] || '', ownDraft = s.ownDraft[c.id] !== undefined ? s.ownDraft[c.id] : ownSaved;
       d = {
         snel:snel, blokken:[0,1,2,3].map(function (qi) { var b = blok(c, qi); b.cls = qi === WQ ? 'qb cur' : 'qb'; if (qi === 0) b.tiles = [{ isGap:true, isTile:false, isSep:false }, { isSep:true, isTile:false, verborgen:true }].concat(b.tiles); return b; }),
-        jaarTegels:[tegel(c, 'c25', 0, 'controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, 'IB', 'IB-aangifte ' + vj())],
+        jaarTegels:[tegel(c, 'c25', 0, 'controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, /BV/.test(c.rechtsvorm) ? 'IB dga' : 'IB', (/BV/.test(c.rechtsvorm) ? 'IB-aangifte dga ' : 'IB-aangifte ') + vj())],
         ownDraft: ownDraft, ownInfo: s.ownDraft[c.id] !== undefined && s.ownDraft[c.id] !== ownSaved ? 'Niet opgeslagen' : (ownSaved ? 'Alleen voor jou zichtbaar' : ''),
         ownBtnCls: s.ownDraft[c.id] !== undefined && s.ownDraft[c.id] !== ownSaved ? 'btn primary' : 'btn',
         gegevens2: alleKenm, secties:secties,
@@ -1032,7 +1039,7 @@ class Component extends DCLogic {
     });
     var jwRows = jwLijst.map(function (c) {
       return { naam:c.naam, init:initial(c.admin), avS:avS(c.admin), open:function () { self.setState({ page:'klanten', sel:c.id, tab:'over' }); self.loadLog(c.id); },
-        tiles:[tegel(c, 'c25', 0, 'Controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'Jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, 'IB', 'IB-aangifte ' + vj())],
+        tiles:[tegel(c, 'c25', 0, 'Controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'Jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, /BV/.test(c.rechtsvorm) ? 'IB dga' : 'IB', (/BV/.test(c.rechtsvorm) ? 'IB-aangifte dga ' : 'IB-aangifte ') + vj())],
         status: c.status !== 'Actief' ? c.status : '', hasStatus: c.status !== 'Actief', notitie: c.notities || '' };
     });
     var jwSeg = function (id) { return s.jwF === id ? 'seg on' : 'seg'; };
@@ -1358,7 +1365,7 @@ class Component extends DCLogic {
       bNieuwCls:bCls('nieuw'), bMutCls:bCls('muteren'), bSelCls:bCls('sel'), bAnaCls:bCls('ana'),
       bNieuw:goSub('nieuw'), bMut:goSub('muteren'), bSel:goSub('sel'), bAna:function () { goSub('ana')(); if (STORE.live) STORE.loadAfvinkLog().then(function (r) { self.setState({ afvinkLog:r }); }).catch(function () { self.setState({ afvinkLog:[] }); }); },
       showForm: s.bsub === 'nieuw' || isEdit, isEdit:isEdit,
-      factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: var(--bg-f1efec)' : '',
+      ibFormLabel: /BV/.test(s.form.rechtsvorm || '') ? 'IB-aangifte dga' : 'IB-aangifte', factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: var(--bg-f1efec)' : '',
       factHint: FACT[s.form.pakket] ? 'Vast bij pakket ' + s.form.pakket : 'Zelf invullen bij ' + s.form.pakket.toLowerCase(),
       formTitle: isEdit ? 'Gegevens wijzigen: ' + (mC ? mC.naam : '') : 'Nieuwe klant toevoegen',
       formHint: isEdit ? 'De wijziging wordt met jouw naam in de historie vastgelegd.' : 'Na opslaan staat de klant direct in Voortgang ' + JAAR + ' bij de gekozen administrateur. Perioden vóór het startkwartaal worden niet van toepassing.',

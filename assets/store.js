@@ -15,8 +15,11 @@
     btwMaand: 'btw_per_maand', pers: 'personenauto', best: 'bestelauto', km: 'km_registratie', uzgb: 'verklaring_uzgb',
     kmuzgb: 'km_uzgb_splitsen', motor: 'motor', fiets: 'fiets', pand: 'pand', bijz: 'bijzonderheden', email: 'email',
     voornaam: 'voornaam', achternaam: 'achternaam', btwnr: 'btw_nummer', btwid: 'btw_id', review: 'google_review',
-    vanY: 'vanaf_jaar', vanQ: 'vanaf_kwartaal', stopY: 'gestopt_jaar', einde: 'einde'
+    vanY: 'vanaf_jaar', vanQ: 'vanaf_kwartaal', stopY: 'gestopt_jaar', einde: 'einde',
+    dCtrl: 'dienst_controle', dJw: 'dienst_jaarwerk', dIb: 'dienst_ib'
   };
+  // Diensten per klant: staan aan tenzij uitdrukkelijk uitgezet
+  var DIENST = ['dCtrl', 'dJw', 'dIb'];
   var BOOL = ['up', 'btwMaand', 'pers', 'best', 'km', 'uzgb', 'kmuzgb', 'motor', 'fiets', 'review'];
   // modelveld -> kolom in tabel "voortgang"
   var VG = { cq1: 'controle_q1', cq2: 'controle_q2', cq3: 'controle_q3', c25: 'controle_vj', jw25: 'jaarwerk_vj', ib25: 'ib_vj', notities: 'notities' };
@@ -25,6 +28,7 @@
     if (f === 'vanQ') return v === null || v === undefined || v === '' || isNaN(v) ? null : parseInt(v, 10) + 1;
     if (f === 'vanY' || f === 'stopY' || f === 'facturen') return v === '' || v === null || v === undefined || isNaN(parseInt(v, 10)) ? null : parseInt(v, 10);
     if (BOOL.indexOf(f) >= 0) return !!v;
+    if (DIENST.indexOf(f) >= 0) return v !== false;
     if (f === 'einde') return v || null;
     if (typeof v === 'string') return v.trim() === '' ? null : v;
     return v === undefined ? null : v;
@@ -34,6 +38,7 @@
     var c = { id: k.id };
     Object.keys(KL).forEach(function (f) { var x = k[KL[f]]; c[f] = x === null || x === undefined ? '' : x; });
     BOOL.forEach(function (f) { c[f] = !!k[KL[f]]; });
+    DIENST.forEach(function (f) { c[f] = k[KL[f]] !== false; });
     c.vanY = k.vanaf_jaar || null;
     c.vanQ = k.vanaf_kwartaal ? k.vanaf_kwartaal - 1 : null;
     c.stopY = k.gestopt_jaar || null;
@@ -97,9 +102,9 @@
     row.controle_q2 = stopt ? null : false;
     row.controle_q3 = stopt ? null : false;
     var jwMee = !stopt || jaar - 1 <= tmJaar(c, 'jw'), ibMee = !stopt || jaar - 1 <= tmJaar(c, 'ib');
-    row.controle_vj = jwMee ? false : null;
-    row.jaarwerk_vj = jwMee ? false : null;
-    row.ib_vj = ibMee ? false : null;
+    row.controle_vj = jwMee && c.dCtrl !== false ? false : null;
+    row.jaarwerk_vj = jwMee && c.dJw !== false ? false : null;
+    row.ib_vj = ibMee && c.dIb !== false ? false : null;
     return row;
   }
 
@@ -291,7 +296,11 @@
       for (var i = 0; i < 12; i++) vg['m' + (i + 1)] = c.mna && c.mna[i] ? null : !!c.months[i];
       for (var q = 0; q < 4; q++) vg['btw' + (q + 1)] = c.bna && c.bna[q] ? null : !!c.btw[q];
       vg.controle_q1 = false; vg.controle_q2 = false; vg.controle_q3 = false;
-      vg.controle_vj = null; vg.jaarwerk_vj = null; vg.ib_vj = null;
+      // Klant al van voor dit jaar: jaarwerk over vorig jaar staat open voor de diensten die we doen
+      var oud = c.vanY && parseInt(c.vanY, 10) < jaar;
+      vg.controle_vj = oud && c.dCtrl !== false ? false : null;
+      vg.jaarwerk_vj = oud && c.dJw !== false ? false : null;
+      vg.ib_vj = oud && c.dIb !== false ? false : null;
       return sb.from('voortgang').insert(vg).then(must).then(function () { return log(id, text); }).then(function () { return id; });
     });
   };

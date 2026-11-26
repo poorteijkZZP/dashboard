@@ -67,6 +67,11 @@ create table if not exists public.klanten (
 -- Voortgang per klant per jaar. Iedereen mag afvinken.
 -- Een lege waarde (null) betekent: niet van toepassing.
 -- controle_vj, jaarwerk_vj en ib_vj gaan over het vorige jaar (in 2026 dus over 2025).
+-- Diensten per klant voor het jaarwerk (standaard alles aan)
+alter table public.klanten add column if not exists dienst_controle boolean not null default true;
+alter table public.klanten add column if not exists dienst_jaarwerk boolean not null default true;
+alter table public.klanten add column if not exists dienst_ib boolean not null default true;
+
 create table if not exists public.voortgang (
   klant_id bigint not null references public.klanten (id) on delete cascade,
   jaar integer not null,
