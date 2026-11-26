@@ -271,6 +271,9 @@ class Component extends DCLogic {
       sf:emptySf(), cols:colSet(['naam','voornaam','email','admin']), saveName:'', saved:[{ l:'Herinnering IB', f:Object.assign(emptySf(), { status:'Actief', ib:'open' }) }], copied:false
     };
     var ui = uiLaden(), st = this.state;
+    // Startpagina per gebruiker (Vandaag of Overzicht), alleen bij een nieuwe sessie
+    try { var sp = localStorage.getItem('pz-start'); if (sp === 'klanten' || sp === 'werk') st.page = sp; } catch (x) {}
+    st.startPagina = st.page === 'klanten' ? 'klanten' : 'werk';
     UI_VELDEN.forEach(function (k) { if (ui[k] !== undefined) st[k] = ui[k]; });
     st.klikMode = 'gedaan';
     st.bankF = 'alle';
@@ -316,6 +319,10 @@ class Component extends DCLogic {
     var ui = uiLaden();
     if (ui.role && ui.role !== me.naam) ui = {};
     var herstel = { me:me, role:me.naam, phase:'loading', werkWie: ui.werkWie !== undefined ? ui.werkWie : null };
+    if (me.startPagina === 'werk' || me.startPagina === 'klanten') {
+      herstel.startPagina = me.startPagina; try { localStorage.setItem('pz-start', me.startPagina); } catch (x) {}
+      if (ui.page === undefined) herstel.page = me.startPagina;
+    }
     if (me.rol !== 'beheer' && (this.state.page === 'beheer')) herstel.page = 'werk';
     this.setState(herstel);
     STORE.loadSettings().then(function (st) {
@@ -1265,7 +1272,8 @@ class Component extends DCLogic {
       isBeheer: beheer,
       roleInitial: initial(role), roleAvS: avS(role) + '; width: 34px; height: 34px; font-size: 14px', mijnOpen: !!s.mijnOpen,
       toggleMijn: function (ev) { ev.stopPropagation(); self.setState({ mijnOpen: !s.mijnOpen }); },
-      mijnNaam: role, kleurKeuzes: KLEUR_OPTIES.map(function (k) { var on = kleurVan(role) && kleurVan(role)[0] === k[0]; return { l:k[0], stijl:'background: ' + k[1] + '; color: ' + k[2], cls: on ? 'kswatch on' : 'kswatch', pick:function (ev) { ev.stopPropagation(); self.zetKleur(on ? null : k[0]); } }; }),
+      mijnNaam: role,
+      startOpties: [['werk', 'Vandaag'], ['klanten', 'Overzicht']].map(function (o) { var on = (s.startPagina || 'werk') === o[0]; return { l:o[1], cls: on ? 'chip chipbtn startk on' : 'chip chipbtn startk', pick:function (ev) { ev.stopPropagation(); try { localStorage.setItem('pz-start', o[0]); } catch (x) {} self.setState({ startPagina:o[0] }); if (STORE.live && STORE.saveStart) STORE.saveStart(o[0]).catch(function () {}); } }; }), kleurKeuzes: KLEUR_OPTIES.map(function (k) { var on = kleurVan(role) && kleurVan(role)[0] === k[0]; return { l:k[0], stijl:'background: ' + k[1] + '; color: ' + k[2], cls: on ? 'kswatch on' : 'kswatch', pick:function (ev) { ev.stopPropagation(); self.zetKleur(on ? null : k[0]); } }; }),
       jaarLabel: String(JAAR), vjLabel: String(vj()),
       jaren: s.jaren.map(function (y) { return { v:String(y), l:String(y) }; }), jaarSel: String(s.jaar), onJaar: function (ev) { self.kiesJaar(ev.target.value); },
       noop: function (ev) { ev.stopPropagation(); },

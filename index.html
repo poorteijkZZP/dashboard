@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261126c">
-<script src="assets/thema.js?v=20261126c"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261126d">
+<script src="assets/thema.js?v=20261126d"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -123,6 +123,8 @@
               <span class="mps">Mijn kleur, voor iedereen zichtbaar bij mijn initialen</span>
               <div class="kswatches"><sc-for list="{{kleurKeuzes}}" as="kk" hint-placeholder-count="8"><button type="button" class="{{kk.cls}}" style="{{kk.stijl}}" title="{{kk.l}}" aria-label="{{kk.l}}" onClick="{{kk.pick}}">{{roleInitial}}</button></sc-for></div>
               <span class="mps">Nog een keer klikken op je kleur zet hem weer uit.</span>
+              <span class="mpt" style="font-size: 13px; margin-top: 6px">Dashboard start op</span>
+              <div style="display: flex; gap: 8px"><sc-for list="{{startOpties}}" as="so" hint-placeholder-count="2"><button type="button" class="{{so.cls}}" onClick="{{so.pick}}">{{so.l}}</button></sc-for></div>
             </div>
           </sc-if>
         </span>
@@ -1408,9 +1410,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261126c"></script>
-<script src="assets/xlsx.js?v=20261126c"></script>
-<script src="assets/store.js?v=20261126c"></script>
-<script src="assets/app.js?v=20261126c"></script>
+<script src="assets/runtime.js?v=20261126d"></script>
+<script src="assets/xlsx.js?v=20261126d"></script>
+<script src="assets/store.js?v=20261126d"></script>
+<script src="assets/app.js?v=20261126d"></script>
 </body>
 </html>
