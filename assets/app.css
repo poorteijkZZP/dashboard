@@ -701,3 +701,6 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .inuittab{grid-template-columns:120px 110px 110px!important}.inuittab input{width:90px;min-height:32px;border:1px solid var(--ln-d0ccc6);border-radius:8px;padding:0 8px;background:var(--bg-ffffff);color:var(--tx-2b2b2b);font:inherit}
 .chipbtn.startk{background:var(--bg-ffffff);border:1px solid var(--ln-d0ccc6);color:var(--tx-2b2b2b);padding:0 12px;height:32px}
 .chipbtn.startk.on{background:var(--bg-2b2b2b);color:var(--tx-ffffff);border-color:var(--ln-2b2b2b)}.chipbtn.startk.on::before{content:'✓ '}
+/* Collegaknoppen: aantal zonder vlakje, gewoon vet achter de initialen */
+.kleurchip b,.chipbtn.iedereen b,.wiek b,.wiek[style*="background"] b{background:none!important;padding:0!important;min-width:0!important;height:auto!important;margin-left:5px;font-weight:800;color:inherit!important;opacity:.75}
+.kleurchip,.chipbtn.iedereen{font-weight:600}
