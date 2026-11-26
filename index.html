@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261126a">
-<script src="assets/thema.js?v=20261126a"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261126b">
+<script src="assets/thema.js?v=20261126b"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -631,9 +631,7 @@
               </label>
               <label class="field">Klant vanaf jaar
                 <select value="{{form.vanY}}" onChange="{{on.vanY}}">
-                  <option value="2025">2025</option>
-                  <option value="2026">2026</option>
-                  <option value="2027">2027</option>
+                  <sc-for list="{{vanJaren}}" as="vj" hint-placeholder-count="5"><option value="{{vj}}">{{vj}}</option></sc-for>
                 </select>
               </label>
               <label class="field">Klant vanaf kwartaal
@@ -1394,9 +1392,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261126a"></script>
-<script src="assets/xlsx.js?v=20261126a"></script>
-<script src="assets/store.js?v=20261126a"></script>
-<script src="assets/app.js?v=20261126a"></script>
+<script src="assets/runtime.js?v=20261126b"></script>
+<script src="assets/xlsx.js?v=20261126b"></script>
+<script src="assets/store.js?v=20261126b"></script>
+<script src="assets/app.js?v=20261126b"></script>
 </body>
 </html>

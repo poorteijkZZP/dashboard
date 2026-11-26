@@ -1365,6 +1365,7 @@ class Component extends DCLogic {
       bNieuwCls:bCls('nieuw'), bMutCls:bCls('muteren'), bSelCls:bCls('sel'), bAnaCls:bCls('ana'),
       bNieuw:goSub('nieuw'), bMut:goSub('muteren'), bSel:goSub('sel'), bAna:function () { goSub('ana')(); if (STORE.live) STORE.loadAfvinkLog().then(function (r) { self.setState({ afvinkLog:r }); }).catch(function () { self.setState({ afvinkLog:[] }); }); },
       showForm: s.bsub === 'nieuw' || isEdit, isEdit:isEdit,
+      vanJaren: (function () { var o = []; for (var y = JAAR + 1; y >= 2015; y--) o.push(String(y)); return o; })(),
       ibFormLabel: /BV/.test(s.form.rechtsvorm || '') ? 'IB-aangifte dga' : 'IB-aangifte', factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: var(--bg-f1efec)' : '',
       factHint: FACT[s.form.pakket] ? 'Vast bij pakket ' + s.form.pakket : 'Zelf invullen bij ' + s.form.pakket.toLowerCase(),
       formTitle: isEdit ? 'Gegevens wijzigen: ' + (mC ? mC.naam : '') : 'Nieuwe klant toevoegen',
