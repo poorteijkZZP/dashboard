@@ -161,6 +161,7 @@ function kwSoorten(list, q) {
 // Eigen kleur per collega (8 tinten), zichtbaar voor iedereen
 var KLEUR_OPTIES = [['oranje','#FFD4AE','#7A3B00'],['rood','#F8C4C0','#7E1F17'],['roze','#F6C6DA','#7A1846'],['paars','#DCCDF4','#4B2A85'],['blauw','#C6DBF5','#173F73'],['turquoise','#BFE8E6','#0D5654'],['groen','#CDE8C6','#23561F'],['grijs','#DEDAD5','#3F3B37']];
 var KLEUREN = {};
+var INUIT = {}; // handmatige aantallen nieuw/gestopt per kwartaal, sleutel 'JJJJ-K'
 var KLEUR_STANDAARD = { Jeroen:'oranje', Gea:'paars', Marco:'blauw', Yassir:'groen' };
 function kleurVan(naam) { var k = KLEUREN[naam] || KLEUR_STANDAARD[naam]; if (k === 'antraciet') k = 'grijs'; for (var i = 0; i < KLEUR_OPTIES.length; i++) if (KLEUR_OPTIES[i][0] === k) return KLEUR_OPTIES[i]; return null; }
 function avS(naam) { var k = kleurVan(naam); return k ? 'background: ' + k[1] + ' !important; color: ' + k[2] + ' !important' : ''; }
@@ -277,7 +278,7 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
-    if (!STORE.live) laadDemoKleuren();
+    if (!STORE.live) { laadDemoKleuren(); try { INUIT = JSON.parse(localStorage.getItem('pz-inuit') || '{}') || {}; } catch (e) { INUIT = {}; } }
     var zelf = this; window.__herteken = function () { zelf.setState({}); };
     var self = this;
     var sluit = function () { if (self.state.menu || self.state.uitleg || self.state.kenmOpen || self.state.vpPop || self.state.mijnOpen) self.setState({ menu:null, uitleg:false, kenmOpen:false, vpPop:null, mijnOpen:false }); };
@@ -340,7 +341,7 @@ class Component extends DCLogic {
   reload() {
     var self = this;
     STORE.loadVp().then(function (r) { self.setState({ vp:r }); }).catch(function () {});
-    return STORE.loadSettings().then(function (st) { PEIL_HANDMATIG = st.peil === undefined ? null : st.peil; var kl = {}; Object.keys(st).forEach(function (k) { if (k.indexOf('kleur:') === 0) kl[k.slice(6)] = st[k]; }); KLEUREN = kl; }).catch(function () {}).then(function () { return STORE.loadAll(self.state.jaar); }).then(function (cl) {
+    return STORE.loadSettings().then(function (st) { PEIL_HANDMATIG = st.peil === undefined ? null : st.peil; var kl = {}; Object.keys(st).forEach(function (k) { if (k.indexOf('kleur:') === 0) kl[k.slice(6)] = st[k]; }); KLEUREN = kl; INUIT = st.inuitstroom && typeof st.inuitstroom === 'object' ? st.inuitstroom : {}; }).catch(function () {}).then(function () { return STORE.loadAll(self.state.jaar); }).then(function (cl) {
       self.setState({ clients: cl, saveErr:'' });
       if (self.state.sel) self.loadLog(self.state.sel);
     }).catch(function (e) { self.setState({ saveErr:'Gegevens laden mislukt: ' + e.message, phase:'app' }); });
@@ -856,7 +857,7 @@ class Component extends DCLogic {
       var secties = [
         { t:'Algemeen', r:[{ k:'Rechtsvorm', v:vul(c.rechtsvorm) }, { k:'Contactpersoon', v:vul((c.voornaam + ' ' + c.achternaam).trim()) }, { k:'E-mail', v:vul(c.email) }, { k:'Administrateur', v:vul(c.admin) }, { k:'Klant sinds', v:vanLabel(c) }, { k:'Status', v: e ? c.status + ' per ' + e.datum + ' (' + e.reden + ')' : c.status }].concat(e && c.status === 'Opgezegd' ? [{ k:'Jaarwerk door ons', v: STORE.tmJaar(c, 'jw') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'jw') }, { k:'IB door ons', v: STORE.tmJaar(c, 'ib') < JAAR - 1 ? 'niet meer' : 't/m ' + STORE.tmJaar(c, 'ib') }] : []) },
         { t:'Pakket en facturatie', r:[{ k:'Pakket', v:vul(c.pakket) }, { k:'Facturen per jaar', v:vul(c.facturen) }, { k:'Google review', v: c.review ? 'Geplaatst' : 'Nog niet' }] },
-        { t:'Fiscaal', r:[{ k:'Btw-regime', v:vul(c.regime) }, { k:'Btw-aangifte', v: c.regime === 'Normaal' ? (c.btwMaand ? 'Per maand' : 'Per kwartaal') : 'Geen' }, { k:'Btw-nummer', v:vul(c.btwnr) }, { k:'Btw-ID', v:vul(c.btwid) }, { k:'Jaarwerk door ons', v: [c.dCtrl !== false ? 'controle' : '', c.dJw !== false ? 'jaarwerk' : '', c.dIb !== false ? (/BV/.test(c.rechtsvorm) ? 'IB dga' : 'IB') : ''].filter(Boolean).join(' · ') || 'geen' }] },
+        { t:'Fiscaal', r:[{ k:'Btw-regime', v:vul(c.regime) }, { k:'Btw-aangifte', v: c.regime === 'Normaal' ? (c.btwMaand ? 'Per maand' : 'Per kwartaal') : 'Geen' }, { k:'Btw-nummer', v:vul(c.btwnr) }, { k:'Btw-ID', v:vul(c.btwid) }, { k:'Jaarwerk door ons', v: [c.dCtrl !== false ? 'controle' : '', c.dJw !== false ? 'jaarwerk' : '', c.dIb !== false ? 'IB' : ''].filter(Boolean).join(' · ') || 'geen' }] },
         { t:'Administratie', r:[{ k:'Verwerking', v: c.freq === 'maand' ? 'Per maand' : 'Per kwartaal' }, { k:'Bank', v: c.bank === 'BK' ? 'Bankkoppeling (BK)' : c.bank === 'geen' ? 'Geen koppeling' : vul(c.bank) }, { k:'Boekhoudpakket', v:vul(c.software) }, { k:'Altijd up2date', v: c.up ? 'Ja, levert minimaal 1x per maand aan' : 'Nee' }] },
         { t:'Bezittingen', r:bezit }
       ];
@@ -867,7 +868,7 @@ class Component extends DCLogic {
       var ownSaved = s.ownNotes[c.id] || '', ownDraft = s.ownDraft[c.id] !== undefined ? s.ownDraft[c.id] : ownSaved;
       d = {
         snel:snel, blokken:[0,1,2,3].map(function (qi) { var b = blok(c, qi); b.cls = qi === WQ ? 'qb cur' : 'qb'; if (qi === 0) b.tiles = [{ isGap:true, isTile:false, isSep:false }, { isSep:true, isTile:false, verborgen:true }].concat(b.tiles); return b; }),
-        jaarTegels:[tegel(c, 'c25', 0, 'controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, /BV/.test(c.rechtsvorm) ? 'IB dga' : 'IB', (/BV/.test(c.rechtsvorm) ? 'IB-aangifte dga ' : 'IB-aangifte ') + vj())],
+        jaarTegels:[tegel(c, 'c25', 0, 'controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, 'IB', 'IB-aangifte ' + vj())],
         ownDraft: ownDraft, ownInfo: s.ownDraft[c.id] !== undefined && s.ownDraft[c.id] !== ownSaved ? 'Niet opgeslagen' : (ownSaved ? 'Alleen voor jou zichtbaar' : ''),
         ownBtnCls: s.ownDraft[c.id] !== undefined && s.ownDraft[c.id] !== ownSaved ? 'btn primary' : 'btn',
         gegevens2: alleKenm, secties:secties,
@@ -961,7 +962,7 @@ class Component extends DCLogic {
     werkSecties[werkSecties.length - 1].vt = 'klanten';
     werkSecties[werkSecties.length - 1].geenBalk = true;
     werkSecties.forEach(function (x) { x.toonBalk = !x.geenBalk; });
-    var teamM = [['n','Klanten'],['adm','Administratie ' + peilLabel()],['ctrlR', WQ > 0 ? 'Controle Q' + WQ : 'Controle'],['btwR','Btw Q' + (WQ + 1)],['rond','Q' + (WQ + 1) + ' rond'],['c25R','Controle ' + vj()],['jwR','Jaarwerk ' + vj()],['ibR','IB ' + vj()],['wacht','Wacht op klant']];
+    var teamM = [['n','Klanten'],['ctrlR', WQ > 0 ? 'Controle Q' + WQ : 'Controle'],['adm','Administratie ' + peilLabel()],['btwR','Btw Q' + (WQ + 1)],['rond','Q' + (WQ + 1) + ' rond'],['c25R','Controle ' + vj()],['jwR','Jaarwerk ' + vj()],['ibR','IB ' + vj()],['wacht','Wacht op klant']];
     var teamRaw = ADMINS.map(function (a) {
       var kl = all.filter(function (c) { return lopend(c) && c.admin === a; });
       var cnt = function (f) { return kl.filter(f).length; };
@@ -1039,7 +1040,7 @@ class Component extends DCLogic {
     });
     var jwRows = jwLijst.map(function (c) {
       return { naam:c.naam, init:initial(c.admin), avS:avS(c.admin), open:function () { self.setState({ page:'klanten', sel:c.id, tab:'over' }); self.loadLog(c.id); },
-        tiles:[tegel(c, 'c25', 0, 'Controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'Jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, /BV/.test(c.rechtsvorm) ? 'IB dga' : 'IB', (/BV/.test(c.rechtsvorm) ? 'IB-aangifte dga ' : 'IB-aangifte ') + vj())],
+        tiles:[tegel(c, 'c25', 0, 'Controle', 'Controle ' + vj()), tegel(c, 'jw25', 0, 'Jaarwerk', 'Jaarwerk ' + vj()), tegel(c, 'ib25', 0, 'IB', 'IB-aangifte ' + vj())],
         status: c.status !== 'Actief' ? c.status : '', hasStatus: c.status !== 'Actief', notitie: c.notities || '' };
     });
     var jwSeg = function (id) { return s.jwF === id ? 'seg on' : 'seg'; };
@@ -1170,16 +1171,36 @@ class Component extends DCLogic {
     var punten = [];
     for (var py = eersteJaar; py <= 2025; py++) punten.push({ l:String(py), v:actiefOp(new Date(py, 11, 31, 23, 59)) });
     var kwRijen = [];
-    for (var ky = 2026; ky <= VANDAAG.getFullYear(); ky++) for (var kq = 0; kq < 4; kq++) {
-      var kb = new Date(ky, kq * 3, 1), ke = new Date(ky, kq * 3 + 3, 0, 23, 59);
-      if (kb > VANDAAG) break;
+    // Handmatig ingevulde aantallen (Beheer > Rapporten) gaan voor; anders berekend uit start- en einddatum
+    var kwLijst = [];
+    if (INUIT['2025-4']) kwLijst.push([2025, 3]);
+    for (var ky = 2026; ky <= VANDAAG.getFullYear(); ky++) for (var kq = 0; kq < 4; kq++) { if (new Date(ky, kq * 3, 1) <= VANDAAG) kwLijst.push([ky, kq]); }
+    kwLijst.forEach(function (x) {
+      var ky = x[0], kq = x[1], kb = new Date(ky, kq * 3, 1), ke = new Date(ky, kq * 3 + 3, 0, 23, 59), hm = INUIT[ky + '-' + (kq + 1)];
       var lopendQ = ke > VANDAAG, peilD = lopendQ ? VANDAAG : ke;
-      var nNieuw = all.filter(function (c) { var sd = startD(c); return sd && sd >= kb && sd <= ke; }).length;
-      var nStop = all.filter(function (c) { var ed = stopD(c); return ed && ed >= kb && ed <= ke && ed <= VANDAAG && ed.getFullYear() > 1900; }).length;
-      var nAct = actiefOp(peilD);
-      punten.push({ l:'Q' + (kq + 1) + ' ' + String(ky).slice(2), v:nAct });
-      kwRijen.push({ p:'Q' + (kq + 1) + ' ' + ky + (lopendQ ? '*' : ''), n:nNieuw, s:nStop, net:(nNieuw - nStop > 0 ? '+' : '') + (nNieuw - nStop), a:nAct });
+      var nNieuw = hm ? (parseInt(hm.n, 10) || 0) : all.filter(function (c) { var sd = startD(c); return sd && sd >= kb && sd <= ke; }).length;
+      var nStop = hm ? (parseInt(hm.s, 10) || 0) : all.filter(function (c) { var ed = stopD(c); return ed && ed >= kb && ed <= ke && ed <= VANDAAG && ed.getFullYear() > 1900; }).length;
+      kwRijen.push({ ky:ky, kq:kq, sleutel: ky + '-' + (kq + 1), hm:!!hm, p:'Q' + (kq + 1) + ' ' + ky + (lopendQ ? '*' : ''), n:nNieuw, s:nStop, net:(nNieuw - nStop > 0 ? '+' : '') + (nNieuw - nStop), a:actiefOp(peilD), peilD:peilD });
+    });
+    // Met handmatige aantallen: actief per kwartaaleinde terugrekenen vanaf het huidige aantal actieve klanten
+    if (kwRijen.length && kwRijen.every(function (r) { return r.hm; })) {
+      var stand = actiefOp(VANDAAG);
+      for (var ri = kwRijen.length - 1; ri >= 0; ri--) { kwRijen[ri].a = stand; stand = stand - kwRijen[ri].n + kwRijen[ri].s; }
     }
+    kwRijen.forEach(function (r) { punten.push({ l:'Q' + (r.kq + 1) + ' ' + String(r.ky).slice(2), v:r.a }); });
+    var inuitEdit = s.inuitEdit ? kwRijen.map(function (r) { var d = s.inuitEdit[r.sleutel] || {}; return { p:r.p, n: d.n !== undefined ? d.n : String(r.n), s: d.s !== undefined ? d.s : String(r.s),
+      onN: function (ev) { var v = ev.target.value; self.setState(function (st) { var e = Object.assign({}, st.inuitEdit); e[r.sleutel] = Object.assign({}, e[r.sleutel], { n:v }); return { inuitEdit:e }; }); },
+      onS: function (ev) { var v = ev.target.value; self.setState(function (st) { var e = Object.assign({}, st.inuitEdit); e[r.sleutel] = Object.assign({}, e[r.sleutel], { s:v }); return { inuitEdit:e }; }); } }; }) : [];
+    var inuitStart = function () { var e = {}; if (!INUIT['2025-4']) e['2025-4'] = { n:'', s:'' }; self.setState({ inuitEdit: e, inuit25: true }); };
+    var inuitSave = function () {
+      var e = s.inuitEdit || {}, nieuw = {};
+      kwRijen.forEach(function (r) { var d = e[r.sleutel] || {}; nieuw[r.sleutel] = { n: parseInt(d.n !== undefined ? d.n : r.n, 10) || 0, s: parseInt(d.s !== undefined ? d.s : r.s, 10) || 0 }; });
+      if (e['2025-4'] && (e['2025-4'].n !== '' || e['2025-4'].s !== '')) nieuw['2025-4'] = { n: parseInt(e['2025-4'].n, 10) || 0, s: parseInt(e['2025-4'].s, 10) || 0 };
+      INUIT = nieuw;
+      if (STORE.live) STORE.setSetting('inuitstroom', nieuw).catch(function (x) { self.setState({ saveErr:'Opslaan mislukt: ' + x.message }); });
+      else { try { localStorage.setItem('pz-inuit', JSON.stringify(nieuw)); } catch (x) {} }
+      self.setState({ inuitEdit:null });
+    };
     var lijnSvg = (function () {
       if (punten.length < 2) return '';
       var W = 900, H = 280, L = 44, R = 20, T = 34, B = 44;
@@ -1366,7 +1387,7 @@ class Component extends DCLogic {
       bNieuw:goSub('nieuw'), bMut:goSub('muteren'), bSel:goSub('sel'), bAna:function () { goSub('ana')(); if (STORE.live) STORE.loadAfvinkLog().then(function (r) { self.setState({ afvinkLog:r }); }).catch(function () { self.setState({ afvinkLog:[] }); }); },
       showForm: s.bsub === 'nieuw' || isEdit, isEdit:isEdit,
       vanJaren: (function () { var o = []; for (var y = JAAR + 1; y >= 2015; y--) o.push(String(y)); return o; })(),
-      ibFormLabel: /BV/.test(s.form.rechtsvorm || '') ? 'IB-aangifte dga' : 'IB-aangifte', factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: var(--bg-f1efec)' : '',
+factLocked: !!FACT[s.form.pakket], factStyle: FACT[s.form.pakket] ? 'background: var(--bg-f1efec)' : '',
       factHint: FACT[s.form.pakket] ? 'Vast bij pakket ' + s.form.pakket : 'Zelf invullen bij ' + s.form.pakket.toLowerCase(),
       formTitle: isEdit ? 'Gegevens wijzigen: ' + (mC ? mC.naam : '') : 'Nieuwe klant toevoegen',
       formHint: isEdit ? 'De wijziging wordt met jouw naam in de historie vastgelegd.' : 'Na opslaan staat de klant direct in Voortgang ' + JAAR + ' bij de gekozen administrateur. Perioden vóór het startkwartaal worden niet van toepassing.',
@@ -1463,6 +1484,11 @@ class Component extends DCLogic {
       afvinkKop: KATS.map(function (k) { return { l:k[1] }; }), afvinkRijen:afvinkRijen, afvinkTot:afvinkTot, afvinkLaden: STORE.live && s.afvinkLog === null,
       rapJaren: (function () { var y = VANDAAG.getFullYear(); return [y, y - 1].map(function (x) { return { v:String(x), l:String(x) }; }); })(), rapJaarSel: String(s.rapJaar), onRapJaar: function (ev) { self.setState({ rapJaar: parseInt(ev.target.value, 10) }); },
       showAna: s.bsub === 'ana', ana:ana, act:act, lijnSvg:lijnSvg, hasLijn: !!lijnSvg, kwRijen:kwRijen, hasKw: kwRijen.length > 0,
+      inuitOpen: !!s.inuitEdit, inuitDicht: !s.inuitEdit, inuitRijen: inuitEdit, inuitStart: inuitStart, inuitSave: inuitSave, inuitStop: function () { self.setState({ inuitEdit:null }); },
+      inuit25: (s.inuitEdit && s.inuitEdit['2025-4']) || {}, heeft25: !!(s.inuitEdit && s.inuitEdit['2025-4']),
+      inuit25N: function (ev) { var v = ev.target.value; self.setState(function (st) { var e = Object.assign({}, st.inuitEdit); e['2025-4'] = Object.assign({}, e['2025-4'], { n:v }); return { inuitEdit:e }; }); },
+      inuit25S: function (ev) { var v = ev.target.value; self.setState(function (st) { var e = Object.assign({}, st.inuitEdit); e['2025-4'] = Object.assign({}, e['2025-4'], { s:v }); return { inuitEdit:e }; }); },
+      kwBron: kwRijen.some(function (r) { return r.hm; }) ? 'Aantallen nieuw en gestopt zijn handmatig ingevuld; actief einde kwartaal is teruggerekend vanaf het huidige aantal.' : 'Berekend uit de start- en einddatum per klant.',
       anaKpi: [{ l:'Nieuwe klanten ' + (JAAR - 4) + ' t/m ' + JAAR, v:sumN }, { l:'Gestopt ' + (JAAR - 4) + ' t/m ' + JAAR, v:sumS }, { l:'Netto groei', v:(sumN - sumS >= 0 ? '+' : '') + (sumN - sumS) }]
     };
   }

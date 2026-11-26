@@ -8,8 +8,8 @@
 <link rel="icon" href="assets/logo-icoon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/app.css?v=20261126b">
-<script src="assets/thema.js?v=20261126b"></script>
+<link rel="stylesheet" href="assets/app.css?v=20261126c">
+<script src="assets/thema.js?v=20261126c"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -648,9 +648,9 @@
             <div style="display: flex; flex-wrap: wrap; gap: 8px">
               <label class="check"><input type="checkbox" checked="{{form.dCtrl}}" onChange="{{on.dCtrl}}">Controle grootboek</label>
               <label class="check"><input type="checkbox" checked="{{form.dJw}}" onChange="{{on.dJw}}">Jaarwerk (balansdossier)</label>
-              <label class="check"><input type="checkbox" checked="{{form.dIb}}" onChange="{{on.dIb}}">{{ibFormLabel}}</label>
+              <label class="check"><input type="checkbox" checked="{{form.dIb}}" onChange="{{on.dIb}}">IB-aangifte</label>
             </div>
-            <span style="font-size: 12px; color: var(--tx-5e5e5e)">Wat uit staat, telt niet mee in de overzichten en komt bij de jaarovergang niet terug. Bij een BV gaat het om de IB-aangifte van de dga.</span>
+            <span style="font-size: 12px; color: var(--tx-5e5e5e)">Wat uit staat, telt niet mee in de overzichten en komt bij de jaarovergang niet terug. Bijvoorbeeld: holding wel IB, werkmaatschappij geen IB.</span>
 
             <p class="sec">Verwerking</p>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
@@ -1018,7 +1018,23 @@
                     <span><b>{{kr.p}}</b></span><span style="color: var(--tx-b35a00); font-weight: 700">{{kr.n}}</span><span style="color: var(--tx-4a4a4a); font-weight: 700">{{kr.s}}</span><span style="font-weight: 800">{{kr.net}}</span><span style="font-weight: 800">{{kr.a}}</span>
                   </sc-for>
                 </div>
-                <span style="font-size: 12px; color: var(--tx-5e5e5e)">* lopend kwartaal, stand van vandaag. Gestopt telt mee in het kwartaal van de einddatum.</span>
+                <span style="font-size: 12px; color: var(--tx-5e5e5e)">* lopend kwartaal, stand van vandaag. {{kwBron}}</span>
+                <sc-if value="{{inuitDicht}}" hint-placeholder-val="{{ true }}"><div><button type="button" class="btn" style="min-height: 34px; font-size: 13px" onClick="{{inuitStart}}">Aantallen nieuw en gestopt invullen</button></div></sc-if>
+                <sc-if value="{{inuitOpen}}" hint-placeholder-val="{{ false }}">
+                  <div class="kenedit">
+                    <p class="sec">Aantallen per kwartaal invullen</p>
+                    <div class="kwtab inuittab">
+                      <span class="kh">Kwartaal</span><span class="kh">Nieuw</span><span class="kh">Gestopt</span>
+                      <sc-if value="{{heeft25}}" hint-placeholder-val="{{ false }}">
+                        <span><b>Q4 2025</b></span><input type="number" min="0" value="{{inuit25.n}}" onChange="{{inuit25N}}"><input type="number" min="0" value="{{inuit25.s}}" onChange="{{inuit25S}}">
+                      </sc-if>
+                      <sc-for list="{{inuitRijen}}" as="ir" hint-placeholder-count="4">
+                        <span><b>{{ir.p}}</b></span><input type="number" min="0" value="{{ir.n}}" onChange="{{ir.onN}}"><input type="number" min="0" value="{{ir.s}}" onChange="{{ir.onS}}">
+                      </sc-for>
+                    </div>
+                    <div style="display: flex; gap: 8px"><button type="button" class="btn primary" onClick="{{inuitSave}}">Opslaan</button><button type="button" class="btn" onClick="{{inuitStop}}">Annuleren</button></div>
+                  </div>
+                </sc-if>
               </div>
             </sc-if>
             <div style="display: flex; flex-direction: column; gap: 10px">
@@ -1392,9 +1408,9 @@
 </template>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.9/dist/umd/supabase.min.js"></script>
-<script src="assets/runtime.js?v=20261126b"></script>
-<script src="assets/xlsx.js?v=20261126b"></script>
-<script src="assets/store.js?v=20261126b"></script>
-<script src="assets/app.js?v=20261126b"></script>
+<script src="assets/runtime.js?v=20261126c"></script>
+<script src="assets/xlsx.js?v=20261126c"></script>
+<script src="assets/store.js?v=20261126c"></script>
+<script src="assets/app.js?v=20261126c"></script>
 </body>
 </html>

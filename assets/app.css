@@ -698,3 +698,4 @@ button.tdt:hover{border-color:var(--ln-8e8e8e)}
 .kpigrid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .ringblok{margin:0!important;padding:12px 18px!important}.ringblok .rbkop{margin-bottom:8px}
 .tt.ct.d,.qb .tt.ct.d{font-weight:500}
+.inuittab{grid-template-columns:120px 110px 110px!important}.inuittab input{width:90px;min-height:32px;border:1px solid var(--ln-d0ccc6);border-radius:8px;padding:0 8px;background:var(--bg-ffffff);color:var(--tx-2b2b2b);font:inherit}
